@@ -1,37 +1,41 @@
 package service
 
 import (
-	"errors"
 	"genesis-currency-api/pkg/dto"
+	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/models"
 	"gorm.io/gorm"
 )
 
-type EmailService struct {
-	db *gorm.DB
+type UserService struct {
+	DB *gorm.DB
 }
 
-func New(db *gorm.DB) *EmailService {
-	return &EmailService{
-		db: db,
+func NewUserService(db *gorm.DB) *UserService {
+	return &UserService{
+		DB: db,
 	}
 }
 
-func (s *EmailService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error) {
+func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error) {
 	entity := dto.SaveRequestToModel(user)
 
-	if result := s.db.Create(&entity); result.Error != nil {
-		return dto.UserResponseDTO{}, errors.New(result.Error.Error())
+	if s.existsByEmail(entity.Email) {
+		return dto.UserResponseDTO{}, errors.NewUserWithEmailExistsErrorError()
+	}
+
+	if result := s.DB.Create(&entity); result.Error != nil {
+		return dto.UserResponseDTO{}, result.Error
 	}
 
 	return dto.ToDTO(entity), nil
 }
 
-func (s *EmailService) GetAll() ([]dto.UserResponseDTO, error) {
+func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 	var users []models.User
 
-	if result := s.db.Find(&users); result.Error != nil {
-		return nil, errors.New(result.Error.Error())
+	if result := s.DB.Find(&users); result.Error != nil {
+		return nil, result.Error
 	}
 
 	var result []dto.UserResponseDTO
@@ -40,4 +44,13 @@ func (s *EmailService) GetAll() ([]dto.UserResponseDTO, error) {
 	}
 
 	return result, nil
+}
+
+func (s *UserService) existsByEmail(email string) bool {
+	var user models.User
+	if result := s.DB.Where("email = ?", email).First(&user); result.Error != nil {
+		return false
+	}
+
+	return true
 }

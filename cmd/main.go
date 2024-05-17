@@ -20,8 +20,8 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
-	emailService := service.New(d)
-	controller.RegisterRoutes(r, emailService)
+	userService := service.NewUserService(d)
+	controller.RegisterRoutes(r, userService)
 
 	port := viper.Get("APP_PORT").(string)
 	r.Run(port)

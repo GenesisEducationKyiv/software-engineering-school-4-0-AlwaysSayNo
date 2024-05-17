@@ -20,6 +20,8 @@ func ErrorHandler() gin.HandlerFunc {
 			switch e := err.(type) {
 			case *errors.ValidationError:
 				c.JSON(http.StatusBadRequest, ErrorResponse{Message: e.Error()})
+			case *errors.UserWithEmailExistsError:
+				c.JSON(http.StatusBadRequest, ErrorResponse{Message: "User with such email is already subscribed"})
 			default:
 				c.JSON(http.StatusInternalServerError, ErrorResponse{Message: "unknown error"})
 			}

@@ -8,16 +8,11 @@ import (
 	"net/http"
 )
 
-type EmailController interface {
-	FindAll(ctx *gin.Context)
-	Add(ctx *gin.Context)
+type UserController struct {
+	emailService *service.UserService
 }
 
-type controller struct {
-	emailService *service.EmailService
-}
-
-func (c *controller) FindAll(ctx *gin.Context) {
+func (c *UserController) FindAll(ctx *gin.Context) {
 	result, err := c.emailService.GetAll()
 
 	if err != nil {
@@ -28,7 +23,7 @@ func (c *controller) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func (c *controller) Add(ctx *gin.Context) {
+func (c *UserController) Add(ctx *gin.Context) {
 	var dto dto.UserSaveRequestDTO
 	err := ctx.ShouldBindJSON(&dto)
 
@@ -40,15 +35,15 @@ func (c *controller) Add(ctx *gin.Context) {
 	result, err := c.emailService.Save(dto)
 
 	if err != nil {
-		ctx.Error(errors.NewDbError("", err))
+		ctx.Error(errors.NewUserWithEmailExistsErrorError())
 		return
 	}
 
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func RegisterRoutes(r *gin.Engine, s *service.EmailService) {
-	c := &controller{
+func RegisterRoutes(r *gin.Engine, s *service.UserService) {
+	c := &UserController{
 		s,
 	}
 
