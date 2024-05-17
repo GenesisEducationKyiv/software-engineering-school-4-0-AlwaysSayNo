@@ -1,8 +1,8 @@
 package controller
 
 import (
+	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
-	"genesis-currency-api/pkg/request"
 	"genesis-currency-api/pkg/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,20 +18,32 @@ type controller struct {
 }
 
 func (c *controller) FindAll(ctx *gin.Context) {
-	result := c.emailService.FindAll()
+	result, err := c.emailService.GetAll()
+
+	if err != nil {
+		ctx.Error(errors.NewDbError("", err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, &result)
 }
 
 func (c *controller) Add(ctx *gin.Context) {
-	var email request.Email
-	err := ctx.ShouldBindJSON(&email)
+	var dto dto.UserSaveRequestDTO
+	err := ctx.ShouldBindJSON(&dto)
 
 	if err != nil {
 		ctx.Error(errors.NewValidationError("", err))
 		return
 	}
 
-	result := c.emailService.Save(email)
+	result, err := c.emailService.Save(dto)
+
+	if err != nil {
+		ctx.Error(errors.NewDbError("", err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, &result)
 }
 
