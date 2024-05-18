@@ -9,11 +9,11 @@ import (
 )
 
 type UserController struct {
-	emailService *service.UserService
+	userService *service.UserService
 }
 
 func (c *UserController) FindAll(ctx *gin.Context) {
-	result, err := c.emailService.GetAll()
+	result, err := c.userService.GetAll()
 
 	if err != nil {
 		ctx.Error(errors.NewDbError("", err))
@@ -32,7 +32,7 @@ func (c *UserController) Add(ctx *gin.Context) {
 		return
 	}
 
-	result, err := c.emailService.Save(dto)
+	result, err := c.userService.Save(dto)
 
 	if err != nil {
 		ctx.Error(errors.NewUserWithEmailExistsErrorError())
@@ -42,7 +42,7 @@ func (c *UserController) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func RegisterRoutes(r *gin.Engine, s *service.UserService) {
+func UserRegisterRoutes(r *gin.Engine, s *service.UserService) {
 	c := &UserController{
 		s,
 	}

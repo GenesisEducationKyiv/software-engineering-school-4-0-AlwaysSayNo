@@ -22,7 +22,10 @@ func main() {
 	r.Use(middleware.ErrorHandler())
 
 	userService := service.NewUserService(d)
-	controller.RegisterRoutes(r, userService)
+	controller.UserRegisterRoutes(r, userService)
+
+	currencyService := service.NewCurrencyService()
+	controller.CurrencyRegisterRoutes(r, currencyService)
 
 	port := viper.Get("APP_PORT").(string)
 	r.Run(port)
