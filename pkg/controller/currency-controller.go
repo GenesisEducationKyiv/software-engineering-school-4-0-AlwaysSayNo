@@ -11,7 +11,7 @@ type CurrencyController struct {
 }
 
 func (c *CurrencyController) GetLatest(ctx *gin.Context) {
-	result, err := c.currencyService.GetCurrencyRates()
+	result, err := c.currencyService.GetCurrencyRate()
 
 	if err != nil {
 		ctx.Error(err)

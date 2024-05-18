@@ -22,11 +22,12 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
-	userService := service.NewUserService(d)
-	controller.UserRegisterRoutes(r, userService)
-
 	currencyService := service.NewCurrencyService()
 	controller.CurrencyRegisterRoutes(r, currencyService)
+
+	userService := service.NewUserService(d)
+	emailService := service.NewEmailService(userService, currencyService)
+	controller.UserRegisterRoutes(r, userService, emailService)
 
 	job.UpdateCurrency(currencyService)
 

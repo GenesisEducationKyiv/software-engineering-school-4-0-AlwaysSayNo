@@ -13,18 +13,18 @@ import (
 )
 
 type CurrencyService struct {
-	currencyRates *[]dto.CurrencyResponseDto
+	currencyRate dto.CurrencyResponseDto
 }
 
 func NewCurrencyService() *CurrencyService {
-	var rates []dto.CurrencyResponseDto
+	var currencyRate dto.CurrencyResponseDto
 	return &CurrencyService{
-		&rates,
+		currencyRate,
 	}
 }
 
-func (s *CurrencyService) GetCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
-	return s.currencyRates, nil
+func (s *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDto, error) {
+	return s.currencyRate, nil
 }
 
 func callCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
@@ -68,10 +68,23 @@ func (s *CurrencyService) UpdateCurrencyRates() {
 
 	currencyRates, err := callCurrencyRates()
 	if err != nil {
-		log.Fatalf("Failed to update currency rates")
+		log.Panic("Failed to update currency rates")
 		return
 	}
-	s.currencyRates = currencyRates
+
+	isUpdated := false
+	for _, r := range *currencyRates {
+		if r.FromCcy == "USD" {
+			s.currencyRate = r
+			isUpdated = true
+			break
+		}
+	}
+
+	if !isUpdated {
+		log.Panicf("No currency %s was found", "UAH")
+		return
+	}
 
 	log.Println("Finish updating currency rates")
 }

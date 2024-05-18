@@ -9,7 +9,8 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService  *service.UserService
+	emailService *service.EmailService
 }
 
 func (c *UserController) FindAll(ctx *gin.Context) {
@@ -42,12 +43,24 @@ func (c *UserController) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func UserRegisterRoutes(r *gin.Engine, s *service.UserService) {
+func (c *UserController) SendEmails(ctx *gin.Context) {
+	err := c.emailService.SendEmails()
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "")
+}
+
+func UserRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
 	c := &UserController{
-		s,
+		us,
+		es,
 	}
 
 	routes := r.Group("/api/emails")
 	routes.GET("/", c.FindAll)
 	routes.POST("/", c.Add)
+	routes.POST("/send", c.SendEmails)
 }
