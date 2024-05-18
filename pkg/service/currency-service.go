@@ -7,23 +7,28 @@ import (
 	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util/date"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
 
 type CurrencyService struct {
-	currencyApiUrl string
+	currencyRates *[]dto.CurrencyResponseDto
 }
 
 func NewCurrencyService() *CurrencyService {
-	apiUrl := getApiUrl()
+	var rates []dto.CurrencyResponseDto
 	return &CurrencyService{
-		currencyApiUrl: apiUrl,
+		&rates,
 	}
 }
 
 func (s *CurrencyService) GetCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
-	resp, err := http.Get(s.currencyApiUrl)
+	return s.currencyRates, nil
+}
+
+func callCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
+	resp, err := http.Get(getApiUrl())
 	if err != nil {
 		return nil, errors.NewApiError("Something went wrong while calling external API", err)
 	}
@@ -56,4 +61,17 @@ func (s *CurrencyService) GetCurrencyRates() (*[]dto.CurrencyResponseDto, error)
 
 func getApiUrl() string {
 	return "https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5"
+}
+
+func (s *CurrencyService) UpdateCurrencyRates() {
+	log.Println("Start updating currency rates")
+
+	currencyRates, err := callCurrencyRates()
+	if err != nil {
+		log.Fatalf("Failed to update currency rates")
+		return
+	}
+	s.currencyRates = currencyRates
+
+	log.Println("Finish updating currency rates")
 }

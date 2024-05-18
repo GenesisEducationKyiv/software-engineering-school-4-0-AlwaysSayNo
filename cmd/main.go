@@ -3,6 +3,7 @@ package main
 import (
 	"genesis-currency-api/pkg/common/db"
 	"genesis-currency-api/pkg/controller"
+	"genesis-currency-api/pkg/job"
 	"genesis-currency-api/pkg/middleware"
 	"genesis-currency-api/pkg/service"
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,8 @@ func main() {
 
 	currencyService := service.NewCurrencyService()
 	controller.CurrencyRegisterRoutes(r, currencyService)
+
+	job.UpdateCurrency(currencyService)
 
 	port := viper.Get("APP_PORT").(string)
 	r.Run(port)
