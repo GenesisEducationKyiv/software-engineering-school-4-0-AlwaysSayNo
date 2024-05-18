@@ -25,7 +25,7 @@ func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, er
 	}
 
 	if result := s.DB.Create(&entity); result.Error != nil {
-		return dto.UserResponseDTO{}, result.Error
+		return dto.UserResponseDTO{}, errors.NewDbError("", result.Error)
 	}
 
 	return dto.ToDTO(entity), nil
@@ -35,7 +35,7 @@ func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 	var users []model.User
 
 	if result := s.DB.Find(&users); result.Error != nil {
-		return nil, result.Error
+		return nil, errors.NewDbError("", result.Error)
 	}
 
 	var result []dto.UserResponseDTO

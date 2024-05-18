@@ -45,10 +45,7 @@ func (s *EmailService) SendEmails() error {
 		return errors.NewInvalidStateError("Failed to parse the file", err)
 	}
 
-	rate, err := s.currencyService.GetCurrencyRate()
-	if err != nil {
-		return errors.NewInvalidStateError("Failed to fetch currency rate", err)
-	}
+	rate := s.currencyService.GetCurrencyRate()
 
 	var body bytes.Buffer
 	err = t.Execute(&body, rate)

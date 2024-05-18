@@ -23,12 +23,32 @@ func NewCurrencyService() *CurrencyService {
 	}
 }
 
-func (s *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDto, error) {
-	return s.currencyRate, nil
+func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
+	return s.currencyRate
 }
 
-func callCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
-	resp, err := http.Get(getApiUrl())
+func getCurrencyRateFromApi() (*[]dto.CurrencyResponseDto, error) {
+	apiResponses, err := callApi()
+	if err != nil {
+		return nil, err
+	}
+
+	var result []dto.CurrencyResponseDto
+	updateDate := date.Format(time.Now())
+	for _, r := range *apiResponses {
+		tmp := dto.ApiCurrencyResponseToDTO(r)
+		tmp.UpdateDate = updateDate
+		result = append(result, tmp)
+	}
+
+	return &result, nil
+}
+
+func callApi() (*[]dto.ApiCurrencyResponseDto, error) {
+	log.Println("Start calling external API")
+	apiUrl := getApiUrl()
+
+	resp, err := http.Get(apiUrl)
 	if err != nil {
 		return nil, errors.NewApiError("Something went wrong while calling external API", err)
 	}
@@ -40,23 +60,17 @@ func callCurrencyRates() (*[]dto.CurrencyResponseDto, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.NewApiError("Failed to read response body", err)
+		return nil, errors.NewInvalidStateError("Failed to read response body", err)
 	}
 
 	var apiResponses []dto.ApiCurrencyResponseDto
 	if err := json.Unmarshal(body, &apiResponses); err != nil {
-		return nil, errors.NewApiError("Failed to unmarshal response", err)
+		return nil, errors.NewInvalidStateError("Failed to unmarshal response", err)
 	}
 
-	var result []dto.CurrencyResponseDto
-	updateDate := date.Format(time.Now())
-	for _, r := range apiResponses {
-		tmp := dto.ApiCurrencyResponseToDTO(r)
-		tmp.UpdateDate = updateDate
-		result = append(result, tmp)
-	}
+	log.Println("Finish calling external API")
 
-	return &result, nil
+	return &apiResponses, nil
 }
 
 func getApiUrl() string {
@@ -66,7 +80,7 @@ func getApiUrl() string {
 func (s *CurrencyService) UpdateCurrencyRates() {
 	log.Println("Start updating currency rates")
 
-	currencyRates, err := callCurrencyRates()
+	currencyRates, err := getCurrencyRateFromApi()
 	if err != nil {
 		log.Panic("Failed to update currency rates")
 		return

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	service2 "genesis-currency-api/internal/service"
+	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
@@ -9,15 +9,15 @@ import (
 )
 
 type UserController struct {
-	userService  *service2.UserService
-	emailService *service2.EmailService
+	userService  *service.UserService
+	emailService *service.EmailService
 }
 
 func (c *UserController) FindAll(ctx *gin.Context) {
 	result, err := c.userService.GetAll()
 
 	if err != nil {
-		ctx.Error(errors.NewDbError("", err))
+		ctx.Error(err)
 		return
 	}
 
@@ -25,18 +25,17 @@ func (c *UserController) FindAll(ctx *gin.Context) {
 }
 
 func (c *UserController) Add(ctx *gin.Context) {
-	var dto dto.UserSaveRequestDTO
-	err := ctx.ShouldBindJSON(&dto)
+	var saveDto dto.UserSaveRequestDTO
+	err := ctx.ShouldBindJSON(&saveDto)
 
 	if err != nil {
 		ctx.Error(errors.NewValidationError("", err))
 		return
 	}
 
-	result, err := c.userService.Save(dto)
-
+	result, err := c.userService.Save(saveDto)
 	if err != nil {
-		ctx.Error(errors.NewUserWithEmailExistsErrorError())
+		ctx.Error(err)
 		return
 	}
 
@@ -53,7 +52,7 @@ func (c *UserController) SendEmails(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "")
 }
 
-func UserRegisterRoutes(r *gin.Engine, us *service2.UserService, es *service2.EmailService) {
+func UserRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
 	c := &UserController{
 		us,
 		es,
