@@ -15,6 +15,7 @@ func main() {
 
 	dbUrl := db.GetUrl()
 
+	db.RunMigrations(dbUrl)
 	d := db.Init(dbUrl)
 
 	r := gin.Default()

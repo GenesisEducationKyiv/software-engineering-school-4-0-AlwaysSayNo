@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"os"
+	"os/exec"
 )
 
 func Init(url string) *gorm.DB {
@@ -16,6 +17,15 @@ func Init(url string) *gorm.DB {
 	}
 
 	return db
+}
+
+func RunMigrations(dbUrl string) {
+	cmd := exec.Command("migrate", "-path", "pkg/common/db/migrations", "-database", dbUrl+"?sslmode=disable", "up")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
 }
 
 func GetUrl() string {
