@@ -58,8 +58,8 @@ func UserRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.Emai
 		es,
 	}
 
-	routes := r.Group("/api/emails")
+	routes := r.Group("/api")
 	routes.GET("/", c.FindAll)
-	routes.POST("/", c.Add)
+	routes.POST("/subscribe", c.Add)
 	routes.POST("/send", c.SendEmails)
 }

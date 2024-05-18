@@ -20,6 +20,6 @@ func CurrencyRegisterRoutes(r *gin.Engine, s *service.CurrencyService) {
 		s,
 	}
 
-	routes := r.Group("/api/currency")
-	routes.GET("/", c.GetLatest)
+	routes := r.Group("/api")
+	routes.GET("/rate", c.GetLatest)
 }

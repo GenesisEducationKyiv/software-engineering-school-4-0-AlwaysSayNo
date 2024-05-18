@@ -9,7 +9,7 @@ type ApiCurrencyResponseDto struct {
 	Sale    string `json:"sale"`
 }
 
-type CurrencyResponseDto struct {
+type CurrencyInfoDto struct {
 	FromCcy    string  `json:"fromCcy"`
 	ToCcy      string  `json:"toCcy"`
 	UpdateDate string  `json:"updateDate"`
@@ -17,13 +17,23 @@ type CurrencyResponseDto struct {
 	SaleRate   float64 `json:"saleRate"`
 }
 
-func ApiCurrencyResponseToDTO(dto ApiCurrencyResponseDto) CurrencyResponseDto {
+type CurrencyResponseDto struct {
+	Number float64 `json:"number"`
+}
+
+func ApiCurrencyResponseToInfoDTO(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
 	buy, _ := strconv.ParseFloat(dto.Buy, 64)
 	sale, _ := strconv.ParseFloat(dto.Sale, 64)
-	return CurrencyResponseDto{
+	return CurrencyInfoDto{
 		FromCcy:  dto.FromCcy,
 		ToCcy:    dto.BaseCcy,
 		BuyRate:  buy,
 		SaleRate: sale,
+	}
+}
+
+func InfoToResponseDTO(dto *CurrencyInfoDto) CurrencyResponseDto {
+	return CurrencyResponseDto{
+		Number: dto.SaleRate,
 	}
 }

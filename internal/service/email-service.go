@@ -45,7 +45,7 @@ func (s *EmailService) SendEmails() error {
 		return errors.NewInvalidStateError("Failed to parse the file", err)
 	}
 
-	rate := s.currencyService.GetCurrencyRate()
+	rate := s.currencyService.GetCurrencyInfo()
 
 	var body bytes.Buffer
 	err = t.Execute(&body, rate)
@@ -59,6 +59,10 @@ func (s *EmailService) SendEmails() error {
 	smtpPassword := viper.Get("SMTP_PASSWORD").(string)
 
 	users, _ := s.userService.GetAll()
+	if len(users) == 0 {
+		return errors.NewInvalidStateError("Emails list is empty", err)
+	}
+
 	to := []string{}
 	for _, u := range users {
 		to = append(to, u.Email)

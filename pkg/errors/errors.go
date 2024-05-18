@@ -20,6 +20,10 @@ type InvalidStateError struct {
 	customError
 }
 
+type InvalidInputError struct {
+	customError
+}
+
 func NewValidationError(message string, cause error) *ValidationError {
 	return &ValidationError{
 		customError: customError{
@@ -29,7 +33,7 @@ func NewValidationError(message string, cause error) *ValidationError {
 	}
 }
 
-func NewUserWithEmailExistsErrorError() *UserWithEmailExistsError {
+func NewUserWithEmailExistsError() *UserWithEmailExistsError {
 	return &UserWithEmailExistsError{
 		customError: customError{},
 	}
@@ -55,6 +59,15 @@ func NewApiError(message string, cause error) *ApiError {
 
 func NewInvalidStateError(message string, cause error) *InvalidStateError {
 	return &InvalidStateError{
+		customError: customError{
+			Message: message,
+			Cause:   cause,
+		},
+	}
+}
+
+func NewInvalidInputError(message string, cause error) *InvalidInputError {
+	return &InvalidInputError{
 		customError: customError{
 			Message: message,
 			Cause:   cause,

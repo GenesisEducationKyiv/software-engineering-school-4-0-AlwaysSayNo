@@ -21,7 +21,7 @@ func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, er
 	entity := dto.SaveRequestToModel(user)
 
 	if s.existsByEmail(entity.Email) {
-		return dto.UserResponseDTO{}, errors.NewUserWithEmailExistsErrorError()
+		return dto.UserResponseDTO{}, errors.NewUserWithEmailExistsError()
 	}
 
 	if result := s.DB.Create(&entity); result.Error != nil {

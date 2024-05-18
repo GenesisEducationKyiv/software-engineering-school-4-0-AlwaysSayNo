@@ -13,30 +13,34 @@ import (
 )
 
 type CurrencyService struct {
-	currencyRate dto.CurrencyResponseDto
+	currencyInfo dto.CurrencyInfoDto
 }
 
 func NewCurrencyService() *CurrencyService {
-	var currencyRate dto.CurrencyResponseDto
+	var currencyRate dto.CurrencyInfoDto
 	return &CurrencyService{
 		currencyRate,
 	}
 }
 
-func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
-	return s.currencyRate
+func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDto {
+	return s.currencyInfo
 }
 
-func getCurrencyRateFromApi() (*[]dto.CurrencyResponseDto, error) {
+func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
+	return dto.InfoToResponseDTO(&s.currencyInfo)
+}
+
+func getCurrencyRateFromApi() (*[]dto.CurrencyInfoDto, error) {
 	apiResponses, err := callApi()
 	if err != nil {
 		return nil, err
 	}
 
-	var result []dto.CurrencyResponseDto
+	var result []dto.CurrencyInfoDto
 	updateDate := date.Format(time.Now())
 	for _, r := range *apiResponses {
-		tmp := dto.ApiCurrencyResponseToDTO(r)
+		tmp := dto.ApiCurrencyResponseToInfoDTO(&r)
 		tmp.UpdateDate = updateDate
 		result = append(result, tmp)
 	}
@@ -89,7 +93,7 @@ func (s *CurrencyService) UpdateCurrencyRates() {
 	isUpdated := false
 	for _, r := range *currencyRates {
 		if r.FromCcy == "USD" {
-			s.currencyRate = r
+			s.currencyInfo = r
 			isUpdated = true
 			break
 		}
