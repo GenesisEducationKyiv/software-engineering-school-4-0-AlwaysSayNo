@@ -1,16 +1,16 @@
 package controller
 
 import (
+	service2 "genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
-	"genesis-currency-api/pkg/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type UserController struct {
-	userService  *service.UserService
-	emailService *service.EmailService
+	userService  *service2.UserService
+	emailService *service2.EmailService
 }
 
 func (c *UserController) FindAll(ctx *gin.Context) {
@@ -53,7 +53,7 @@ func (c *UserController) SendEmails(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "")
 }
 
-func UserRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
+func UserRegisterRoutes(r *gin.Engine, us *service2.UserService, es *service2.EmailService) {
 	c := &UserController{
 		us,
 		es,

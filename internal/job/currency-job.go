@@ -2,7 +2,7 @@ package job
 
 import (
 	"fmt"
-	"genesis-currency-api/pkg/service"
+	"genesis-currency-api/internal/service"
 	"github.com/go-co-op/gocron"
 	"time"
 )

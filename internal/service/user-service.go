@@ -1,9 +1,9 @@
 package service
 
 import (
+	"genesis-currency-api/internal/model"
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
-	"genesis-currency-api/pkg/models"
 	"gorm.io/gorm"
 )
 
@@ -32,7 +32,7 @@ func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, er
 }
 
 func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
-	var users []models.User
+	var users []model.User
 
 	if result := s.DB.Find(&users); result.Error != nil {
 		return nil, result.Error
@@ -47,7 +47,7 @@ func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 }
 
 func (s *UserService) existsByEmail(email string) bool {
-	var user models.User
+	var user model.User
 	if result := s.DB.Where("email = ?", email).First(&user); result.Error != nil {
 		return false
 	}

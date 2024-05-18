@@ -1,6 +1,8 @@
 package dto
 
-import "genesis-currency-api/pkg/models"
+import (
+	"genesis-currency-api/internal/model"
+)
 
 type UserResponseDTO struct {
 	ID        int64  `json:"id"`
@@ -15,7 +17,7 @@ type UserSaveRequestDTO struct {
 	LastName  string `json:"lastName" binding:"required,min=2,max=30"`
 }
 
-func ToDTO(entity models.User) UserResponseDTO {
+func ToDTO(entity model.User) UserResponseDTO {
 	return UserResponseDTO{
 		ID:        entity.ID,
 		Email:     entity.Email,
@@ -24,8 +26,8 @@ func ToDTO(entity models.User) UserResponseDTO {
 	}
 }
 
-func SaveRequestToModel(dto UserSaveRequestDTO) models.User {
-	return models.User{
+func SaveRequestToModel(dto UserSaveRequestDTO) model.User {
+	return model.User{
 		Email:     dto.Email,
 		FirstName: dto.FirstName,
 		LastName:  dto.LastName,
