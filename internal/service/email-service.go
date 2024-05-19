@@ -53,17 +53,24 @@ func (s *EmailService) SendEmails() error {
 		return errors.NewInvalidStateError("Failed to execute template:", err)
 	}
 
+	return s.send(&body)
+}
+
+func (s *EmailService) send(body *bytes.Buffer) error {
+	log.Println("Start sending emails")
+
 	smtpHost := viper.Get("SMTP_HOST").(string)
 	smtpPort := viper.Get("SMTP_PORT").(string)
-	smtpUser := viper.Get("SMTP_USER").(string)
-	smtpPassword := viper.Get("SMTP_PASSWORD").(string)
 
-	users, _ := s.userService.GetAll()
+	smtpUser := os.Getenv("SMTP_USER")
+	smtpPassword := os.Getenv("SMTP_PASSWORD")
+
+	users, err := s.userService.GetAll()
 	if len(users) == 0 {
 		return errors.NewInvalidStateError("Emails list is empty", err)
 	}
 
-	to := []string{}
+	var to []string
 	for _, u := range users {
 		to = append(to, u.Email)
 	}
@@ -80,6 +87,7 @@ func (s *EmailService) SendEmails() error {
 		return errors.NewInvalidStateError("Failed to send email:", err)
 	}
 
-	log.Println("Email sent successfully")
+	log.Println("Finish sending emails")
+
 	return nil
 }
