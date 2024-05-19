@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  my_postgres:
+    image: postgres:15.1
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: currency-api
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - my_postgres
+    environment:
+      - DB_HOST=my_postgres
+      - DB_PORT=5432
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=currency-api
+    ports:
+      - "8080:8080"
+    command: [ "./main" ]
+
+volumes:
+  postgres_volume:
