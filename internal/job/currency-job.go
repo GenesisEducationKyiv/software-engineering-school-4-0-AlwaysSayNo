@@ -1,20 +1,20 @@
 package job
 
 import (
-	"fmt"
 	"genesis-currency-api/internal/service"
-	"github.com/go-co-op/gocron"
+	"github.com/robfig/cron/v3"
+	"log"
 	"time"
 )
 
-func UpdateCurrency(currencyService *service.CurrencyService) {
-	scheduler := gocron.NewScheduler(time.UTC)
-
-	_, err := scheduler.Every(30).Minute().Do(currencyService.UpdateCurrencyRates)
-	if err != nil {
-		fmt.Println("Error scheduling task:", err)
-		return
-	}
-
-	go scheduler.StartAsync()
+// UpdateCurrencyJob is a cron function to update currency service cache.
+// It is executed every hour.
+func UpdateCurrencyJob(currencyService *service.CurrencyService) {
+	scheduler := cron.New(cron.WithLocation(time.UTC))
+	scheduler.AddFunc("0 * * * *", func() {
+		log.Println("Start job: Update Currency Rates")
+		currencyService.UpdateCurrencyRates()
+		log.Println("Finish job: Update Currency Rates")
+	})
+	scheduler.Start()
 }

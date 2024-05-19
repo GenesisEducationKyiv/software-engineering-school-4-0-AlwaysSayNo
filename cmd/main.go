@@ -25,11 +25,8 @@ func main() {
 	userService := service.NewUserService(d)
 	emailService := service.NewEmailService(userService, currencyService)
 
-	controller.CurrencyRegisterRoutes(r, currencyService)
-	controller.UserRegisterRoutes(r, userService, emailService)
-	controller.UtilRegisterRoutes(r, userService, emailService)
-
-	job.UpdateCurrency(currencyService)
+	job.StartAllJobs(currencyService, emailService)
+	controller.RegisterAllRoutes(r, currencyService, userService, emailService)
 
 	port := viper.Get("APP_PORT").(string)
 	r.Run(port)

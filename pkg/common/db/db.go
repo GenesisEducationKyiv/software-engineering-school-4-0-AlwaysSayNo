@@ -10,17 +10,19 @@ import (
 	"time"
 )
 
+// Init is used to establish connection with database.
 func Init(url string) *gorm.DB {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
-
 	if err != nil {
 		log.Fatalln(err)
 	}
+
 	waitDbIsUp(db)
 
 	return db
 }
 
+// waitDbIsUp is a function that prevents application container to fail if docker-compose is used and db hasn't started yet.
 func waitDbIsUp(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -44,6 +46,7 @@ func waitDbIsUp(db *gorm.DB) {
 	}
 }
 
+// RunMigrations is used to run migrations against database using golang migrate.
 func RunMigrations(dbUrl string) {
 	cmd := exec.Command("migrate", "-path", "pkg/common/db/migrations", "-database", dbUrl+"?sslmode=disable", "up")
 	cmd.Stdout = os.Stdout
@@ -53,6 +56,7 @@ func RunMigrations(dbUrl string) {
 	}
 }
 
+// GetUrl is used to prepare a database url.
 func GetUrl() string {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
@@ -61,7 +65,4 @@ func GetUrl() string {
 	dbName := os.Getenv("DB_NAME")
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
-}
-func WaitDbIsUp() {
-
 }

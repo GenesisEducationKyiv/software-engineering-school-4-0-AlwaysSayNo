@@ -10,6 +10,7 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
+// ErrorHandler is a middleware for handling errors on a top level.
 func ErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
