@@ -15,9 +15,8 @@ func main() {
 	viper.ReadInConfig()
 
 	dbUrl := db.GetUrl()
-
-	db.RunMigrations(dbUrl)
 	d := db.Init(dbUrl)
+	db.RunMigrations(dbUrl)
 
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())

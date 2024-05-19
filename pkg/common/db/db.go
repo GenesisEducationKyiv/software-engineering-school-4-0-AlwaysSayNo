@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"time"
 )
 
 func Init(url string) *gorm.DB {
@@ -15,8 +16,32 @@ func Init(url string) *gorm.DB {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	waitDbIsUp(db)
 
 	return db
+}
+
+func waitDbIsUp(db *gorm.DB) {
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatalln("Failed to get generic database object from gorm DB:", err)
+	}
+
+	// Wait for the database to be ready
+	for i := 0; i < 10; i++ {
+		err = sqlDB.Ping()
+		if err == nil {
+			log.Println("Database connection is successful")
+			break
+		}
+
+		log.Printf("Waiting for database to be ready (%d) (%v)", i+1, err)
+		time.Sleep(2 * time.Second)
+	}
+
+	if err != nil {
+		log.Fatalln("Failed to connect to the database:", err)
+	}
 }
 
 func RunMigrations(dbUrl string) {
@@ -36,4 +61,7 @@ func GetUrl() string {
 	dbName := os.Getenv("DB_NAME")
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+}
+func WaitDbIsUp() {
+
 }

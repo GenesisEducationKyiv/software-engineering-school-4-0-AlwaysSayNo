@@ -24,7 +24,6 @@ COPY . .
 # Build the Go app
 RUN go build \
   -ldflags="-linkmode external -extldflags -static" \
-
   -tags netgo \
   -o main ./cmd/main.go
 
