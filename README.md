@@ -51,7 +51,8 @@ In order to run the project with docker-compose, you must create the following t
        SMTP_PASSWORD=zvai mawk wdbn aamd //example: 16 character app password; 
        SMTP_USER=test@gmail.com //example: sender gmail address.
     ```
-**Note**: You can check [here](https://youtu.be/H0HZc4FgX7E?si=-8iIGmPG5UwyrEys), how to get the SMTP_PASSWORD for your SMTP_USER. 
+**Note**: You can check [here](https://youtu.be/H0HZc4FgX7E?si=-8iIGmPG5UwyrEys), how to get the SMTP_PASSWORD for your SMTP_USER
+. 
 
 - __db-env-local__ - responsible the variables needed for the database to work:
     ```db-env-local 
@@ -114,3 +115,7 @@ In order to run the project with docker-compose, you must create the following t
 
 - **Hourly**: The service sends a request to the PrivatBank API to fetch the latest exchange rate every hour.
 - **Daily**: Emails with the current exchange rate are sent to all subscribed users every day at 9:00 AM UTC.
+
+
+## Note
+Unfortunately, I couldn't make the size of the dockerfile smaller.
