@@ -3,7 +3,7 @@ package main
 import (
 	"genesis-currency-api/internal/job"
 	"genesis-currency-api/internal/middleware"
-	service2 "genesis-currency-api/internal/service"
+	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/common/db"
 	"genesis-currency-api/pkg/controller"
 	"github.com/gin-gonic/gin"
@@ -21,12 +21,13 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
-	currencyService := service2.NewCurrencyService()
-	controller.CurrencyRegisterRoutes(r, currencyService)
+	currencyService := service.NewCurrencyService()
+	userService := service.NewUserService(d)
+	emailService := service.NewEmailService(userService, currencyService)
 
-	userService := service2.NewUserService(d)
-	emailService := service2.NewEmailService(userService, currencyService)
+	controller.CurrencyRegisterRoutes(r, currencyService)
 	controller.UserRegisterRoutes(r, userService, emailService)
+	controller.UtilRegisterRoutes(r, userService, emailService)
 
 	job.UpdateCurrency(currencyService)
 

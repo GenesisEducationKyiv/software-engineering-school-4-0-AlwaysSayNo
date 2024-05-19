@@ -80,9 +80,7 @@ func (s *EmailService) send(body *bytes.Buffer) error {
 	message := []byte(fmt.Sprintf("%s\r\n%s\r\n%s", subject, mime, body.String()))
 	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpHost)
 
-	log.Println(smtpUser, smtpPassword, smtpHost)
 	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUser, to, message)
-	log.Println(smtpHost+":"+smtpPort, auth, smtpUser, to)
 	if err != nil {
 		return errors.NewInvalidStateError("Failed to send email:", err)
 	}
