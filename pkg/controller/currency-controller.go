@@ -12,7 +12,7 @@ type CurrencyController struct {
 
 func (c *CurrencyController) GetLatest(ctx *gin.Context) {
 	result := c.currencyService.GetCurrencyRate()
-	ctx.JSON(http.StatusOK, &result)
+	ctx.String(http.StatusOK, "%f", result.Number)
 }
 
 // CurrencyRegisterRoutes creates an instance of CurrencyController and registers routes for it.

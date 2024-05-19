@@ -22,7 +22,7 @@ func ErrorHandler() gin.HandlerFunc {
 			case *errors.ValidationError:
 				c.JSON(http.StatusBadRequest, ErrorResponse{Message: e.Error()})
 			case *errors.UserWithEmailExistsError:
-				c.JSON(http.StatusBadRequest, ErrorResponse{Message: "User with such email is already subscribed"})
+				c.JSON(http.StatusBadRequest, "Повертати, якщо e-mail вже є в базі даних")
 			case *errors.InvalidInputError:
 				c.JSON(http.StatusBadRequest, ErrorResponse{Message: e.Error()})
 			default:

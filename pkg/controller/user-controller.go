@@ -3,7 +3,6 @@ package controller
 import (
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/dto"
-	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,21 +13,18 @@ type UserController struct {
 }
 
 func (c *UserController) Add(ctx *gin.Context) {
+	email := ctx.PostForm("email")
+
 	var saveDto dto.UserSaveRequestDTO
-	err := ctx.ShouldBindJSON(&saveDto)
+	saveDto.Email = email
 
-	if err != nil {
-		ctx.Error(errors.NewValidationError("", err))
-		return
-	}
-
-	result, err := c.userService.Save(saveDto)
+	_, err := c.userService.Save(saveDto)
 	if err != nil {
 		ctx.Error(err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &result)
+	ctx.JSON(http.StatusOK, "E-mail додано")
 }
 
 // UserRegisterRoutes creates an instance of UserController and registers routes for it.
