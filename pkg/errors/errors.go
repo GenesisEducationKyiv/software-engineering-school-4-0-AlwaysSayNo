@@ -1,5 +1,10 @@
 package errors
 
+import (
+	"github.com/gin-gonic/gin"
+	"log"
+)
+
 type ValidationError struct {
 	customError
 }
@@ -72,5 +77,12 @@ func NewInvalidInputError(message string, cause error) *InvalidInputError {
 			Message: message,
 			Cause:   cause,
 		},
+	}
+}
+
+func AttachToCtx(err error, ctx *gin.Context) {
+	ctxErr := ctx.Error(err)
+	if ctxErr != nil {
+		log.Printf("Error %v happened while attaching error %v to current context", ctxErr, err)
 	}
 }

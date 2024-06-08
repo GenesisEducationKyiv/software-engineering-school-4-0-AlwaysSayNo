@@ -21,7 +21,7 @@ type CurrencyResponseDto struct {
 	Number float64 `json:"number"`
 }
 
-func ApiCurrencyResponseToInfoDTO(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
+func ApiCurrencyResponseToInfoDto(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
 	buy, _ := strconv.ParseFloat(dto.Buy, 64)
 	sale, _ := strconv.ParseFloat(dto.Sale, 64)
 	return CurrencyInfoDto{
@@ -32,7 +32,7 @@ func ApiCurrencyResponseToInfoDTO(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
 	}
 }
 
-func InfoToResponseDTO(dto *CurrencyInfoDto) CurrencyResponseDto {
+func InfoToResponseDto(dto *CurrencyInfoDto) CurrencyResponseDto {
 	return CurrencyResponseDto{
 		Number: dto.SaleRate,
 	}

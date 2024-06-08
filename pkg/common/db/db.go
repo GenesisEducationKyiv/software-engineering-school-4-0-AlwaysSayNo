@@ -56,8 +56,8 @@ func RunMigrations(dbUrl string) {
 	}
 }
 
-// GetUrl is used to prepare a database url.
-func GetUrl() string {
+// GetDatabaseUrl is used to prepare a database url.
+func GetDatabaseUrl() string {
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbHost := os.Getenv("DB_HOST")

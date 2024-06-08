@@ -2,6 +2,7 @@ package controller
 
 import (
 	"genesis-currency-api/internal/service"
+	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,7 +16,7 @@ func (c *UtilController) FindAll(ctx *gin.Context) {
 	result, err := c.userService.GetAll()
 
 	if err != nil {
-		ctx.Error(err)
+		errors.AttachToCtx(err, ctx)
 		return
 	}
 
@@ -25,7 +26,7 @@ func (c *UtilController) FindAll(ctx *gin.Context) {
 func (c *UtilController) SendEmails(ctx *gin.Context) {
 	err := c.emailService.SendEmails()
 	if err != nil {
-		ctx.Error(err)
+		errors.AttachToCtx(err, ctx)
 		return
 	}
 

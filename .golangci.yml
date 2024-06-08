@@ -1,0 +1,20 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    # Default linters
+    - errcheck     # Detect unchecked errors
+    - gosimple     # Suggest code simplifications
+    - govet        # Reports suspicious constructs
+    - ineffassign  # Detects unused variable assignments
+    - staticcheck  # go vet on steroids
+    - typecheck    # Standard Go type checks
+    - unused       # Detect unused constants, variables, functions and types
+
+    # Suggested additional linters
+    - gocyclo      # Detect cyclomatic complexity
+    - goconst      # Detect repeated values that can be made constants
+    - misspell     # Fix spelling errors
+    - unconvert    # Detect unnecessary type conversions
+    - unparam      # Detect unused function parameters

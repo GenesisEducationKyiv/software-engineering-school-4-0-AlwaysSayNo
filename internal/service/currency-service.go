@@ -24,7 +24,11 @@ func NewCurrencyService() *CurrencyService {
 	c := &CurrencyService{
 		currencyInfo,
 	}
-	c.UpdateCurrencyRates()
+
+	err := c.UpdateCurrencyRates()
+	if err != nil {
+		log.Panic("Error during creating CurrencyService: ", err)
+	}
 
 	return c
 }
@@ -38,7 +42,7 @@ func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDto {
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
 func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
-	return dto.InfoToResponseDTO(&s.currencyInfo)
+	return dto.InfoToResponseDto(&s.currencyInfo)
 }
 
 // getCurrencyRateFromApi retrieves a full set of data from the 3rd party API call.
@@ -54,7 +58,7 @@ func getCurrencyRateFromApi() (*[]dto.CurrencyInfoDto, error) {
 	// Update (cache) time
 	updateDate := date.Format(time.Now())
 	for _, r := range *apiResponses {
-		info := dto.ApiCurrencyResponseToInfoDTO(&r)
+		info := dto.ApiCurrencyResponseToInfoDto(&r)
 		info.UpdateDate = updateDate
 
 		infos = append(infos, info)
@@ -73,7 +77,11 @@ func callApi() (*[]dto.ApiCurrencyResponseDto, error) {
 	if err != nil {
 		return nil, errors.NewApiError("Something went wrong while calling external API", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("Error closing response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.NewApiError(fmt.Sprintf("Unexpected status code: %d", resp.StatusCode), nil)
@@ -100,14 +108,13 @@ func getApiUrl() string {
 
 // UpdateCurrencyRates is used to update #currencyInfo by calling 3rd party API.
 // In this case #currencyInfo is a cache value of API response for currency USD.
-func (s *CurrencyService) UpdateCurrencyRates() {
+func (s *CurrencyService) UpdateCurrencyRates() error {
 	log.Println("Start updating currency rates")
 
 	// Get list of 3rd party values.
 	currencyRates, err := getCurrencyRateFromApi()
 	if err != nil {
-		log.Panic("Failed to update currency rates: ", err)
-		return
+		return err
 	}
 
 	// Retrieve USD value only.
@@ -122,9 +129,9 @@ func (s *CurrencyService) UpdateCurrencyRates() {
 
 	// If there is no USD currency - raise a panic
 	if !isUpdated {
-		log.Panicf("No currency %s was found", "UAH")
-		return
+		return errors.NewInvalidStateError("No currency UAH was found", nil)
 	}
 
 	log.Println("Finish updating currency rates")
+	return nil
 }

@@ -15,8 +15,14 @@ func SendEmailsJob(emailService *service.EmailService) {
 
 	_, err := scheduler.AddFunc("0 9 * * *", func() {
 		log.Println("Start job: Send Emails")
-		emailService.SendEmails()
-		log.Println("Start job: Send Emails")
+
+		err := emailService.SendEmails()
+		if err != nil {
+			fmt.Printf("Error with: Send Emails")
+			fmt.Println(err)
+		} else {
+			log.Println("Finish job: Send Emails")
+		}
 	})
 	if err != nil {
 		fmt.Println("Error scheduling task:", err)

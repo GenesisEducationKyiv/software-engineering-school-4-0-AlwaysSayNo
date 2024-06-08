@@ -5,16 +5,17 @@ import (
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/common/db"
+	"genesis-currency-api/pkg/common/envs"
 	"genesis-currency-api/pkg/controller"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"log"
 )
 
 func main() {
-	viper.SetConfigFile("./pkg/common/envs/.env")
-	viper.ReadInConfig()
+	envs.Init()
 
-	dbUrl := db.GetUrl()
+	dbUrl := db.GetDatabaseUrl()
 	d := db.Init(dbUrl)
 	db.RunMigrations(dbUrl)
 
@@ -29,5 +30,8 @@ func main() {
 	controller.RegisterAllRoutes(r, currencyService, userService, emailService)
 
 	port := viper.Get("APP_PORT").(string)
-	r.Run(port)
+	err := r.Run(port)
+	if err != nil {
+		log.Fatal("Error happened while server bootstrapping: ", err)
+	}
 }
