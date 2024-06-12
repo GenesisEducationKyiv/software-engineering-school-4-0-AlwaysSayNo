@@ -32,7 +32,7 @@ func Init(url string) *gorm.DB {
 func waitDBIsUp(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalln("Failed to get generic database object from gorm DB:", err)
+		log.Fatalln("failed to get generic database object from gorm DB:", err)
 	}
 
 	// Wait for the database to be ready
@@ -48,7 +48,7 @@ func waitDBIsUp(db *gorm.DB) {
 	}
 
 	if err != nil {
-		log.Fatalln("Failed to connect to the database:", err)
+		log.Fatalln("failed to connect to the database:", err)
 	}
 }
 
@@ -56,23 +56,23 @@ func waitDBIsUp(db *gorm.DB) {
 func RunMigrations(db *gorm.DB) {
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("Failed to get SQL DB from Gorm DB: %v", err)
+		log.Fatalf("failed to get SQL DB from Gorm DB: %v", err)
 	}
 
 	driver, err := migrPostgres.WithInstance(sqlDB, &migrPostgres.Config{})
 	if err != nil {
-		log.Fatalf("Failed to create migration driver: %v", err)
+		log.Fatalf("failed to create migration driver: %v", err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://pkg/common/db/migrations",
 		"postgres", driver)
 	if err != nil {
-		log.Fatalf("Failed to create migration instance: %v", err)
+		log.Fatalf("failed to create migration instance: %v", err)
 	}
 
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		log.Fatalf("Failed to run migrations: %v", err)
+		log.Fatalf("failed to run migrations: %v", err)
 	}
 
 	log.Println("Migrations ran successfully")

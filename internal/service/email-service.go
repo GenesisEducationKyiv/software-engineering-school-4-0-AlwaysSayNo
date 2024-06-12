@@ -55,12 +55,12 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 
 	tmpl, err := os.ReadFile(tmplPath)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("Failed to read the file", err)
+		return nil, errors.NewInvalidStateError("failed to read the file", err)
 	}
 
 	t, err := template.New("email").Parse(string(tmpl))
 	if err != nil {
-		return nil, errors.NewInvalidStateError("Failed to parse the file", err)
+		return nil, errors.NewInvalidStateError("failed to parse the file", err)
 	}
 
 	rate := s.currencyService.GetCurrencyInfo()
@@ -69,7 +69,7 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 	var body bytes.Buffer
 	err = t.Execute(&body, rate)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("Failed to execute template:", err)
+		return nil, errors.NewInvalidStateError("failed to execute template:", err)
 	}
 
 	return &body, nil
@@ -104,7 +104,7 @@ func (s *EmailService) send(body *bytes.Buffer) error {
 
 	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUser, to, message)
 	if err != nil {
-		return errors.NewInvalidStateError("Failed to send email:", err)
+		return errors.NewInvalidStateError("failed to send email:", err)
 	}
 
 	log.Println("Finish sending emails")

@@ -29,7 +29,7 @@ func NewCurrencyService() *CurrencyService {
 
 	err := c.UpdateCurrencyRates()
 	if err != nil {
-		log.Panic("Error during creating CurrencyService: ", err)
+		log.Panic("error during creating CurrencyService: ", err)
 	}
 
 	return c
@@ -85,7 +85,7 @@ func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("Error closing response body: %v", err)
+			log.Printf("error closing response body: %v", err)
 		}
 	}()
 
@@ -95,12 +95,12 @@ func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("Failed to read response body", err)
+		return nil, errors.NewInvalidStateError("failed to read response body", err)
 	}
 
 	var apiResponses []dto.APICurrencyResponseDTO
 	if err := json.Unmarshal(body, &apiResponses); err != nil {
-		return nil, errors.NewInvalidStateError("Failed to unmarshal response", err)
+		return nil, errors.NewInvalidStateError("failed to unmarshal response", err)
 	}
 
 	log.Println("Finish calling external API")

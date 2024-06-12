@@ -31,8 +31,7 @@ func main() {
 	controller.RegisterAllRoutes(r, currencyService, userService, emailService)
 
 	port := viper.Get("APP_PORT").(string)
-	err := r.Run(port)
-	if err != nil {
-		log.Fatal("Error happened while server bootstrapping: ", err)
+	if err := r.Run(port); err != nil {
+		log.Fatal("error happened while server bootstrapping: ", err)
 	}
 }

@@ -84,6 +84,6 @@ func NewInvalidInputError(message string, cause error) *InvalidInputError {
 func AttachToCtx(err error, ctx *gin.Context) {
 	ctxErr := ctx.Error(err)
 	if ctxErr != nil {
-		log.Printf("Error %v happened while attaching error %v to current context", ctxErr, err)
+		log.Printf("error %v happened while attaching error %v to current context", ctxErr, err)
 	}
 }

@@ -1,7 +1,6 @@
 package job
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -17,16 +16,14 @@ func SendEmailsJob(emailService *service.EmailService) {
 	_, err := scheduler.AddFunc("0 9 * * *", func() {
 		log.Println("Start job: Send Emails")
 
-		err := emailService.SendEmails()
-		if err != nil {
-			fmt.Printf("Error with: Send Emails")
-			fmt.Println(err)
+		if err := emailService.SendEmails(); err != nil {
+			log.Printf("error with: Send Emails - %v\n", err)
 		} else {
 			log.Println("Finish job: Send Emails")
 		}
 	})
 	if err != nil {
-		fmt.Println("Error scheduling task:", err)
+		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
 		return
 	}
 

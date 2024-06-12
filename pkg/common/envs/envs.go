@@ -10,6 +10,6 @@ func Init() {
 	viper.SetConfigFile("./pkg/common/envs/.env")
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Error happened while config initialization: ", err)
+		log.Fatal("error happened while config initialization: ", err)
 	}
 }
