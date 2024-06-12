@@ -3,18 +3,27 @@ run:
 
 linters:
   enable:
-    # Default linters
-    - errcheck     # Detect unchecked errors
-    - gosimple     # Suggest code simplifications
-    - govet        # Reports suspicious constructs
-    - ineffassign  # Detects unused variable assignments
+    # Suggested linters
     - staticcheck  # go vet on steroids
-    - typecheck    # Standard Go type checks
+    - gosimple     # Suggest code simplifications
     - unused       # Detect unused constants, variables, functions and types
-
-    # Suggested additional linters
-    - gocyclo      # Detect cyclomatic complexity
-    - goconst      # Detect repeated values that can be made constants
-    - misspell     # Fix spelling errors
-    - unconvert    # Detect unnecessary type conversions
+    - govet        # Reports suspicious constructs
     - unparam      # Detect unused function parameters
+    - gosec        # Detect security issues
+    - gocyclo      # Detect cyclomatic complexity
+    - dupl         # Detect duplicate code fragments
+    - misspell     # Fix spelling errors
+    - typecheck    # Standard Go type checks
+    - ineffassign  # Detects unused variable assignments
+    - stylecheck   # Checks code style
+    - gochecknoinits # Detects initializations in init() functions
+    - exportloopref # Detects loop variables passed by reference to functions
+    - gocritic     # Detect potential issues in code
+    - revive       # General purpose linter
+    - nakedret     # Detect naked returns
+    - prealloc     # Suggests preallocating slices
+    - dogsled      # Detects unnecessary multiple variable assignments
+    - gocognit     # Detect cognitive complexity in functions
+#    - gofumpt      # Enforce gofumpt formatting --> asserts "File is not `gofumpt`-ed" even for formatted files
+    - lll          # Detect long lines
+#    - noctx        # Detect functions that accept context without using it --> cannot pass context into scheduler properly

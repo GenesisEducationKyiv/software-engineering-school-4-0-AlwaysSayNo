@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"genesis-currency-api/internal/job"
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/internal/service"
@@ -9,15 +11,14 @@ import (
 	"genesis-currency-api/pkg/controller"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"log"
 )
 
 func main() {
 	envs.Init()
 
-	dbUrl := db.GetDatabaseUrl()
-	d := db.Init(dbUrl)
-	db.RunMigrations(dbUrl)
+	dbURL := db.GetDatabaseURL()
+	d := db.Init(dbURL)
+	db.RunMigrations(d)
 
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())

@@ -2,10 +2,11 @@ package job
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/service"
-	"github.com/robfig/cron/v3"
 	"log"
 	"time"
+
+	"genesis-currency-api/internal/service"
+	"github.com/robfig/cron/v3"
 )
 
 // SendEmailsJob is a cron function to send emails to subscribed users.

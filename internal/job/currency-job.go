@@ -2,10 +2,11 @@ package job
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/service"
-	"github.com/robfig/cron/v3"
 	"log"
 	"time"
+
+	"genesis-currency-api/internal/service"
+	"github.com/robfig/cron/v3"
 )
 
 // UpdateCurrencyJob is a cron function to update currency service cache.

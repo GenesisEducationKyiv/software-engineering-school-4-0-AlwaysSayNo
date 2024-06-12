@@ -1,11 +1,12 @@
 package controller
 
 import (
+	"net/http"
+
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type UserController struct {

@@ -1,15 +1,16 @@
 package errors
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ValidationError struct {
 	customError
 }
 
-type DbError struct {
+type DBError struct {
 	customError
 }
 
@@ -17,7 +18,7 @@ type UserWithEmailExistsError struct {
 	customError
 }
 
-type ApiError struct {
+type APIError struct {
 	customError
 }
 
@@ -44,8 +45,8 @@ func NewUserWithEmailExistsError() *UserWithEmailExistsError {
 	}
 }
 
-func NewDbError(message string, cause error) *DbError {
-	return &DbError{
+func NewDBError(message string, cause error) *DBError {
+	return &DBError{
 		customError: customError{
 			Message: message,
 			Cause:   cause,
@@ -53,8 +54,8 @@ func NewDbError(message string, cause error) *DbError {
 	}
 }
 
-func NewApiError(message string, cause error) *ApiError {
-	return &ApiError{
+func NewAPIError(message string, cause error) *APIError {
+	return &APIError{
 		customError: customError{
 			Message: message,
 			Cause:   cause,

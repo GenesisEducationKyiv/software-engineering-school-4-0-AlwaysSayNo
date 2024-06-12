@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"net/http"
+
 	"genesis-currency-api/internal/service"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type CurrencyController struct {

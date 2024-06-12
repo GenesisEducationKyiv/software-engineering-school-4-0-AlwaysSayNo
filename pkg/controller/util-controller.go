@@ -1,10 +1,11 @@
 package controller
 
 import (
+	"net/http"
+
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type UtilController struct {
@@ -14,7 +15,6 @@ type UtilController struct {
 
 func (c *UtilController) FindAll(ctx *gin.Context) {
 	result, err := c.userService.GetAll()
-
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return

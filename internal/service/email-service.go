@@ -3,13 +3,14 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"genesis-currency-api/pkg/errors"
-	"github.com/spf13/viper"
 	"html/template"
 	"log"
 	"net/smtp"
 	"os"
 	"path/filepath"
+
+	"genesis-currency-api/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 type CurrencyEmailData struct {
@@ -78,7 +79,6 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 // If the list of users is empty, it will return an error.
 // Returns error in case of occurrence.
 func (s *EmailService) send(body *bytes.Buffer) error {
-
 	smtpHost := viper.Get("SMTP_HOST").(string)
 	smtpPort := viper.Get("SMTP_PORT").(string)
 
@@ -91,7 +91,7 @@ func (s *EmailService) send(body *bytes.Buffer) error {
 		return errors.NewInvalidStateError("Emails list is empty", err)
 	}
 
-	var to []string
+	to := make([]string, 0, len(users))
 	for _, u := range users {
 		to = append(to, u.Email)
 	}

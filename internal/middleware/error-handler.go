@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type ErrorResponse struct {
