@@ -16,8 +16,8 @@ func (c *CurrencyController) GetLatest(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "%f", result.Number)
 }
 
-// CurrencyRegisterRoutes creates an instance of CurrencyController and registers routes for it.
-func CurrencyRegisterRoutes(r *gin.Engine, s *service.CurrencyService) {
+// RegisterCurrencyRoutes creates an instance of CurrencyController and registers routes for it.
+func RegisterCurrencyRoutes(r *gin.Engine, s *service.CurrencyService) {
 	c := &CurrencyController{
 		s,
 	}

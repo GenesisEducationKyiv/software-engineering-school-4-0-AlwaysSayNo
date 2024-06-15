@@ -1,18 +1,15 @@
 package job
 
 import (
-	"log"
-	"time"
-
 	"genesis-currency-api/internal/service"
 	"github.com/robfig/cron/v3"
+	"log"
 )
 
 // UpdateCurrencyJob is a cron function to update currency service cache.
 // It is executed every hour.
-func UpdateCurrencyJob(currencyService *service.CurrencyService) {
-	scheduler := cron.New(cron.WithLocation(time.UTC))
-	_, err := scheduler.AddFunc("0 * * * *", func() {
+func UpdateCurrencyJob(cron *cron.Cron, currencyService *service.CurrencyService) {
+	_, err := cron.AddFunc("0 * * * *", func() {
 		log.Println("Start job: Update Currency Rates")
 
 		if err := currencyService.UpdateCurrencyRates(); err != nil {
@@ -25,5 +22,4 @@ func UpdateCurrencyJob(currencyService *service.CurrencyService) {
 		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
 		return
 	}
-	scheduler.Start()
 }

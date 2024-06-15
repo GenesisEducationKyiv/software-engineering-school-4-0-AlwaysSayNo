@@ -29,8 +29,8 @@ func (c *UserController) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "E-mail додано")
 }
 
-// UserRegisterRoutes creates an instance of UserController and registers routes for it.
-func UserRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
+// RegisterUserRoutes creates an instance of UserController and registers routes for it.
+func RegisterUserRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
 	c := &UserController{
 		us,
 		es,

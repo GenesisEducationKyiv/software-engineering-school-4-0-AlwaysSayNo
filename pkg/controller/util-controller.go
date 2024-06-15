@@ -33,8 +33,8 @@ func (c *UtilController) SendEmails(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Emails are successfully sent")
 }
 
-// UtilRegisterRoutes creates an instance of UtilController and registers routes for it.
-func UtilRegisterRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
+// RegisterUtilRoutes creates an instance of UtilController and registers routes for it.
+func RegisterUtilRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
 	c := &UtilController{
 		us,
 		es,
