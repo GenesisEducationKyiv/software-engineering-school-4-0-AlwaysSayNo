@@ -19,7 +19,7 @@ func Init() {
 func Get(name string) string {
 	value := viper.Get(name).(string)
 	if value == "" {
-		log.Fatalf("environment variable %semail-service.go is not set", name)
+		log.Fatalf("environment variable %semail-service.go is not set\n", name)
 	}
 
 	return value

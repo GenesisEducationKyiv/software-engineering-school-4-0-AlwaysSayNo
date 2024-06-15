@@ -88,7 +88,7 @@ func (s *CurrencyService) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("error closing response body: %v", err)
+			log.Printf("error closing response body: %v\n", err)
 		}
 	}()
 

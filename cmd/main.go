@@ -19,7 +19,6 @@ func main() {
 
 	dbURL := db.GetDatabaseURL(config.LoadDatabaseConfig())
 	d := db.Init(dbURL)
-	db.RunMigrations(d)
 
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
