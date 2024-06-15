@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"os"
+	"net/url"
 	"time"
 
+	"genesis-currency-api/pkg/config"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/source/file" // blank import needed for migration purposes
 
@@ -79,12 +80,17 @@ func RunMigrations(db *gorm.DB) {
 }
 
 // GetDatabaseURL is used to prepare a database url.
-func GetDatabaseURL() string {
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbName := os.Getenv("DB_NAME")
+func GetDatabaseURL(cnf config.DatabaseConfig) string {
+	dbURL := &url.URL{
+		Scheme: "postgres",
+		User:   url.UserPassword(cnf.DBUser, cnf.DBPassword),
+		Host:   fmt.Sprintf("%s:%s", cnf.DBHost, cnf.DBPort),
+		Path:   cnf.DBName,
+	}
 
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+	query := dbURL.Query()
+	query.Add("sslmode", "disable")
+	dbURL.RawQuery = query.Encode()
+
+	return dbURL.String()
 }

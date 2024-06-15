@@ -32,7 +32,7 @@ func APICurrencyResponseToInfoDTO(dto *APICurrencyResponseDTO) CurrencyInfoDTO {
 	}
 }
 
-func InfoToResponseDto(dto *CurrencyInfoDTO) CurrencyResponseDto {
+func InfoToResponseDTO(dto *CurrencyInfoDTO) CurrencyResponseDto {
 	return CurrencyResponseDto{
 		Number: dto.SaleRate,
 	}

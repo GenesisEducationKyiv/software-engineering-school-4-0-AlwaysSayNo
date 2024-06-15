@@ -9,8 +9,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"genesis-currency-api/pkg/config"
+
 	"genesis-currency-api/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 type CurrencyEmailData struct {
@@ -24,13 +25,17 @@ type CurrencyEmailData struct {
 type EmailService struct {
 	userService     *UserService
 	currencyService *CurrencyService
+	cnf             config.EmailServiceConfig
 }
 
 // NewEmailService is a factory function for EmailService
-func NewEmailService(userService *UserService, currencyService *CurrencyService) *EmailService {
+func NewEmailService(userService *UserService,
+	currencyService *CurrencyService,
+	cnf config.EmailServiceConfig) *EmailService {
 	return &EmailService{
 		userService,
 		currencyService,
+		cnf,
 	}
 }
 
@@ -79,12 +84,6 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 // If the list of users is empty, it will return an error.
 // Returns error in case of occurrence.
 func (s *EmailService) send(body *bytes.Buffer) error {
-	smtpHost := viper.Get("SMTP_HOST").(string)
-	smtpPort := viper.Get("SMTP_PORT").(string)
-
-	smtpUser := os.Getenv("SMTP_USER")
-	smtpPassword := os.Getenv("SMTP_PASSWORD")
-
 	// Empty users list check.
 	users, err := s.userService.GetAll()
 	if len(users) == 0 {
@@ -96,13 +95,12 @@ func (s *EmailService) send(body *bytes.Buffer) error {
 		to = append(to, u.Email)
 	}
 
-	subject := viper.Get("EMAIL_SUBJECT").(string)
 	mime := "MIME-version: 1.0;\r\nContent-Type: text/html; charset=\"UTF-8\";\r\n"
 
-	message := []byte(fmt.Sprintf("%s\r\n%s\r\n%s", subject, mime, body.String()))
-	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpHost)
+	message := []byte(fmt.Sprintf("%s\r\n%s\r\n%s", s.cnf.EmailSubject, mime, body.String()))
+	auth := smtp.PlainAuth("", s.cnf.SMTPUser, s.cnf.SMTPPassword, s.cnf.SMTPHost)
 
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, smtpUser, to, message)
+	err = smtp.SendMail(s.cnf.SMTPHost+":"+s.cnf.SMTPPort, auth, s.cnf.SMTPUser, to, message)
 	if err != nil {
 		return errors.NewInvalidStateError("failed to send email:", err)
 	}
