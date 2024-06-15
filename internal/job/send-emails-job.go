@@ -1,11 +1,11 @@
 package job
 
 import (
-	"fmt"
-	"genesis-currency-api/internal/service"
-	"github.com/robfig/cron/v3"
 	"log"
 	"time"
+
+	"genesis-currency-api/internal/service"
+	"github.com/robfig/cron/v3"
 )
 
 // SendEmailsJob is a cron function to send emails to subscribed users.
@@ -15,11 +15,15 @@ func SendEmailsJob(emailService *service.EmailService) {
 
 	_, err := scheduler.AddFunc("0 9 * * *", func() {
 		log.Println("Start job: Send Emails")
-		emailService.SendEmails()
-		log.Println("Start job: Send Emails")
+
+		if err := emailService.SendEmails(); err != nil {
+			log.Printf("error with: Send Emails - %v\n", err)
+		} else {
+			log.Println("Finish job: Send Emails")
+		}
 	})
 	if err != nil {
-		fmt.Println("Error scheduling task:", err)
+		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
 		return
 	}
 

@@ -2,14 +2,14 @@ package dto
 
 import "strconv"
 
-type ApiCurrencyResponseDto struct {
+type APICurrencyResponseDTO struct {
 	FromCcy string `json:"ccy"`
 	BaseCcy string `json:"base_ccy"`
 	Buy     string `json:"buy"`
 	Sale    string `json:"sale"`
 }
 
-type CurrencyInfoDto struct {
+type CurrencyInfoDTO struct {
 	FromCcy    string  `json:"fromCcy"`
 	ToCcy      string  `json:"toCcy"`
 	UpdateDate string  `json:"updateDate"`
@@ -21,10 +21,10 @@ type CurrencyResponseDto struct {
 	Number float64 `json:"number"`
 }
 
-func ApiCurrencyResponseToInfoDTO(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
+func APICurrencyResponseToInfoDTO(dto *APICurrencyResponseDTO) CurrencyInfoDTO {
 	buy, _ := strconv.ParseFloat(dto.Buy, 64)
 	sale, _ := strconv.ParseFloat(dto.Sale, 64)
-	return CurrencyInfoDto{
+	return CurrencyInfoDTO{
 		FromCcy:  dto.FromCcy,
 		ToCcy:    dto.BaseCcy,
 		BuyRate:  buy,
@@ -32,7 +32,7 @@ func ApiCurrencyResponseToInfoDTO(dto *ApiCurrencyResponseDto) CurrencyInfoDto {
 	}
 }
 
-func InfoToResponseDTO(dto *CurrencyInfoDto) CurrencyResponseDto {
+func InfoToResponseDto(dto *CurrencyInfoDTO) CurrencyResponseDto {
 	return CurrencyResponseDto{
 		Number: dto.SaleRate,
 	}

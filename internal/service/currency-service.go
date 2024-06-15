@@ -3,58 +3,64 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
+	"time"
+
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util/date"
 	"github.com/spf13/viper"
-	"io"
-	"log"
-	"net/http"
-	"time"
 )
 
 type CurrencyService struct {
-	currencyInfo dto.CurrencyInfoDto
+	currencyInfo dto.CurrencyInfoDTO
 }
 
 // NewCurrencyService is a factory function for CurrencyService
 func NewCurrencyService() *CurrencyService {
 	// A cache value for 3rd party API response.
-	var currencyInfo dto.CurrencyInfoDto
+	var currencyInfo dto.CurrencyInfoDTO
 	c := &CurrencyService{
 		currencyInfo,
 	}
-	c.UpdateCurrencyRates()
+
+	err := c.UpdateCurrencyRates()
+	if err != nil {
+		log.Panic("error during creating CurrencyService: ", err)
+	}
 
 	return c
 }
 
 // GetCurrencyInfo returns extended information about currency rate.
 // It is then used in email.
-func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDto {
+func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
 	return s.currencyInfo
 }
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
 func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
-	return dto.InfoToResponseDTO(&s.currencyInfo)
+	return dto.InfoToResponseDto(&s.currencyInfo)
 }
 
-// getCurrencyRateFromApi retrieves a full set of data from the 3rd party API call.
-// Then it maps ApiCurrencyResponse to CurrencyInfoDto and adds the time when call was made.
-// Returns a list of CurrencyInfoDto for all available from 3rd party API currencies.
-func getCurrencyRateFromApi() (*[]dto.CurrencyInfoDto, error) {
-	apiResponses, err := callApi()
+// getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.
+// Then it maps ApiCurrencyResponse to CurrencyInfoDTO and adds the time when call was made.
+// Returns a list of CurrencyInfoDTO for all available from 3rd party API currencies.
+func getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
+	apiResponses, err := callAPI()
 	if err != nil {
 		return nil, err
 	}
 
-	var infos []dto.CurrencyInfoDto
+	infos := make([]dto.CurrencyInfoDTO, 0, len(*apiResponses))
 	// Update (cache) time
 	updateDate := date.Format(time.Now())
 	for _, r := range *apiResponses {
-		info := dto.ApiCurrencyResponseToInfoDTO(&r)
+		info := dto.APICurrencyResponseToInfoDTO(&r)
 		info.UpdateDate = updateDate
 
 		infos = append(infos, info)
@@ -63,30 +69,38 @@ func getCurrencyRateFromApi() (*[]dto.CurrencyInfoDto, error) {
 	return &infos, nil
 }
 
-// callApi prepares and executes call to the 3rd party API.
+// callAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
-func callApi() (*[]dto.ApiCurrencyResponseDto, error) {
+func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	log.Println("Start calling external API")
-	apiUrl := getApiUrl()
 
-	resp, err := http.Get(apiUrl)
+	apiURL, err := get3rdPartyURL()
 	if err != nil {
-		return nil, errors.NewApiError("Something went wrong while calling external API", err)
+		return nil, err
 	}
-	defer resp.Body.Close()
+
+	resp, err := http.Get(apiURL.String())
+	if err != nil {
+		return nil, errors.NewAPIError("Something went wrong while calling external API", err)
+	}
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			log.Printf("error closing response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.NewApiError(fmt.Sprintf("Unexpected status code: %d", resp.StatusCode), nil)
+		return nil, errors.NewAPIError(fmt.Sprintf("Unexpected status code: %d", resp.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("Failed to read response body", err)
+		return nil, errors.NewInvalidStateError("failed to read response body", err)
 	}
 
-	var apiResponses []dto.ApiCurrencyResponseDto
+	var apiResponses []dto.APICurrencyResponseDTO
 	if err := json.Unmarshal(body, &apiResponses); err != nil {
-		return nil, errors.NewInvalidStateError("Failed to unmarshal response", err)
+		return nil, errors.NewInvalidStateError("failed to unmarshal response", err)
 	}
 
 	log.Println("Finish calling external API")
@@ -94,20 +108,24 @@ func callApi() (*[]dto.ApiCurrencyResponseDto, error) {
 	return &apiResponses, nil
 }
 
-func getApiUrl() string {
-	return viper.Get("THIRD_PARTY_API").(string)
+func get3rdPartyURL() (*url.URL, error) {
+	parsedURL, err := url.ParseRequestURI(viper.Get("THIRD_PARTY_API").(string))
+	if err != nil {
+		return nil, errors.NewAPIError("Invalid URL", err)
+	}
+
+	return parsedURL, nil
 }
 
 // UpdateCurrencyRates is used to update #currencyInfo by calling 3rd party API.
 // In this case #currencyInfo is a cache value of API response for currency USD.
-func (s *CurrencyService) UpdateCurrencyRates() {
+func (s *CurrencyService) UpdateCurrencyRates() error {
 	log.Println("Start updating currency rates")
 
 	// Get list of 3rd party values.
-	currencyRates, err := getCurrencyRateFromApi()
+	currencyRates, err := getCurrencyRateFromAPI()
 	if err != nil {
-		log.Panic("Failed to update currency rates: ", err)
-		return
+		return err
 	}
 
 	// Retrieve USD value only.
@@ -122,9 +140,9 @@ func (s *CurrencyService) UpdateCurrencyRates() {
 
 	// If there is no USD currency - raise a panic
 	if !isUpdated {
-		log.Panicf("No currency %s was found", "UAH")
-		return
+		return errors.NewInvalidStateError("No currency UAH was found", nil)
 	}
 
 	log.Println("Finish updating currency rates")
+	return nil
 }

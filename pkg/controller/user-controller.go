@@ -1,10 +1,12 @@
 package controller
 
 import (
+	"net/http"
+
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/dto"
+	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type UserController struct {
@@ -20,7 +22,7 @@ func (c *UserController) Add(ctx *gin.Context) {
 
 	_, err := c.userService.Save(saveDto)
 	if err != nil {
-		ctx.Error(err)
+		errors.AttachToCtx(err, ctx)
 		return
 	}
 
