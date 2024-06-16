@@ -36,24 +36,30 @@ func NewCurrencyServiceImpl(cnf config.CurrencyServiceConfig) *CurrencyServiceIm
 		cnf,
 	}
 
-	err := c.UpdateCurrencyRates()
-	if err != nil {
-		log.Panic("error during creating CurrencyServiceImpl: ", err)
-	}
-
 	return c
 }
 
 // GetCurrencyInfo returns extended information about currency rate.
 // It is then used in email.
 func (s *CurrencyServiceImpl) GetCurrencyInfo() dto.CurrencyInfoDTO {
-	return s.currencyInfo
+	return s.getCurrencyInfo()
 }
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
 func (s *CurrencyServiceImpl) GetCurrencyRate() dto.CurrencyResponseDto {
-	return dto.InfoToResponseDTO(&s.currencyInfo)
+	data := s.getCurrencyInfo()
+	return dto.InfoToResponseDTO(&data)
+}
+
+func (s *CurrencyServiceImpl) getCurrencyInfo() dto.CurrencyInfoDTO {
+	if s.currencyInfo.UpdateDate == "" {
+		if err := s.UpdateCurrencyRates(); err != nil {
+			log.Printf(err.Error())
+		} //todo make return err
+	}
+
+	return s.currencyInfo
 }
 
 // getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.
@@ -99,7 +105,7 @@ func (s *CurrencyServiceImpl) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.NewAPIError(fmt.Sprintf("Unexpected status code: %d", resp.StatusCode), nil)
+		return nil, errors.NewAPIError(fmt.Sprintf("Unexpected status code: %d\f", resp.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -149,7 +155,7 @@ func (s *CurrencyServiceImpl) UpdateCurrencyRates() error {
 
 	// If there is no USD currency - raise a panic
 	if !isUpdated {
-		return errors.NewInvalidStateError("No currency UAH was found", nil)
+		return errors.NewAPIError("No currency UAH was found", nil)
 	}
 
 	log.Println("Finish updating currency rates")
