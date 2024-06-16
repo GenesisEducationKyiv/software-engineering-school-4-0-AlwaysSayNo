@@ -23,9 +23,9 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
-	currencyService := service.NewCurrencyService(config.LoadCurrencyServiceConfig())
-	userService := service.NewUserService(d)
-	emailService := service.NewEmailService(userService, currencyService, config.LoadEmailServiceConfig())
+	currencyService := service.NewCurrencyServiceImpl(config.LoadCurrencyServiceConfig())
+	userService := service.NewUserServiceImpl(d)
+	emailService := service.NewEmailServiceImpl(userService, currencyService, config.LoadEmailServiceConfig())
 
 	job.StartAllJobs(currencyService, emailService)
 	controller.RegisterAllRoutes(r, currencyService, userService, emailService)

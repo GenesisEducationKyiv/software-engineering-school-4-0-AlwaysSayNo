@@ -8,12 +8,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UtilController struct {
-	userService  *service.UserService
-	emailService *service.EmailService
+type UtilController interface {
+	FindAll(ctx *gin.Context)
+	SendEmails(ctx *gin.Context)
 }
 
-func (c *UtilController) FindAll(ctx *gin.Context) {
+type UtilControllerImpl struct {
+	userService  service.UserService
+	emailService service.EmailService
+}
+
+func (c *UtilControllerImpl) FindAll(ctx *gin.Context) {
 	result, err := c.userService.GetAll()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
@@ -23,7 +28,7 @@ func (c *UtilController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func (c *UtilController) SendEmails(ctx *gin.Context) {
+func (c *UtilControllerImpl) SendEmails(ctx *gin.Context) {
 	err := c.emailService.SendEmails()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
@@ -33,9 +38,9 @@ func (c *UtilController) SendEmails(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Emails are successfully sent")
 }
 
-// RegisterUtilRoutes creates an instance of UtilController and registers routes for it.
-func RegisterUtilRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
-	c := &UtilController{
+// RegisterUtilRoutes creates an instance of UtilControllerImpl and registers routes for it.
+func RegisterUtilRoutes(r *gin.Engine, us service.UserService, es service.EmailService) {
+	c := &UtilControllerImpl{
 		us,
 		es,
 	}

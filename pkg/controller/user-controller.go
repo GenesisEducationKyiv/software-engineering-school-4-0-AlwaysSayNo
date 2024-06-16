@@ -9,12 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserController struct {
-	userService  *service.UserService
-	emailService *service.EmailService
+type UserController interface {
+	Add(ctx *gin.Context)
 }
 
-func (c *UserController) Add(ctx *gin.Context) {
+type UserControllerImpl struct {
+	userService  service.UserService
+	emailService service.EmailService
+}
+
+func (c *UserControllerImpl) Add(ctx *gin.Context) {
 	email := ctx.PostForm("email")
 
 	var saveDto dto.UserSaveRequestDTO
@@ -29,9 +33,9 @@ func (c *UserController) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "E-mail додано")
 }
 
-// RegisterUserRoutes creates an instance of UserController and registers routes for it.
-func RegisterUserRoutes(r *gin.Engine, us *service.UserService, es *service.EmailService) {
-	c := &UserController{
+// RegisterUserRoutes creates an instance of UserControllerImpl and registers routes for it.
+func RegisterUserRoutes(r *gin.Engine, us service.UserService, es service.EmailService) {
+	c := &UserControllerImpl{
 		us,
 		es,
 	}
