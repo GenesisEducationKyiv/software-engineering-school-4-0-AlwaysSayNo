@@ -20,10 +20,6 @@ func TestCurrencyServiceImplSuite(t *testing.T) {
 	suite.Run(t, &CurrencyServiceImplSuite{})
 }
 
-func (csis *CurrencyServiceImplSuite) SetupTest() {
-
-}
-
 func (csis *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {

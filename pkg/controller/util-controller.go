@@ -28,7 +28,7 @@ func (c *UtilControllerImpl) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func (c *UtilControllerImpl) SendEmails(ctx *gin.Context) {
+func (c *UtilControllerImpl) SendEmails(ctx *gin.Context) { //todo
 	err := c.emailService.SendEmails()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
@@ -46,6 +46,6 @@ func RegisterUtilRoutes(r *gin.Engine, us service.UserService, es service.EmailS
 	}
 
 	routes := r.Group("/api/util")
-	routes.GET("/emails", c.FindAll)
+	routes.GET("/users", c.FindAll)
 	routes.POST("/emails/send", c.SendEmails)
 }
