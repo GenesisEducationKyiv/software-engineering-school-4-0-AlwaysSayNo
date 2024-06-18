@@ -1,8 +1,9 @@
 package job
 
 import (
-	"genesis-currency-api/pkg/interface/service"
 	"time"
+
+	"genesis-currency-api/pkg/interface/service"
 
 	"github.com/robfig/cron/v3"
 )

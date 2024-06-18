@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"genesis-currency-api/pkg/interface/service"
 	"net/http"
+
+	"genesis-currency-api/pkg/interface/service"
 
 	"github.com/gin-gonic/gin"
 )
