@@ -1,17 +1,12 @@
 package controller
 
 import (
+	"genesis-currency-api/pkg/interface/service"
 	"net/http"
 
-	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
-
-type UtilController interface {
-	FindAll(ctx *gin.Context)
-	SendEmails(ctx *gin.Context)
-}
 
 type UtilControllerImpl struct {
 	userService  service.UserService

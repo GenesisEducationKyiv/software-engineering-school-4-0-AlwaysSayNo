@@ -7,11 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserService interface {
-	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
-	GetAll() ([]dto.UserResponseDTO, error)
-}
-
 type UserServiceImpl struct {
 	DB *gorm.DB
 }

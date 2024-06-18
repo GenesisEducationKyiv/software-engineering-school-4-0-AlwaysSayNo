@@ -1,15 +1,11 @@
 package controller
 
 import (
+	"genesis-currency-api/pkg/interface/service"
 	"net/http"
 
-	"genesis-currency-api/internal/service"
 	"github.com/gin-gonic/gin"
 )
-
-type CurrencyController interface {
-	GetLatest(ctx *gin.Context)
-}
 
 type CurrencyControllerImpl struct {
 	currencyService service.CurrencyService

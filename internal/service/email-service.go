@@ -22,10 +22,6 @@ type CurrencyEmailData struct {
 	SaleRate   float64
 }
 
-type EmailService interface {
-	SendEmails() error
-}
-
 type EmailServiceImpl struct {
 	userService     *UserServiceImpl
 	currencyService *CurrencyServiceImpl

@@ -16,12 +16,6 @@ import (
 	"genesis-currency-api/pkg/util/date"
 )
 
-type CurrencyService interface {
-	GetCurrencyInfo() dto.CurrencyInfoDTO
-	GetCurrencyRate() dto.CurrencyResponseDto
-	UpdateCurrencyRates() error
-}
-
 type CurrencyServiceImpl struct {
 	currencyInfo dto.CurrencyInfoDTO
 	cnf          config.CurrencyServiceConfig
