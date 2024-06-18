@@ -14,7 +14,7 @@ type CurrencyService struct {
 }
 
 // GetCurrencyInfo provides a mock function with given fields:
-func (_m *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
+func (_m *CurrencyService) GetCurrencyInfo() (dto.CurrencyInfoDTO, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
@@ -22,31 +22,51 @@ func (_m *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
 	}
 
 	var r0 dto.CurrencyInfoDTO
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (dto.CurrencyInfoDTO, error)); ok {
+		return rf()
+	}
 	if rf, ok := ret.Get(0).(func() dto.CurrencyInfoDTO); ok {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(dto.CurrencyInfoDTO)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetCurrencyRate provides a mock function with given fields:
-func (_m *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
+func (_m *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCurrencyRate")
 	}
 
-	var r0 dto.CurrencyResponseDto
-	if rf, ok := ret.Get(0).(func() dto.CurrencyResponseDto); ok {
+	var r0 dto.CurrencyResponseDTO
+	var r1 error
+	if rf, ok := ret.Get(0).(func() (dto.CurrencyResponseDTO, error)); ok {
+		return rf()
+	}
+	if rf, ok := ret.Get(0).(func() dto.CurrencyResponseDTO); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(dto.CurrencyResponseDto)
+		r0 = ret.Get(0).(dto.CurrencyResponseDTO)
 	}
 
-	return r0
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // UpdateCurrencyRates provides a mock function with given fields:

@@ -2,13 +2,14 @@ package service_test
 
 import (
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/config"
 	myerrors "genesis-currency-api/pkg/errors"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 type CurrencyServiceImplSuite struct {
@@ -20,10 +21,11 @@ func TestCurrencyServiceImplSuite(t *testing.T) {
 	suite.Run(t, &CurrencyServiceImplSuite{})
 }
 
-func (csis *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
+func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
+	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
-			csis.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
+			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
 		}
 		w.WriteHeader(http.StatusOK)
 
@@ -34,23 +36,27 @@ func (csis *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
 	}))
 
 	defer server.Close()
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
-	currencyInfo := csis.sut.GetCurrencyInfo()
+	// ACT
+	currencyInfo, err := suite.sut.GetCurrencyInfo()
+	suite.Require().Nil(err)
 
-	csis.Equal(currencyInfo.FromCcy, "USD")
-	csis.Equal(currencyInfo.ToCcy, "UAH")
-	csis.Equal(currencyInfo.BuyRate, 39.95)
-	csis.Equal(currencyInfo.SaleRate, 40.87)
-	csis.NotNil(currencyInfo.UpdateDate)
+	// VERIFY
+	suite.Equal(currencyInfo.FromCcy, "USD")
+	suite.Equal(currencyInfo.ToCcy, "UAH")
+	suite.Equal(currencyInfo.BuyRate, 39.95)
+	suite.Equal(currencyInfo.SaleRate, 40.87)
+	suite.NotNil(currencyInfo.UpdateDate)
 }
 
-func (csis *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
+func (suite *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
+	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
-			csis.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
+			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
 		}
 		w.WriteHeader(http.StatusOK)
 
@@ -61,40 +67,47 @@ func (csis *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
 	}))
 
 	defer server.Close()
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
-	currencyRate := csis.sut.GetCurrencyRate()
+	// ACT
+	currencyRate, err := suite.sut.GetCurrencyRate()
+	suite.Require().Nil(err)
 
-	csis.Equal(currencyRate.Number, 40.87)
+	// VERIFY
+	suite.Equal(currencyRate.Number, 40.87)
 }
 
-func (csis *CurrencyServiceImplSuite) TestUpdateCurrencyRates_errWhileGet() {
+func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_errWhileGet() {
+	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
-			csis.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
+			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
 		}
 		http.Error(w, "simulated error", http.StatusInternalServerError)
 	}))
 
 	defer server.Close()
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.APIError
 
-	err := csis.sut.UpdateCurrencyRates()
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
 
-	csis.NotNil(err)
-	csis.True(errors.As(err, &apiErr))
+	// VERIFY
+	suite.NotNil(err)
+	suite.True(errors.As(err, &apiErr))
 }
 
-func (csis *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
+func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
+	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
-			csis.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
+			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
 		}
 
 		w.WriteHeader(http.StatusOK)
@@ -105,35 +118,41 @@ func (csis *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode() 
 	}))
 
 	defer server.Close()
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.InvalidStateError
 
-	err := csis.sut.UpdateCurrencyRates()
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
 
-	csis.NotNil(err)
-	csis.True(errors.As(err, &apiErr))
+	// VERIFY
+	suite.NotNil(err)
+	suite.True(errors.As(err, &apiErr))
 }
 
-func (csis *CurrencyServiceImplSuite) TestUpdateCurrencyRates_invalidURL() {
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_invalidURL() {
+	// SETUP
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: "invalid-url",
 	})
 
 	var apiErr *myerrors.APIError
 
-	err := csis.sut.UpdateCurrencyRates()
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
 
-	csis.NotNil(err)
-	csis.True(errors.As(err, &apiErr))
+	// VERIFY
+	suite.NotNil(err)
+	suite.True(errors.As(err, &apiErr))
 }
 
-func (csis *CurrencyServiceImplSuite) TestGetCurrencyInfo_noCurrencyUSD() {
+func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_noCurrencyUSD() {
+	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
-			csis.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
+			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
 		}
 		w.WriteHeader(http.StatusOK)
 
@@ -144,14 +163,16 @@ func (csis *CurrencyServiceImplSuite) TestGetCurrencyInfo_noCurrencyUSD() {
 	}))
 
 	defer server.Close()
-	csis.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.APIError
 
-	err := csis.sut.UpdateCurrencyRates()
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
 
-	csis.NotNil(err)
-	csis.True(errors.As(err, &apiErr))
+	// VERIFY
+	suite.NotNil(err)
+	suite.True(errors.As(err, &apiErr))
 }

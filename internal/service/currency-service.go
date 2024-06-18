@@ -17,8 +17,8 @@ import (
 )
 
 type CurrencyService interface {
-	GetCurrencyInfo() dto.CurrencyInfoDTO
-	GetCurrencyRate() dto.CurrencyResponseDto
+	GetCurrencyInfo() (dto.CurrencyInfoDTO, error)
+	GetCurrencyRate() (dto.CurrencyResponseDTO, error)
 	UpdateCurrencyRates() error
 }
 
@@ -41,25 +41,25 @@ func NewCurrencyServiceImpl(cnf config.CurrencyServiceConfig) *CurrencyServiceIm
 
 // GetCurrencyInfo returns extended information about currency rate.
 // It is then used in email.
-func (s *CurrencyServiceImpl) GetCurrencyInfo() dto.CurrencyInfoDTO {
+func (s *CurrencyServiceImpl) GetCurrencyInfo() (dto.CurrencyInfoDTO, error) {
 	return s.getCurrencyInfo()
 }
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
-func (s *CurrencyServiceImpl) GetCurrencyRate() dto.CurrencyResponseDto {
-	data := s.getCurrencyInfo()
-	return dto.InfoToResponseDTO(&data)
+func (s *CurrencyServiceImpl) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
+	data, err := s.getCurrencyInfo()
+	return dto.InfoToResponseDTO(&data), err
 }
 
-func (s *CurrencyServiceImpl) getCurrencyInfo() dto.CurrencyInfoDTO {
+func (s *CurrencyServiceImpl) getCurrencyInfo() (dto.CurrencyInfoDTO, error) {
 	if s.currencyInfo.UpdateDate == "" {
 		if err := s.UpdateCurrencyRates(); err != nil {
-			log.Printf(err.Error())
-		} //todo make return err
+			return s.currencyInfo, err
+		}
 	}
 
-	return s.currencyInfo
+	return s.currencyInfo, nil
 }
 
 // getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.

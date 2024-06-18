@@ -3,6 +3,8 @@ package controller
 import (
 	"net/http"
 
+	"genesis-currency-api/pkg/errors"
+
 	"genesis-currency-api/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +18,10 @@ type CurrencyControllerImpl struct {
 }
 
 func (c *CurrencyControllerImpl) GetLatest(ctx *gin.Context) {
-	result := c.currencyService.GetCurrencyRate()
+	result, err := c.currencyService.GetCurrencyRate()
+	if err != nil {
+		errors.AttachToCtx(err, ctx)
+	}
 	ctx.String(http.StatusOK, "%f", result.Number)
 }
 

@@ -28,7 +28,7 @@ func (c *UtilControllerImpl) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func (c *UtilControllerImpl) SendEmails(ctx *gin.Context) { //todo
+func (c *UtilControllerImpl) SendEmails(ctx *gin.Context) {
 	err := c.emailService.SendEmails()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)

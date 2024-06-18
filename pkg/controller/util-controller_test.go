@@ -3,16 +3,17 @@ package controller_test
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/controller"
 	"genesis-currency-api/pkg/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 type UtilControllerImplTestSuite struct {
@@ -91,7 +92,7 @@ func (suite *UtilControllerImplTestSuite) TestSendEmails_checkResult() {
 
 	// VERIFY
 	suite.Equal(http.StatusOK, resp.Code)
-	suite.Equal("Emails are successfully sent", strings.Replace(resp.Body.String(), "\"", "", -1))
+	suite.Equal("Emails are successfully sent", strings.ReplaceAll(resp.Body.String(), "\"", ""))
 
 	suite.mockEmailService.AssertExpectations(suite.T())
 }

@@ -1,6 +1,12 @@
 package controller_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strings"
+	"testing"
+
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/controller"
@@ -8,11 +14,6 @@ import (
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strings"
-	"testing"
 )
 
 type UserControllerImplTestSuite struct {
@@ -57,7 +58,7 @@ func (suite *UserControllerImplTestSuite) TestAdd_checkResult() {
 	// ACT
 	suite.router.ServeHTTP(resp, req)
 
-	// Перевірка результату
+	// VERIFY
 	suite.Equal(http.StatusOK, resp.Code)
 	suite.Contains(resp.Body.String(), "E-mail додано")
 

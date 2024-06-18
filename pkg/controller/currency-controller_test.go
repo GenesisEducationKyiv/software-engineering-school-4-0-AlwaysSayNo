@@ -1,15 +1,16 @@
 package controller_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/controller"
 	"genesis-currency-api/pkg/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 type CurrencyControllerImplTestSuite struct {
@@ -32,7 +33,7 @@ func (suite *CurrencyControllerImplTestSuite) SetupTest() {
 
 func (suite *CurrencyControllerImplTestSuite) TestGetLatest_checkResult() {
 	// SETUP
-	rate := dto.CurrencyResponseDto{
+	rate := dto.CurrencyResponseDTO{
 		Number: 39.35,
 	}
 	suite.mockCurrencyService.On("GetCurrencyRate").Return(rate, nil)

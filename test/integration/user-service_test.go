@@ -1,9 +1,15 @@
-package intergration_test
+//go:build integration
+
+package integration_test
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"path/filepath"
+	"testing"
+
 	"genesis-currency-api/internal/model"
 	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/config"
@@ -19,9 +25,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"path/filepath"
-	"testing"
 )
 
 type UserServiceImplSuite struct {
@@ -52,7 +55,8 @@ func (suite *UserServiceImplSuite) SetupSuite() {
 	cnf.DBHost = host
 	cnf.DBPort = port.Port()
 
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cnf.DBUser, cnf.DBPassword, cnf.DBHost, cnf.DBPort, cnf.DBName)
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		cnf.DBUser, cnf.DBPassword, cnf.DBHost, cnf.DBPort, cnf.DBName)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	suite.Require().Nil(err)
 
@@ -63,7 +67,9 @@ func (suite *UserServiceImplSuite) SetupSuite() {
 	suite.Require().Nil(err)
 }
 
-func (suite *UserServiceImplSuite) createContainer(ctx context.Context, cnf config.DatabaseConfig) (testcontainers.Container, string, nat.Port, error) {
+func (suite *UserServiceImplSuite) createContainer(ctx context.Context,
+	cnf config.DatabaseConfig,
+) (testcontainers.Container, string, nat.Port, error) {
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:15.1",
 		ExposedPorts: []string{"5432/tcp"},
