@@ -9,22 +9,31 @@ import (
 	"net/url"
 	"time"
 
+	"genesis-currency-api/pkg/config"
+
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util/date"
-	"github.com/spf13/viper"
 )
+
+type CurrencyServiceInterface interface {
+	GetCurrencyInfo() dto.CurrencyInfoDTO
+	GetCurrencyRate() dto.CurrencyResponseDTO
+	UpdateCurrencyRates() error
+}
 
 type CurrencyService struct {
 	currencyInfo dto.CurrencyInfoDTO
+	cnf          config.CurrencyServiceConfig
 }
 
 // NewCurrencyService is a factory function for CurrencyService
-func NewCurrencyService() *CurrencyService {
+func NewCurrencyService(cnf config.CurrencyServiceConfig) *CurrencyService {
 	// A cache value for 3rd party API response.
 	var currencyInfo dto.CurrencyInfoDTO
 	c := &CurrencyService{
 		currencyInfo,
+		cnf,
 	}
 
 	err := c.UpdateCurrencyRates()
@@ -43,15 +52,15 @@ func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
-func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDto {
-	return dto.InfoToResponseDto(&s.currencyInfo)
+func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDTO {
+	return dto.InfoToResponseDTO(&s.currencyInfo)
 }
 
 // getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.
 // Then it maps ApiCurrencyResponse to CurrencyInfoDTO and adds the time when call was made.
 // Returns a list of CurrencyInfoDTO for all available from 3rd party API currencies.
-func getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
-	apiResponses, err := callAPI()
+func (s *CurrencyService) getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
+	apiResponses, err := s.callAPI()
 	if err != nil {
 		return nil, err
 	}
@@ -71,10 +80,10 @@ func getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
 
 // callAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
-func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
+func (s *CurrencyService) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	log.Println("Start calling external API")
 
-	apiURL, err := get3rdPartyURL()
+	apiURL, err := s.parse3rdPartyURL()
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +94,7 @@ func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("error closing response body: %v", err)
+			log.Printf("error closing response body: %v\n", err)
 		}
 	}()
 
@@ -108,8 +117,8 @@ func callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	return &apiResponses, nil
 }
 
-func get3rdPartyURL() (*url.URL, error) {
-	parsedURL, err := url.ParseRequestURI(viper.Get("THIRD_PARTY_API").(string))
+func (s *CurrencyService) parse3rdPartyURL() (*url.URL, error) {
+	parsedURL, err := url.ParseRequestURI(s.cnf.ThirdPartyAPI)
 	if err != nil {
 		return nil, errors.NewAPIError("Invalid URL", err)
 	}
@@ -123,7 +132,7 @@ func (s *CurrencyService) UpdateCurrencyRates() error {
 	log.Println("Start updating currency rates")
 
 	// Get list of 3rd party values.
-	currencyRates, err := getCurrencyRateFromAPI()
+	currencyRates, err := s.getCurrencyRateFromAPI()
 	if err != nil {
 		return err
 	}

@@ -39,27 +39,24 @@ The __./pkg/common/envs/.env__ file stores all public variables, such as:
     THIRD_PARTY_API="https://api.privatbank.ua/p24api/pubinfo?exchange&coursid=5" // a link to the 3rd party API for obtaining currency data.
     ```
 
+    All other variables are considered secret and must be provided as environment variables. 
+    In order to run the project with docker-compose, you must create the following file in the project root: 
 
-All other variables are considered secret and must be provided as environment variables. 
-In order to run the project with docker-compose, you must create the following two files in the project root: 
-
-- __app-env-local__ - responsible the variables needed for the application to work:
-    ```app-env-local
+    _.env__ - responsible the variables needed for the application and database to work:
+    ```.env
+       # application environments
        DB_NAME=currency-api //example: a name of the database schema (for migration);
        DB_PASSWORD=root //example: database user password (for migration);
        DB_USER=root //example: database user login (for migration);
        SMTP_PASSWORD=zvai mawk wdbn aamd //example: 16 character app password; 
        SMTP_USER=test@gmail.com //example: sender gmail address.
+    
+       # database environments
+       POSTGRES_USER=root //example: a name of the database schema;
+       POSTGRES_PASSWORD=root //example: database user password;
+       POSTGRES_DB=currency-api //example: database user login;
     ```
-**Note**: You can check [here](https://youtu.be/H0HZc4FgX7E?si=-8iIGmPG5UwyrEys), how to get the SMTP_PASSWORD for your SMTP_USER
-. 
-
-- __db-env-local__ - responsible the variables needed for the database to work:
-    ```db-env-local 
-    POSTGRES_USER=root //example: a name of the database schema;
-    POSTGRES_PASSWORD=root //example: database user password;
-    POSTGRES_DB=currency-api //example: database user login;
-    ```
+    **Note**: You can check [here](https://youtu.be/H0HZc4FgX7E?si=-8iIGmPG5UwyrEys), how to get the SMTP_PASSWORD for your SMTP_USER.
 
 3. **Build and run the Docker containers**:
     ```sh

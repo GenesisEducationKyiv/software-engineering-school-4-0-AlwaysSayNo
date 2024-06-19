@@ -6,22 +6,25 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - db-env-local
+      - .env
     volumes:
       - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
     depends_on:
-      - my_postgres
-    environment:
-      - DB_HOST=my_postgres
-      - DB_PORT=5432
+      my_postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
     env_file:
-      - app-env-local
-    command: [ "./main" ]
+      - .env
+    command: /bin/sh -c "migrate -path pkg/common/db/migrations -database 'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable' up && ./main"
 
 volumes:
   postgres_volume:

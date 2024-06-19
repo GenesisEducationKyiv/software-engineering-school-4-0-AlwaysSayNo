@@ -17,7 +17,7 @@ type CurrencyInfoDTO struct {
 	SaleRate   float64 `json:"saleRate"`
 }
 
-type CurrencyResponseDto struct {
+type CurrencyResponseDTO struct {
 	Number float64 `json:"number"`
 }
 
@@ -32,8 +32,8 @@ func APICurrencyResponseToInfoDTO(dto *APICurrencyResponseDTO) CurrencyInfoDTO {
 	}
 }
 
-func InfoToResponseDto(dto *CurrencyInfoDTO) CurrencyResponseDto {
-	return CurrencyResponseDto{
+func InfoToResponseDTO(dto *CurrencyInfoDTO) CurrencyResponseDTO {
+	return CurrencyResponseDTO{
 		Number: dto.SaleRate,
 	}
 }
