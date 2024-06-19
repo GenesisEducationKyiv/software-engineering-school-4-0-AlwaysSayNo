@@ -14,6 +14,10 @@ import (
 	"genesis-currency-api/pkg/errors"
 )
 
+type EmailServiceInterface interface {
+	SendEmails() error
+}
+
 type CurrencyEmailData struct {
 	FromCcy    string
 	ToCcy      string
@@ -22,28 +26,28 @@ type CurrencyEmailData struct {
 	SaleRate   float64
 }
 
-type EmailServiceImpl struct {
-	userService     *UserServiceImpl
-	currencyService *CurrencyServiceImpl
+type EmailService struct {
+	userService     *UserService
+	currencyService *CurrencyService
 	cnf             config.EmailServiceConfig
 }
 
-// NewEmailServiceImpl is a factory function for EmailServiceImpl
-func NewEmailServiceImpl(userService *UserServiceImpl,
-	currencyService *CurrencyServiceImpl,
+// NewEmailService is a factory function for EmailService
+func NewEmailService(userService *UserService,
+	currencyService *CurrencyService,
 	cnf config.EmailServiceConfig,
-) *EmailServiceImpl {
-	return &EmailServiceImpl{
-		userService,
-		currencyService,
-		cnf,
+) *EmailService {
+	return &EmailService{
+		userService:     userService,
+		currencyService: currencyService,
+		cnf:             cnf,
 	}
 }
 
 // SendEmails is used to send a currency update email to all subscribed users.
 // It sends full CurrencyInfoDto information (buy, sale rates) compared to /api/rate ena-point.
 // Returns error in case of occurrence.
-func (s *EmailServiceImpl) SendEmails() error {
+func (s *EmailService) SendEmails() error {
 	log.Println("Start sending emails")
 	body, err := s.prepareEmail()
 	if err != nil {
@@ -55,7 +59,7 @@ func (s *EmailServiceImpl) SendEmails() error {
 
 // prepareEmail is used to prepare an email. Email consists of an email_template and rate information.
 // Returns prepared email or error.
-func (s *EmailServiceImpl) prepareEmail() (*bytes.Buffer, error) {
+func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 	// Get an email_template.
 	tmplPath := filepath.Join("pkg", "common", "templates", "email_template.html")
 
@@ -84,7 +88,7 @@ func (s *EmailServiceImpl) prepareEmail() (*bytes.Buffer, error) {
 // send sends emails to users using the standard library.
 // If the list of users is empty, it will return an error.
 // Returns error in case of occurrence.
-func (s *EmailServiceImpl) send(body *bytes.Buffer) error {
+func (s *EmailService) send(body *bytes.Buffer) error {
 	// Empty users list check.
 	users, err := s.userService.GetAll()
 	if len(users) == 0 {

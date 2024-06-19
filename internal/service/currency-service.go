@@ -16,23 +16,29 @@ import (
 	"genesis-currency-api/pkg/util/date"
 )
 
-type CurrencyServiceImpl struct {
+type CurrencyServiceInterface interface {
+	GetCurrencyInfo() dto.CurrencyInfoDTO
+	GetCurrencyRate() dto.CurrencyResponseDTO
+	UpdateCurrencyRates() error
+}
+
+type CurrencyService struct {
 	currencyInfo dto.CurrencyInfoDTO
 	cnf          config.CurrencyServiceConfig
 }
 
-// NewCurrencyServiceImpl is a factory function for CurrencyServiceImpl
-func NewCurrencyServiceImpl(cnf config.CurrencyServiceConfig) *CurrencyServiceImpl {
+// NewCurrencyService is a factory function for CurrencyService
+func NewCurrencyService(cnf config.CurrencyServiceConfig) *CurrencyService {
 	// A cache value for 3rd party API response.
 	var currencyInfo dto.CurrencyInfoDTO
-	c := &CurrencyServiceImpl{
+	c := &CurrencyService{
 		currencyInfo,
 		cnf,
 	}
 
 	err := c.UpdateCurrencyRates()
 	if err != nil {
-		log.Panic("error during creating CurrencyServiceImpl: ", err)
+		log.Panic("error during creating CurrencyService: ", err)
 	}
 
 	return c
@@ -40,20 +46,20 @@ func NewCurrencyServiceImpl(cnf config.CurrencyServiceConfig) *CurrencyServiceIm
 
 // GetCurrencyInfo returns extended information about currency rate.
 // It is then used in email.
-func (s *CurrencyServiceImpl) GetCurrencyInfo() dto.CurrencyInfoDTO {
+func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
 	return s.currencyInfo
 }
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
-func (s *CurrencyServiceImpl) GetCurrencyRate() dto.CurrencyResponseDto {
+func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDTO {
 	return dto.InfoToResponseDTO(&s.currencyInfo)
 }
 
 // getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.
 // Then it maps ApiCurrencyResponse to CurrencyInfoDTO and adds the time when call was made.
 // Returns a list of CurrencyInfoDTO for all available from 3rd party API currencies.
-func (s *CurrencyServiceImpl) getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
+func (s *CurrencyService) getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, error) {
 	apiResponses, err := s.callAPI()
 	if err != nil {
 		return nil, err
@@ -74,7 +80,7 @@ func (s *CurrencyServiceImpl) getCurrencyRateFromAPI() (*[]dto.CurrencyInfoDTO, 
 
 // callAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
-func (s *CurrencyServiceImpl) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
+func (s *CurrencyService) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	log.Println("Start calling external API")
 
 	apiURL, err := s.parse3rdPartyURL()
@@ -111,7 +117,7 @@ func (s *CurrencyServiceImpl) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	return &apiResponses, nil
 }
 
-func (s *CurrencyServiceImpl) parse3rdPartyURL() (*url.URL, error) {
+func (s *CurrencyService) parse3rdPartyURL() (*url.URL, error) {
 	parsedURL, err := url.ParseRequestURI(s.cnf.ThirdPartyAPI)
 	if err != nil {
 		return nil, errors.NewAPIError("Invalid URL", err)
@@ -122,7 +128,7 @@ func (s *CurrencyServiceImpl) parse3rdPartyURL() (*url.URL, error) {
 
 // UpdateCurrencyRates is used to update #currencyInfo by calling 3rd party API.
 // In this case #currencyInfo is a cache value of API response for currency USD.
-func (s *CurrencyServiceImpl) UpdateCurrencyRates() error {
+func (s *CurrencyService) UpdateCurrencyRates() error {
 	log.Println("Start updating currency rates")
 
 	// Get list of 3rd party values.
