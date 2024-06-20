@@ -1,4 +1,4 @@
-package controller_test
+package util_test
 
 import (
 	"encoding/json"
@@ -8,9 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"genesis-currency-api/internal/handler/util"
+
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"
-	"genesis-currency-api/pkg/controller"
 	"genesis-currency-api/pkg/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
@@ -19,8 +20,8 @@ import (
 type UtilControllerImplTestSuite struct {
 	suite.Suite
 	router           *gin.Engine
-	mockUserService  *mocks.UserService
-	mockEmailService *mocks.EmailService
+	mockUserService  *mocks.UserServiceInterface
+	mockEmailService *mocks.EmailServiceInterface
 }
 
 func TestUtilControllerImplTestSuite(t *testing.T) {
@@ -31,11 +32,13 @@ func (suite *UtilControllerImplTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.router = gin.New()
 
-	suite.mockUserService = new(mocks.UserService)
-	suite.mockEmailService = new(mocks.EmailService)
+	suite.mockUserService = new(mocks.UserServiceInterface)
+	suite.mockEmailService = new(mocks.EmailServiceInterface)
 
 	suite.router.Use(middleware.ErrorHandler())
-	controller.RegisterUtilRoutes(suite.router, suite.mockUserService, suite.mockEmailService)
+
+	utilHandler := util.NewHandler(suite.mockUserService, suite.mockEmailService)
+	util.RegisterRoutes(suite.router, *utilHandler)
 }
 
 func (suite *UtilControllerImplTestSuite) TestFindAll_checkResult() {

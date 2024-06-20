@@ -27,19 +27,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserServiceImplSuite struct {
+type UserServiceSuite struct {
 	suite.Suite
 	DB        *gorm.DB
 	tx        *gorm.DB
-	service   service.UserService
+	service   service.UserServiceInterface
 	container testcontainers.Container
 }
 
-func TestUserServiceImplSuite(t *testing.T) {
-	suite.Run(t, new(UserServiceImplSuite))
+func TestUserServiceSuite(t *testing.T) {
+	suite.Run(t, new(UserServiceSuite))
 }
 
-func (suite *UserServiceImplSuite) SetupSuite() {
+func (suite *UserServiceSuite) SetupSuite() {
 	// Start container
 	ctx := context.Background()
 
@@ -67,7 +67,7 @@ func (suite *UserServiceImplSuite) SetupSuite() {
 	suite.Require().Nil(err)
 }
 
-func (suite *UserServiceImplSuite) createContainer(ctx context.Context,
+func (suite *UserServiceSuite) createContainer(ctx context.Context,
 	cnf config.DatabaseConfig,
 ) (testcontainers.Container, string, nat.Port, error) {
 	req := testcontainers.ContainerRequest{
@@ -105,7 +105,7 @@ func (suite *UserServiceImplSuite) createContainer(ctx context.Context,
 	return container, host, port, nil
 }
 
-func (suite *UserServiceImplSuite) runMigrations(dsn string) error {
+func (suite *UserServiceSuite) runMigrations(dsn string) error {
 	migrationPath, err := getMigrationsPath()
 	if err != nil {
 		return err
@@ -140,27 +140,27 @@ func getMigrationsPath() (string, error) {
 	return filepath.Join(rootPath, "pkg", "common", "db", "migrations"), nil
 }
 
-func (suite *UserServiceImplSuite) TearDownSuite() {
+func (suite *UserServiceSuite) TearDownSuite() {
 	err := suite.container.Terminate(context.Background())
 	suite.Require().Nil(err)
 }
 
-func (suite *UserServiceImplSuite) SetupTest() {
+func (suite *UserServiceSuite) SetupTest() {
 	// Start a new transaction
 	tx := suite.DB.Begin()
 	suite.Require().NotNil(tx)
 	suite.tx = tx
 
-	suite.service = service.NewUserServiceImpl(tx)
+	suite.service = service.NewUserService(tx)
 }
 
-func (suite *UserServiceImplSuite) TearDownTest() {
+func (suite *UserServiceSuite) TearDownTest() {
 	// Roll back the transaction
 	err := suite.tx.Rollback().Error
 	suite.Require().Nil(err)
 }
 
-func (suite *UserServiceImplSuite) TestSave_checkResult() {
+func (suite *UserServiceSuite) TestSave_checkResult() {
 	// SETUP
 	saveRequestDto := dto.UserSaveRequestDTO{
 		Email: "test@example.com",
@@ -174,7 +174,7 @@ func (suite *UserServiceImplSuite) TestSave_checkResult() {
 	suite.Equal(saveRequestDto.Email, user.Email)
 }
 
-func (suite *UserServiceImplSuite) TestSave_whenUserAlreadyExists() {
+func (suite *UserServiceSuite) TestSave_whenUserAlreadyExists() {
 	// SETUP
 	saveRequestDto := dto.UserSaveRequestDTO{
 		Email: "exists@example.com",
@@ -195,7 +195,7 @@ func (suite *UserServiceImplSuite) TestSave_whenUserAlreadyExists() {
 	suite.True(errors.As(err, &userWithEmailExistsError))
 }
 
-func (suite *UserServiceImplSuite) TestGetAll_dbIsEmpty_checkResult() {
+func (suite *UserServiceSuite) TestGetAll_dbIsEmpty_checkResult() {
 	// ACT
 	users, err := suite.service.GetAll()
 
@@ -205,7 +205,7 @@ func (suite *UserServiceImplSuite) TestGetAll_dbIsEmpty_checkResult() {
 	suite.Equal(0, len(users))
 }
 
-func (suite *UserServiceImplSuite) TestGetAll_dbContainsUsers_checkResult() {
+func (suite *UserServiceSuite) TestGetAll_dbContainsUsers_checkResult() {
 	// SETUP
 	usersToSave := []model.User{
 		{Email: "user1@example.com"},

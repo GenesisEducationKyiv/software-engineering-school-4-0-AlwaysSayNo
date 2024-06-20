@@ -12,16 +12,16 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type CurrencyServiceImplSuite struct {
+type CurrencyServiceSuite struct {
 	suite.Suite
-	sut service.CurrencyService
+	sut service.CurrencyServiceInterface
 }
 
 func TestCurrencyServiceImplSuite(t *testing.T) {
-	suite.Run(t, &CurrencyServiceImplSuite{})
+	suite.Run(t, &CurrencyServiceSuite{})
 }
 
-func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
+func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_checkResult() {
 	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
@@ -36,7 +36,7 @@ func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
@@ -52,7 +52,7 @@ func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_checkResult() {
 	suite.NotNil(currencyInfo.UpdateDate)
 }
 
-func (suite *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
+func (suite *CurrencyServiceSuite) TestGetCurrencyRate_checkResult() {
 	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
@@ -67,7 +67,7 @@ func (suite *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
@@ -79,7 +79,7 @@ func (suite *CurrencyServiceImplSuite) TestGetCurrencyRate_checkResult() {
 	suite.Equal(currencyRate.Number, 40.87)
 }
 
-func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_errWhileGet() {
+func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_errWhileGet() {
 	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
@@ -89,7 +89,7 @@ func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_errWhileGet() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
@@ -103,7 +103,7 @@ func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_errWhileGet() {
 	suite.True(errors.As(err, &apiErr))
 }
 
-func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
+func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
 	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
@@ -118,7 +118,7 @@ func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode()
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 
@@ -132,9 +132,9 @@ func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_nonOKStatusCode()
 	suite.True(errors.As(err, &apiErr))
 }
 
-func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_invalidURL() {
+func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_invalidURL() {
 	// SETUP
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: "invalid-url",
 	})
 
@@ -148,7 +148,7 @@ func (suite *CurrencyServiceImplSuite) TestUpdateCurrencyRates_invalidURL() {
 	suite.True(errors.As(err, &apiErr))
 }
 
-func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_noCurrencyUSD() {
+func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_noCurrencyUSD() {
 	// SETUP
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/external-api" {
@@ -163,7 +163,7 @@ func (suite *CurrencyServiceImplSuite) TestGetCurrencyInfo_noCurrencyUSD() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyServiceImpl(config.CurrencyServiceConfig{
+	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
 		ThirdPartyAPI: server.URL + "/external-api",
 	})
 

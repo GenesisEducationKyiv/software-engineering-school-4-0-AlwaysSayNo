@@ -1,4 +1,4 @@
-package controller_test
+package currency_test
 
 import (
 	"net/http"
@@ -6,32 +6,35 @@ import (
 	"strconv"
 	"testing"
 
+	"genesis-currency-api/internal/handler/currency"
+
 	"genesis-currency-api/mocks"
-	"genesis-currency-api/pkg/controller"
 	"genesis-currency-api/pkg/dto"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
 
-type CurrencyControllerImplTestSuite struct {
+type CurrencyHandlerTestSuite struct {
 	suite.Suite
 	router              *gin.Engine
-	mockCurrencyService *mocks.CurrencyService
+	mockCurrencyService *mocks.CurrencyServiceInterface
 }
 
-func TestCurrencyControllerTestSuite(t *testing.T) {
-	suite.Run(t, new(CurrencyControllerImplTestSuite))
+func TestCurrencyHandlerTestSuite(t *testing.T) {
+	suite.Run(t, new(CurrencyHandlerTestSuite))
 }
 
-func (suite *CurrencyControllerImplTestSuite) SetupTest() {
+func (suite *CurrencyHandlerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.router = gin.New()
 
-	suite.mockCurrencyService = new(mocks.CurrencyService)
-	controller.RegisterCurrencyRoutes(suite.router, suite.mockCurrencyService)
+	suite.mockCurrencyService = new(mocks.CurrencyServiceInterface)
+
+	currencyHandler := currency.NewHandler(suite.mockCurrencyService)
+	currency.RegisterRoutes(suite.router, *currencyHandler)
 }
 
-func (suite *CurrencyControllerImplTestSuite) TestGetLatest_checkResult() {
+func (suite *CurrencyHandlerTestSuite) TestGetLatest_checkResult() {
 	// SETUP
 	rate := dto.CurrencyResponseDTO{
 		Number: 39.35,
