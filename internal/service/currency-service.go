@@ -124,7 +124,7 @@ func (s *CurrencyService) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 }
 
 func (s *CurrencyService) parse3rdPartyURL() (*url.URL, error) {
-	parsedURL, err := url.ParseRequestURI(s.cnf.ThirdPartyAPI)
+	parsedURL, err := url.ParseRequestURI(s.cnf.ThirdPartyAPIPrivateBank)
 	if err != nil {
 		return nil, errors.NewAPIError("Invalid URL", err)
 	}

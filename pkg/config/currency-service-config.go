@@ -5,11 +5,13 @@ import (
 )
 
 type CurrencyServiceConfig struct {
-	ThirdPartyAPI string
+	ThirdPartyAPIPrivateBank  string
+	ThirdPartyAPICDNJSDeliver string
 }
 
 func LoadCurrencyServiceConfig() CurrencyServiceConfig {
 	return CurrencyServiceConfig{
-		ThirdPartyAPI: envs.Get("THIRD_PARTY_API"),
+		ThirdPartyAPIPrivateBank:  envs.Get("THIRD_PARTY_API_PRIVATE_BANK"),
+		ThirdPartyAPICDNJSDeliver: envs.Get("THIRD_PARTY_API_CDN_JS_DELIVR"),
 	}
 }

@@ -37,7 +37,7 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_checkResult() {
 
 	defer server.Close()
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: server.URL + "/external-api",
+		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	// ACT
@@ -68,7 +68,7 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyRate_checkResult() {
 
 	defer server.Close()
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: server.URL + "/external-api",
+		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	// ACT
@@ -90,7 +90,7 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_errWhileGet() {
 
 	defer server.Close()
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: server.URL + "/external-api",
+		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.APIError
@@ -119,7 +119,7 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
 
 	defer server.Close()
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: server.URL + "/external-api",
+		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.InvalidStateError
@@ -135,7 +135,7 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
 func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_invalidURL() {
 	// SETUP
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: "invalid-url",
+		ThirdPartyAPIPrivateBank: "invalid-url",
 	})
 
 	var apiErr *myerrors.APIError
@@ -164,7 +164,7 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_noCurrencyUSD() {
 
 	defer server.Close()
 	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
-		ThirdPartyAPI: server.URL + "/external-api",
+		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.APIError
