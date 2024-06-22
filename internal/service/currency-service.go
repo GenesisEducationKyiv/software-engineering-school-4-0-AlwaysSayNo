@@ -33,8 +33,12 @@ func NewCurrencyService(currencyProvider CurrencyProvider) *CurrencyService {
 
 // GetCurrencyRate returns short information about currency rate.
 func (s *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
-	data, err := s.getCurrencyDTO()
-	return data.CurrencyResponseDTO, err
+	currencyDTO, err := s.getCurrencyDTO()
+	return currencyDTO.CurrencyResponseDTO, err
+}
+
+func (s *CurrencyService) GetCachedCurrency() (dto.CachedCurrency, error) {
+	return s.getCurrencyDTO()
 }
 
 func (s *CurrencyService) getCurrencyDTO() (dto.CachedCurrency, error) {

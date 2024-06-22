@@ -3,7 +3,7 @@ package service
 import (
 	"genesis-currency-api/internal/model"
 	"genesis-currency-api/pkg/dto"
-	"genesis-currency-api/pkg/errors"
+	apperrors "genesis-currency-api/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -30,11 +30,11 @@ func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, er
 
 	// Check email uniqueness.
 	if s.existsByEmail(entity.Email) {
-		return dto.UserResponseDTO{}, errors.NewUserWithEmailExistsError()
+		return dto.UserResponseDTO{}, apperrors.NewUserWithEmailExistsError()
 	}
 
 	if result := s.DB.Create(&entity); result.Error != nil {
-		return dto.UserResponseDTO{}, errors.NewDBError("", result.Error)
+		return dto.UserResponseDTO{}, apperrors.NewDBError("", result.Error)
 	}
 
 	return dto.ToDTO(entity), nil
@@ -46,7 +46,7 @@ func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 	var users []model.User
 
 	if result := s.DB.Find(&users); result.Error != nil {
-		return nil, errors.NewDBError("", result.Error)
+		return nil, apperrors.NewDBError("", result.Error)
 	}
 
 	result := make([]dto.UserResponseDTO, 0, len(users))
