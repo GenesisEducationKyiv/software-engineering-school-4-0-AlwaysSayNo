@@ -9,6 +9,11 @@ type PrivateAPICurrencyResponseDTO struct {
 	Sale    string `json:"sale"`
 }
 
+type GovUaAPICurrencyResponseDTO struct {
+	FromCcy string  `json:"cc"`
+	Rate    float64 `json:"rate"`
+}
+
 type JSDeliverAPICurrencyResponseDTO struct {
 	Date string `json:"date"`
 	Usd  struct {
@@ -36,6 +41,12 @@ type CachedCurrency struct {
 func JSDeliverAPICurrencyResponseToDTO(dto *JSDeliverAPICurrencyResponseDTO) CurrencyResponseDTO {
 	return CurrencyResponseDTO{
 		Number: dto.Usd.Uah,
+	}
+}
+
+func GovUaAPICurrencyResponseDTOToDTO(dto *GovUaAPICurrencyResponseDTO) CurrencyResponseDTO {
+	return CurrencyResponseDTO{
+		Number: dto.Rate,
 	}
 }
 

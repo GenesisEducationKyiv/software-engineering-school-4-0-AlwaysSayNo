@@ -2,7 +2,9 @@ package main
 
 import (
 	"genesis-currency-api/internal/external/api/client/cdn_jsdelivr"
+	gov_ua "genesis-currency-api/internal/external/api/client/gov_ua"
 	"genesis-currency-api/internal/external/api/client/private"
+
 	"log"
 
 	"genesis-currency-api/internal/handler/currency"
@@ -62,15 +64,20 @@ func getCurrencyProviderChain() service.CurrencyProvider {
 	// GET PROVIDERS
 	privateClient, err := private.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
-		log.Fatal("while creating private currency provider")
+		log.Fatal("creating Private Bank currency provider")
+	}
+	govUaClient, err := gov_ua.NewClient(config.LoadCurrencyServiceConfig())
+	if err != nil {
+		log.Fatal("creating Bank Gov Ua currency provider")
 	}
 	jsDelivrClient, err := cdn_jsdelivr.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
-		log.Fatal("while creating JS deliver currency provider")
+		log.Fatal("creating JS Deliver currency provider")
 	}
 
 	// SET PROVIDERS CHAIN
-	privateClient.SetNext(jsDelivrClient)
+	govUaClient.SetNext(jsDelivrClient)
+	privateClient.SetNext(govUaClient)
 
 	return privateClient
 }

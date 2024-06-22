@@ -22,7 +22,7 @@ type Client struct {
 }
 
 // NewClient is a factory function for JsDelivr API Client
-func NewClient(cnf config.CurrencyServiceConfig) (*Client, error) {
+func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 	if apiURL, err := parser.ParseURL(cnf.ThirdPartyAPICDNJSDeliver); err != nil {
 		return nil, err
 	} else {

@@ -25,9 +25,9 @@ type Client struct {
 	next   CurrencyRater
 }
 
-// NewClient is a factory function for Private Bank API Client
+// NewClient is a factory function for Bank Gov Ua API Client
 func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
-	if apiURL, err := parser.ParseURL(cnf.ThirdPartyAPIPrivateBank); err != nil {
+	if apiURL, err := parser.ParseURL(cnf.ThirdPartyAPIBankGovUa); err != nil {
 		return nil, err
 	} else {
 		return &Client{
@@ -39,12 +39,12 @@ func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 // GetCurrencyRate returns information about currency rate.
 func (s *Client) GetCurrencyRate() (*dto.CurrencyResponseDTO, error) {
 	if responseDTO, err := s.getUSDCurrencyFromAPI(); err == nil {
-		log.Printf("Success response from Private Bank API: %v\n", *responseDTO)
+		log.Printf("Success response from Bank Gov Ua API: %v\n", *responseDTO)
 		return responseDTO, nil
 	} else if s.next == nil {
 		return nil, fmt.Errorf("end of the currency rater chain: %w", err)
 	} else {
-		log.Printf("Error while calling Private Bank API: %v", err)
+		log.Printf("Error while calling Bank Gov Ua API: %v", err)
 	}
 
 	log.Println("Try next currency getter")
@@ -62,7 +62,7 @@ func (s *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
 
 	for _, r := range *apiResponses {
 		if r.FromCcy == USD {
-			apiResponse := dto.PrivateAPICurrencyResponseToDTO(&r)
+			apiResponse := dto.GovUaAPICurrencyResponseDTOToDTO(&r)
 			return &apiResponse, nil
 		}
 	}
@@ -72,16 +72,16 @@ func (s *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
 
 // callAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
-func (s *Client) callAPI() (*[]dto.PrivateAPICurrencyResponseDTO, error) {
-	log.Println("Start calling Private Bank API")
+func (s *Client) callAPI() (*[]dto.GovUaAPICurrencyResponseDTO, error) {
+	log.Println("Start calling Bank Gov Ua API")
 
 	resp, err := http.Get(s.apiURL)
 	if err != nil {
-		return nil, errors.NewAPIError("doing GET request to Private Bank API", err)
+		return nil, errors.NewAPIError("doing GET request to Bank Gov Ua API", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("closing response body from Private Bank API: %v\n", err)
+			log.Printf("closing response body from Bank Gov Ua API: %v\n", err)
 		}
 	}()
 
@@ -94,12 +94,12 @@ func (s *Client) callAPI() (*[]dto.PrivateAPICurrencyResponseDTO, error) {
 		return nil, errors.NewInvalidStateError("reading response body", err)
 	}
 
-	var apiResponses []dto.PrivateAPICurrencyResponseDTO
+	var apiResponses []dto.GovUaAPICurrencyResponseDTO
 	if err := json.Unmarshal(body, &apiResponses); err != nil {
 		return nil, errors.NewInvalidStateError("unmarshalling response body", err)
 	}
 
-	log.Println("Finish calling Private Bank API")
+	log.Println("Finish calling Bank Gov Ua API")
 
 	return &apiResponses, nil
 }
