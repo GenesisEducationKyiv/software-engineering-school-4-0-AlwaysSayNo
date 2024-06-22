@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"fmt"
+	"genesis-currency-api/pkg/dto"
 	"html/template"
 	"log"
 	"net/smtp"
@@ -18,6 +19,14 @@ type EmailServiceInterface interface {
 	SendEmails() error
 }
 
+type UserGetter interface {
+	GetAll() ([]dto.UserResponseDTO, error)
+}
+
+type DatedCurrencyGetter interface {
+	GetCachedCurrency() (dto.CachedCurrency, error)
+}
+
 type CurrencyEmailData struct {
 	FromCcy    string
 	ToCcy      string
@@ -27,25 +36,25 @@ type CurrencyEmailData struct {
 }
 
 type EmailService struct {
-	userService     *UserService
-	currencyService *CurrencyService
-	cnf             config.EmailServiceConfig
+	userGetter     UserGetter
+	currencyGetter DatedCurrencyGetter
+	cnf            config.EmailServiceConfig
 }
 
 // NewEmailService is a factory function for EmailService
-func NewEmailService(userService *UserService,
-	currencyService *CurrencyService,
+func NewEmailService(userGetter UserGetter,
+	currencyGetter DatedCurrencyGetter,
 	cnf config.EmailServiceConfig,
 ) *EmailService {
 	return &EmailService{
-		userService:     userService,
-		currencyService: currencyService,
-		cnf:             cnf,
+		userGetter:     userGetter,
+		currencyGetter: currencyGetter,
+		cnf:            cnf,
 	}
 }
 
 // SendEmails is used to send a currency update email to all subscribed users.
-// It sends full CurrencyInfoDto information (buy, sale rates) compared to /api/rate ena-point.
+// It sends information (rate, update date).
 // Returns error in case of occurrence.
 func (s *EmailService) SendEmails() error {
 	log.Println("Start sending emails")
@@ -54,7 +63,13 @@ func (s *EmailService) SendEmails() error {
 		return err
 	}
 
-	return s.send(body)
+	if err := s.send(body); err != nil {
+		log.Println("Unsuccessful finish emails sending")
+		return fmt.Errorf("sending email body: %w", err)
+	}
+
+	log.Println("Finish sending emails")
+	return nil
 }
 
 // prepareEmail is used to prepare an email. Email consists of an email_template and rate information.
@@ -65,24 +80,24 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 
 	tmpl, err := os.ReadFile(tmplPath)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("failed to read the file", err)
+		return nil, errors.NewInvalidStateError("reading the template file", err)
 	}
 
 	t, err := template.New("email").Parse(string(tmpl))
 	if err != nil {
-		return nil, errors.NewInvalidStateError("failed to parse the file", err)
+		return nil, errors.NewInvalidStateError("parsing the template file", err)
 	}
 
-	rate, err := s.currencyService.GetCurrencyInfo()
+	currency, err := s.currencyGetter.GetCachedCurrency()
 	if err != nil {
 		return nil, err
 	}
 
-	// Put rate data into email_template
+	// Put currency data into email_template
 	var body bytes.Buffer
-	err = t.Execute(&body, rate)
+	err = t.Execute(&body, currency)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("failed to execute template:", err)
+		return nil, errors.NewInvalidStateError("executing template:", err)
 	}
 
 	return &body, nil
@@ -93,9 +108,9 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 // Returns error in case of occurrence.
 func (s *EmailService) send(body *bytes.Buffer) error {
 	// Empty users list check.
-	users, err := s.userService.GetAll()
+	users, err := s.userGetter.GetAll()
 	if len(users) == 0 {
-		return errors.NewInvalidStateError("Emails list is empty", err)
+		return errors.NewInvalidStateError("emails list is empty", err)
 	}
 
 	to := make([]string, 0, len(users))
@@ -110,7 +125,7 @@ func (s *EmailService) send(body *bytes.Buffer) error {
 
 	err = smtp.SendMail(s.cnf.SMTPHost+":"+s.cnf.SMTPPort, auth, s.cnf.SMTPUser, to, message)
 	if err != nil {
-		return errors.NewInvalidStateError("failed to send email:", err)
+		return errors.NewInvalidStateError("while sending email:", err)
 	}
 
 	log.Println("Finish sending emails")
