@@ -1,6 +1,8 @@
 package main
 
 import (
+	"genesis-currency-api/internal/external/api/client/cdn_jsdelivr"
+	"genesis-currency-api/internal/external/api/client/private"
 	"log"
 
 	"genesis-currency-api/internal/handler/currency"
@@ -28,8 +30,11 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
+	// CURRENCY API HANDLERS
+	currencyProvider := getCurrencyProviderChain()
+
 	// SERVICES
-	currencyService := service.NewCurrencyService(config.LoadCurrencyServiceConfig())
+	currencyService := service.NewCurrencyService(currencyProvider)
 	userService := service.NewUserService(d)
 	emailService := service.NewEmailService(userService, currencyService, config.LoadEmailServiceConfig())
 
@@ -49,6 +54,23 @@ func main() {
 	// START SERVER
 	cnf := config.LoadServerConfigConfig()
 	if err := r.Run(cnf.ApplicationPort); err != nil {
-		log.Fatal("error happened while server bootstrapping: ", err)
+		log.Fatal("while server bootstrapping: ", err)
 	}
+}
+
+func getCurrencyProviderChain() service.CurrencyProvider {
+	// GET PROVIDERS
+	privateClient, err := private.NewClient(config.LoadCurrencyServiceConfig())
+	if err != nil {
+		log.Fatal("while creating private currency provider")
+	}
+	jsDelivrClient, err := cdn_jsdelivr.NewClient(config.LoadCurrencyServiceConfig())
+	if err != nil {
+		log.Fatal("while creating JS deliver currency provider")
+	}
+
+	// SET PROVIDERS CHAIN
+	privateClient.SetNext(jsDelivrClient)
+
+	return privateClient
 }
