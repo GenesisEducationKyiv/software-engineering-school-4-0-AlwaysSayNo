@@ -1,10 +1,9 @@
 package main
 
 import (
-	"genesis-currency-api/internal/external/api/client/cdn_jsdelivr"
-	gov_ua "genesis-currency-api/internal/external/api/client/gov_ua"
-	"genesis-currency-api/internal/external/api/client/private"
-
+	"genesis-currency-api/internal/external/api/currency/cdn_jsdelivr"
+	gov_ua "genesis-currency-api/internal/external/api/currency/gov_ua"
+	"genesis-currency-api/internal/external/api/currency/private"
 	"log"
 
 	"genesis-currency-api/internal/handler/currency"
