@@ -2,8 +2,9 @@ package main
 
 import (
 	"genesis-currency-api/internal/external/api/currency/cdn_jsdelivr"
-	gov_ua "genesis-currency-api/internal/external/api/currency/gov_ua"
+	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
 	"genesis-currency-api/internal/external/api/currency/private"
+	repouser "genesis-currency-api/internal/repository/user"
 	"log"
 
 	"genesis-currency-api/internal/handler/currency"
@@ -27,6 +28,9 @@ func main() {
 	dbURL := db.GetDatabaseURL(config.LoadDatabaseConfig())
 	d := db.Init(dbURL)
 
+	// REPOSITORIES
+	userRepository := repouser.NewRepository(d)
+
 	// ENGINE
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
@@ -36,7 +40,7 @@ func main() {
 
 	// SERVICES
 	currencyService := service.NewCurrencyService(currencyProvider)
-	userService := service.NewUserService(d)
+	userService := service.NewUserService(userRepository)
 	emailService := service.NewEmailService(userService, currencyService, config.LoadEmailServiceConfig())
 
 	// JOBS
@@ -65,7 +69,7 @@ func getCurrencyProviderChain() service.CurrencyProvider {
 	if err != nil {
 		log.Fatal("creating Private Bank currency provider")
 	}
-	govUaClient, err := gov_ua.NewClient(config.LoadCurrencyServiceConfig())
+	govUaClient, err := govua.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating Bank Gov Ua currency provider")
 	}

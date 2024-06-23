@@ -9,7 +9,7 @@ import (
 )
 
 type Saver interface {
-	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
+	Save(user dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error)
 }
 
 type Handler struct {

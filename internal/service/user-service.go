@@ -1,11 +1,13 @@
 package service
 
 import (
-	"genesis-currency-api/internal/model"
+	"fmt"
+	"genesis-currency-api/internal/repository/user"
 	"genesis-currency-api/pkg/dto"
 	apperrors "genesis-currency-api/pkg/errors"
-	"gorm.io/gorm"
 )
+
+//todo update docs
 
 type UserServiceInterface interface {
 	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
@@ -13,58 +15,48 @@ type UserServiceInterface interface {
 }
 
 type UserService struct {
-	DB *gorm.DB
+	userRepository *user.Repository
 }
 
 // NewUserService is a factory function for UserService
-func NewUserService(db *gorm.DB) *UserService {
+func NewUserService(userRepository *user.Repository) *UserService {
 	return &UserService{
-		DB: db,
+		userRepository: userRepository,
 	}
 }
 
 // Save saves user's information into the database. Only users with unique emails are saved.
 // Returns UserResponseDTO with additional information or error.
-func (s *UserService) Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error) {
-	entity := dto.SaveRequestToModel(user)
+func (s *UserService) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error) {
+	userModel := dto.SaveRequestToModel(saveRequestDTO)
 
 	// Check email uniqueness.
-	if s.existsByEmail(entity.Email) {
-		return dto.UserResponseDTO{}, apperrors.NewUserWithEmailExistsError()
+	if s.userRepository.ExistsByEmail(userModel.Email) {
+		return nil, apperrors.NewUserWithEmailExistsError()
 	}
 
-	if result := s.DB.Create(&entity); result.Error != nil {
-		return dto.UserResponseDTO{}, apperrors.NewDBError("", result.Error)
+	savedUser, err := s.userRepository.Create(userModel)
+	if err != nil {
+		return nil, fmt.Errorf("saving savedUser in database: %w", err)
 	}
 
-	return dto.ToDTO(entity), nil
+	userDTO := dto.ToDTO(*savedUser)
+
+	return &userDTO, nil
 }
 
 // GetAll is used to get all available in database users' information.
 // Returns all available UserResponseDTO.
 func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
-	var users []model.User
-
-	if result := s.DB.Find(&users); result.Error != nil {
-		return nil, apperrors.NewDBError("", result.Error)
+	users, err := s.userRepository.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("getting all users from database: %w", err)
 	}
 
-	result := make([]dto.UserResponseDTO, 0, len(users))
-	for _, u := range users {
+	result := make([]dto.UserResponseDTO, 0, len(*users))
+	for _, u := range *users {
 		result = append(result, dto.ToDTO(u))
 	}
 
 	return result, nil
-}
-
-// existsByEmail is used to check if user with such email already exists in database.
-// Returns false if database responded with error, otherwise true.
-func (s *UserService) existsByEmail(email string) bool {
-	var user model.User
-	if result := s.DB.Where("email = ?", email).First(&user); result.Error != nil {
-		// result.Error - there is no user with such email
-		return false
-	}
-
-	return true
 }
