@@ -1,4 +1,4 @@
-package service_test
+package currency_test
 
 import (
 	"errors"
@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/config"
 	myerrors "genesis-currency-api/pkg/errors"
 	"github.com/stretchr/testify/suite"
@@ -14,7 +13,7 @@ import (
 
 type CurrencyServiceSuite struct {
 	suite.Suite
-	sut service.CurrencyServiceInterface
+	sut CurrencyServiceInterface
 }
 
 func TestCurrencyServiceImplSuite(t *testing.T) {
@@ -36,7 +35,7 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_checkResult() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
@@ -67,7 +66,7 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyRate_checkResult() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
@@ -89,7 +88,7 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_errWhileGet() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
@@ -118,14 +117,14 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.InvalidStateError
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.GetCurrencyInfo()
 
 	// VERIFY
 	suite.NotNil(err)
@@ -134,14 +133,14 @@ func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
 
 func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_invalidURL() {
 	// SETUP
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: "invalid-url",
 	})
 
 	var apiErr *myerrors.APIError
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.GetCurrencyInfo()
 
 	// VERIFY
 	suite.NotNil(err)
@@ -163,14 +162,14 @@ func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_noCurrencyUSD() {
 	}))
 
 	defer server.Close()
-	suite.sut = service.NewCurrencyService(config.CurrencyServiceConfig{
+	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
 		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
 	})
 
 	var apiErr *myerrors.APIError
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.GetCurrencyInfo()
 
 	// VERIFY
 	suite.NotNil(err)

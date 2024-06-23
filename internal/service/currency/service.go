@@ -1,4 +1,4 @@
-package service
+package currency
 
 import (
 	"genesis-currency-api/pkg/util/date"
@@ -8,40 +8,40 @@ import (
 	"genesis-currency-api/pkg/dto"
 )
 
-type CurrencyServiceInterface interface {
+type ServiceInterface interface {
 	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
 	UpdateCurrencyRates() error
 }
 
-type CurrencyProvider interface {
+type Provider interface {
 	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
 }
 
-type CurrencyService struct {
+type Service struct {
 	currencyDTO      dto.CachedCurrency
-	currencyProvider CurrencyProvider
+	currencyProvider Provider
 }
 
-// NewCurrencyService is a factory function for CurrencyService
-func NewCurrencyService(currencyProvider CurrencyProvider) *CurrencyService {
+// NewCurrencyService is a factory function for Service
+func NewCurrencyService(currencyProvider Provider) *Service {
 	// A cache value for 3rd party API response.
-	return &CurrencyService{
+	return &Service{
 		dto.CachedCurrency{},
 		currencyProvider,
 	}
 }
 
 // GetCurrencyRate returns short information about currency rate.
-func (s *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
+func (s *Service) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
 	currencyDTO, err := s.getCurrencyDTO()
 	return currencyDTO.CurrencyResponseDTO, err
 }
 
-func (s *CurrencyService) GetCachedCurrency() (dto.CachedCurrency, error) {
+func (s *Service) GetCachedCurrency() (dto.CachedCurrency, error) {
 	return s.getCurrencyDTO()
 }
 
-func (s *CurrencyService) getCurrencyDTO() (dto.CachedCurrency, error) {
+func (s *Service) getCurrencyDTO() (dto.CachedCurrency, error) {
 	if s.currencyDTO.UpdateDate == "" {
 		if err := s.UpdateCurrencyRates(); err != nil {
 			return s.currencyDTO, err
@@ -53,7 +53,7 @@ func (s *CurrencyService) getCurrencyDTO() (dto.CachedCurrency, error) {
 
 // UpdateCurrencyRates is used to update #currencyDTO by calling 3rd party API.
 // In this case #currencyDTO is a cache value of API response for currency USD.
-func (s *CurrencyService) UpdateCurrencyRates() error {
+func (s *Service) UpdateCurrencyRates() error {
 	log.Println("Start updating currency rates")
 
 	currencyRate, err := s.currencyProvider.GetCurrencyRate()

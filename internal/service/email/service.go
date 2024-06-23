@@ -1,4 +1,4 @@
-package service
+package email
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"genesis-currency-api/pkg/errors"
 )
 
-type EmailServiceInterface interface {
+type ServiceInterface interface {
 	SendEmails() error
 }
 
@@ -35,18 +35,18 @@ type CurrencyEmailData struct {
 	SaleRate   float64
 }
 
-type EmailService struct {
+type Service struct {
 	userGetter     UserGetter
 	currencyGetter DatedCurrencyGetter
 	cnf            config.EmailServiceConfig
 }
 
-// NewEmailService is a factory function for EmailService
+// NewEmailService is a factory function for Service
 func NewEmailService(userGetter UserGetter,
 	currencyGetter DatedCurrencyGetter,
 	cnf config.EmailServiceConfig,
-) *EmailService {
-	return &EmailService{
+) *Service {
+	return &Service{
 		userGetter:     userGetter,
 		currencyGetter: currencyGetter,
 		cnf:            cnf,
@@ -56,7 +56,7 @@ func NewEmailService(userGetter UserGetter,
 // SendEmails is used to send a currency update email to all subscribed users.
 // It sends information (rate, update date).
 // Returns error in case of occurrence.
-func (s *EmailService) SendEmails() error {
+func (s *Service) SendEmails() error {
 	log.Println("Start sending emails")
 	body, err := s.prepareEmail()
 	if err != nil {
@@ -74,7 +74,7 @@ func (s *EmailService) SendEmails() error {
 
 // prepareEmail is used to prepare an email. Email consists of an email_template and rate information.
 // Returns prepared email or error.
-func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
+func (s *Service) prepareEmail() (*bytes.Buffer, error) {
 	// Get an email_template.
 	tmplPath := filepath.Join("pkg", "common", "templates", "email_template.html")
 
@@ -106,7 +106,7 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 // send sends emails to users using the standard library.
 // If the list of users is empty, it will return an error.
 // Returns error in case of occurrence.
-func (s *EmailService) send(body *bytes.Buffer) error {
+func (s *Service) send(body *bytes.Buffer) error {
 	// Empty users list check.
 	users, err := s.userGetter.GetAll()
 	if len(users) == 0 {

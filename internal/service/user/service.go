@@ -1,4 +1,4 @@
-package service
+package user
 
 import (
 	"fmt"
@@ -9,25 +9,25 @@ import (
 
 //todo update docs
 
-type UserServiceInterface interface {
+type ServiceInterface interface {
 	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
 	GetAll() ([]dto.UserResponseDTO, error)
 }
 
-type UserService struct {
+type Service struct {
 	userRepository *user.Repository
 }
 
-// NewUserService is a factory function for UserService
-func NewUserService(userRepository *user.Repository) *UserService {
-	return &UserService{
+// NewUserService is a factory function for Service
+func NewUserService(userRepository *user.Repository) *Service {
+	return &Service{
 		userRepository: userRepository,
 	}
 }
 
 // Save saves user's information into the database. Only users with unique emails are saved.
 // Returns UserResponseDTO with additional information or error.
-func (s *UserService) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error) {
+func (s *Service) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error) {
 	userModel := dto.SaveRequestToModel(saveRequestDTO)
 
 	// Check email uniqueness.
@@ -47,7 +47,7 @@ func (s *UserService) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResp
 
 // GetAll is used to get all available in database users' information.
 // Returns all available UserResponseDTO.
-func (s *UserService) GetAll() ([]dto.UserResponseDTO, error) {
+func (s *Service) GetAll() ([]dto.UserResponseDTO, error) {
 	users, err := s.userRepository.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("getting all users from database: %w", err)
