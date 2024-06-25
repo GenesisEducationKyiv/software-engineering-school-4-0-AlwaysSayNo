@@ -22,8 +22,8 @@ type Service struct {
 	currencyProvider Provider
 }
 
-// NewCurrencyService is a factory function for Service
-func NewCurrencyService(currencyProvider Provider) *Service {
+// NewService is a factory function for Service
+func NewService(currencyProvider Provider) *Service {
 	// A cache value for 3rd party API response.
 	return &Service{
 		dto.CachedCurrency{},

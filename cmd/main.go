@@ -5,9 +5,9 @@ import (
 	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
 	"genesis-currency-api/internal/external/api/currency/private"
 	repouser "genesis-currency-api/internal/repository/user"
-	currency2 "genesis-currency-api/internal/service/currency"
+	servcurrency "genesis-currency-api/internal/service/currency"
 	"genesis-currency-api/internal/service/email"
-	user2 "genesis-currency-api/internal/service/user"
+	servuser "genesis-currency-api/internal/service/user"
 	"log"
 
 	"genesis-currency-api/internal/handler/currency"
@@ -41,9 +41,9 @@ func main() {
 	currencyProvider := getCurrencyProviderChain()
 
 	// SERVICES
-	currencyService := currency2.NewCurrencyService(currencyProvider)
-	userService := user2.NewUserService(userRepository)
-	emailService := email.NewEmailService(userService, currencyService, config.LoadEmailServiceConfig())
+	currencyService := servcurrency.NewService(currencyProvider)
+	userService := servuser.NewService(userRepository)
+	emailService := email.NewService(userService, currencyService, config.LoadEmailServiceConfig())
 
 	// JOBS
 	job.StartAllJobs(currencyService, emailService)
@@ -65,7 +65,7 @@ func main() {
 	}
 }
 
-func getCurrencyProviderChain() currency2.Provider {
+func getCurrencyProviderChain() servcurrency.Provider {
 	// GET PROVIDERS
 	privateClient, err := private.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {

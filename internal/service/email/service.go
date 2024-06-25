@@ -41,8 +41,8 @@ type Service struct {
 	cnf            config.EmailServiceConfig
 }
 
-// NewEmailService is a factory function for Service
-func NewEmailService(userGetter UserGetter,
+// NewService is a factory function for Service
+func NewService(userGetter UserGetter,
 	currencyGetter DatedCurrencyGetter,
 	cnf config.EmailServiceConfig,
 ) *Service {

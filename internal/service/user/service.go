@@ -18,8 +18,8 @@ type Service struct {
 	userRepository *user.Repository
 }
 
-// NewUserService is a factory function for Service
-func NewUserService(userRepository *user.Repository) *Service {
+// NewService is a factory function for Service
+func NewService(userRepository *user.Repository) *Service {
 	return &Service{
 		userRepository: userRepository,
 	}
