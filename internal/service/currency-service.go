@@ -17,8 +17,8 @@ import (
 )
 
 type CurrencyServiceInterface interface {
-	GetCurrencyInfo() dto.CurrencyInfoDTO
-	GetCurrencyRate() dto.CurrencyResponseDTO
+	GetCurrencyInfo() (dto.CurrencyInfoDTO, error)
+	GetCurrencyRate() (dto.CurrencyResponseDTO, error)
 	UpdateCurrencyRates() error
 }
 
@@ -36,24 +36,30 @@ func NewCurrencyService(cnf config.CurrencyServiceConfig) *CurrencyService {
 		cnf,
 	}
 
-	err := c.UpdateCurrencyRates()
-	if err != nil {
-		log.Panic("error during creating CurrencyService: ", err)
-	}
-
 	return c
 }
 
 // GetCurrencyInfo returns extended information about currency rate.
 // It is then used in email.
-func (s *CurrencyService) GetCurrencyInfo() dto.CurrencyInfoDTO {
-	return s.currencyInfo
+func (s *CurrencyService) GetCurrencyInfo() (dto.CurrencyInfoDTO, error) {
+	return s.getCurrencyInfo()
 }
 
 // GetCurrencyRate returns short information about currency rate (sale rate).
 // It is then used in API.
-func (s *CurrencyService) GetCurrencyRate() dto.CurrencyResponseDTO {
-	return dto.InfoToResponseDTO(&s.currencyInfo)
+func (s *CurrencyService) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
+	data, err := s.getCurrencyInfo()
+	return dto.InfoToResponseDTO(&data), err
+}
+
+func (s *CurrencyService) getCurrencyInfo() (dto.CurrencyInfoDTO, error) {
+	if s.currencyInfo.UpdateDate == "" {
+		if err := s.UpdateCurrencyRates(); err != nil {
+			return s.currencyInfo, err
+		}
+	}
+
+	return s.currencyInfo, nil
 }
 
 // getCurrencyRateFromAPI retrieves a full set of data from the 3rd party API call.
@@ -99,7 +105,7 @@ func (s *CurrencyService) callAPI() (*[]dto.APICurrencyResponseDTO, error) {
 	}()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, errors.NewAPIError(fmt.Sprintf("Unexpected status code: %d", resp.StatusCode), nil)
+		return nil, errors.NewAPIError(fmt.Sprintf("Unexpected status code: %d\n", resp.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -149,7 +155,7 @@ func (s *CurrencyService) UpdateCurrencyRates() error {
 
 	// If there is no USD currency - raise a panic
 	if !isUpdated {
-		return errors.NewInvalidStateError("No currency UAH was found", nil)
+		return errors.NewAPIError("No currency UAH was found", nil)
 	}
 
 	log.Println("Finish updating currency rates")

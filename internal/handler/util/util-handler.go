@@ -52,6 +52,6 @@ func (c *Handler) SendEmails(ctx *gin.Context) {
 // RegisterRoutes registers routes for passed Handler.
 func RegisterRoutes(r *gin.Engine, handler Handler) {
 	routes := r.Group("/api/util")
-	routes.GET("/emails", handler.FindAll)
+	routes.GET("/users", handler.FindAll)
 	routes.POST("/emails/send", handler.SendEmails)
 }

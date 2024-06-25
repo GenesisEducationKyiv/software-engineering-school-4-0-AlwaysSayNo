@@ -73,7 +73,10 @@ func (s *EmailService) prepareEmail() (*bytes.Buffer, error) {
 		return nil, errors.NewInvalidStateError("failed to parse the file", err)
 	}
 
-	rate := s.currencyService.GetCurrencyInfo()
+	rate, err := s.currencyService.GetCurrencyInfo()
+	if err != nil {
+		return nil, err
+	}
 
 	// Put rate data into email_template
 	var body bytes.Buffer

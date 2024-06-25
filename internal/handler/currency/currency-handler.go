@@ -3,13 +3,15 @@ package currency
 import (
 	"net/http"
 
+	"genesis-currency-api/pkg/errors"
+
 	"genesis-currency-api/pkg/dto"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Rater interface {
-	GetCurrencyRate() dto.CurrencyResponseDTO
+	GetCurrencyRate() (dto.CurrencyResponseDTO, error)
 }
 
 type Handler struct {
@@ -23,8 +25,11 @@ func NewHandler(rater Rater) *Handler {
 }
 
 func (c *Handler) GetLatest(ctx *gin.Context) {
-	result := c.rater.GetCurrencyRate()
-	ctx.String(http.StatusOK, "%f", result.Number)
+	if result, err := c.rater.GetCurrencyRate(); err != nil {
+		errors.AttachToCtx(err, ctx)
+	} else {
+		ctx.String(http.StatusOK, "%f", result.Number)
+	}
 }
 
 // RegisterRoutes registers routes for passed Handler
