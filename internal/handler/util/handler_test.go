@@ -17,39 +17,39 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type UtilControllerImplTestSuite struct {
+type HandlerTestSuite struct {
 	suite.Suite
-	router           *gin.Engine
-	mockUserService  *mocks.UserServiceInterface
-	mockEmailService *mocks.EmailServiceInterface
+	router          *gin.Engine
+	userGetterMock  *mocks.UserGetter
+	emailSenderMock *mocks.EmailSender
 }
 
-func TestUtilControllerImplTestSuite(t *testing.T) {
-	suite.Run(t, new(UtilControllerImplTestSuite))
+func TestHandlerTestSuite(t *testing.T) {
+	suite.Run(t, new(HandlerTestSuite))
 }
 
-func (suite *UtilControllerImplTestSuite) SetupTest() {
+func (suite *HandlerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.router = gin.New()
 
-	suite.mockUserService = new(mocks.UserServiceInterface)
-	suite.mockEmailService = new(mocks.EmailServiceInterface)
+	suite.userGetterMock = new(mocks.UserGetter)
+	suite.emailSenderMock = new(mocks.EmailSender)
 
 	suite.router.Use(middleware.ErrorHandler())
 
-	utilHandler := util.NewHandler(suite.mockUserService, suite.mockEmailService)
+	utilHandler := util.NewHandler(suite.userGetterMock, suite.emailSenderMock)
 	util.RegisterRoutes(suite.router, *utilHandler)
 }
 
-func (suite *UtilControllerImplTestSuite) TestFindAll_checkResult() {
+func (suite *HandlerTestSuite) TestFindAll_checkResult() {
 	// SETUP
 	users := []dto.UserResponseDTO{
 		{Email: "user1@example.com"},
 		{Email: "user2@example.com"},
 	}
-	suite.mockUserService.On("GetAll").Return(users, nil)
+	suite.userGetterMock.On("GetAll").Return(users, nil)
 
-	req, _ := http.NewRequest("GET", "/api/util/users", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/util/users", nil)
 	resp := httptest.NewRecorder()
 
 	// ACT
@@ -64,14 +64,14 @@ func (suite *UtilControllerImplTestSuite) TestFindAll_checkResult() {
 	suite.Equal(responseBody[0].Email, users[0].Email)
 	suite.Equal(responseBody[1].Email, users[1].Email)
 
-	suite.mockUserService.AssertExpectations(suite.T())
+	suite.userGetterMock.AssertExpectations(suite.T())
 }
 
-func (suite *UtilControllerImplTestSuite) TestFindAll_whenError() {
+func (suite *HandlerTestSuite) TestFindAll_whenError() {
 	// SETUP
-	suite.mockUserService.On("GetAll").Return(nil, errors.New("test"))
+	suite.userGetterMock.On("GetAll").Return(nil, errors.New("test"))
 
-	req, _ := http.NewRequest("GET", "/api/util/users", nil)
+	req, _ := http.NewRequest("GET", "/api/v1/util/users", nil)
 	resp := httptest.NewRecorder()
 
 	// ACT
@@ -80,14 +80,14 @@ func (suite *UtilControllerImplTestSuite) TestFindAll_whenError() {
 	// VERIFY
 	suite.Equal(http.StatusInternalServerError, resp.Code)
 
-	suite.mockUserService.AssertExpectations(suite.T())
+	suite.userGetterMock.AssertExpectations(suite.T())
 }
 
-func (suite *UtilControllerImplTestSuite) TestSendEmails_checkResult() {
+func (suite *HandlerTestSuite) TestSendEmails_checkResult() {
 	// SETUP
-	suite.mockEmailService.On("SendEmails").Return(nil)
+	suite.emailSenderMock.On("SendEmails").Return(nil)
 
-	req, _ := http.NewRequest("POST", "/api/util/emails/send", nil)
+	req, _ := http.NewRequest("POST", "/api/v1/util/emails/send", nil)
 	resp := httptest.NewRecorder()
 
 	// ACT
@@ -97,14 +97,14 @@ func (suite *UtilControllerImplTestSuite) TestSendEmails_checkResult() {
 	suite.Equal(http.StatusOK, resp.Code)
 	suite.Equal("Emails are successfully sent", strings.ReplaceAll(resp.Body.String(), "\"", ""))
 
-	suite.mockEmailService.AssertExpectations(suite.T())
+	suite.emailSenderMock.AssertExpectations(suite.T())
 }
 
-func (suite *UtilControllerImplTestSuite) TestSendEmails_whenError() {
+func (suite *HandlerTestSuite) TestSendEmails_whenError() {
 	// SETUP
-	suite.mockEmailService.On("SendEmails").Return(errors.New("test"))
+	suite.emailSenderMock.On("SendEmails").Return(errors.New("test"))
 
-	req, _ := http.NewRequest("POST", "/api/util/emails/send", nil)
+	req, _ := http.NewRequest("POST", "/api/v1/util/emails/send", nil)
 	resp := httptest.NewRecorder()
 
 	// ACT
@@ -113,5 +113,5 @@ func (suite *UtilControllerImplTestSuite) TestSendEmails_whenError() {
 	// VERIFY
 	suite.Equal(http.StatusInternalServerError, resp.Code)
 
-	suite.mockEmailService.AssertExpectations(suite.T())
+	suite.emailSenderMock.AssertExpectations(suite.T())
 }

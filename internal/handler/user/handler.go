@@ -22,13 +22,13 @@ func NewHandler(saver Saver) *Handler {
 	}
 }
 
-func (c *Handler) Add(ctx *gin.Context) {
+func (h *Handler) Add(ctx *gin.Context) {
 	email := ctx.PostForm("email")
 
 	var saveDto dto.UserSaveRequestDTO
 	saveDto.Email = email
 
-	_, err := c.saver.Save(saveDto)
+	_, err := h.saver.Save(saveDto)
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return

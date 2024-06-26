@@ -8,11 +8,6 @@ import (
 	"genesis-currency-api/pkg/dto"
 )
 
-type ServiceInterface interface {
-	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
-	UpdateCurrencyRates() error
-}
-
 type Provider interface {
 	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
 }

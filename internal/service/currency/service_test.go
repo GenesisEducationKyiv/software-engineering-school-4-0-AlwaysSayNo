@@ -1,177 +1,144 @@
 package currency_test
 
 import (
-	"errors"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
-	"genesis-currency-api/pkg/config"
-	myerrors "genesis-currency-api/pkg/errors"
+	"fmt"
+	"genesis-currency-api/internal/service/currency"
+	"genesis-currency-api/mocks"
+	"genesis-currency-api/pkg/dto"
 	"github.com/stretchr/testify/suite"
+	"testing"
 )
 
-type CurrencyServiceSuite struct {
+type ServiceSuite struct {
 	suite.Suite
-	sut CurrencyServiceInterface
+	sut                  *currency.Service
+	currencyProviderMock *mocks.Provider
 }
 
-func TestCurrencyServiceImplSuite(t *testing.T) {
-	suite.Run(t, &CurrencyServiceSuite{})
+func TestServiceImplSuite(t *testing.T) {
+	suite.Run(t, &ServiceSuite{})
 }
 
-func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_checkResult() {
+func (suite *ServiceSuite) SetupTest() {
+	suite.currencyProviderMock = new(mocks.Provider)
+
+	suite.sut = currency.NewService(suite.currencyProviderMock)
+}
+
+func (suite *ServiceSuite) TestGetCurrencyRate_whenNoCachedValue_checkResult() {
 	// SETUP
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/external-api" {
-			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
-		}
-		w.WriteHeader(http.StatusOK)
-
-		_, err := w.Write([]byte(`[{"ccy":"USD","base_ccy":"UAH","buy":"39.95","sale":"40.87"}]`))
-		if err != nil {
-			return
-		}
-	}))
-
-	defer server.Close()
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
-	})
+	number := 42.2
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
 
 	// ACT
-	currencyInfo, err := suite.sut.GetCurrencyInfo()
+	responseDTO, err := suite.sut.GetCurrencyRate()
 	suite.Require().Nil(err)
 
 	// VERIFY
-	suite.Equal(currencyInfo.FromCcy, "USD")
-	suite.Equal(currencyInfo.ToCcy, "UAH")
-	suite.Equal(currencyInfo.BuyRate, 39.95)
-	suite.Equal(currencyInfo.SaleRate, 40.87)
-	suite.NotNil(currencyInfo.UpdateDate)
+	suite.Equal(responseDTO.Number, number)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
 }
 
-func (suite *CurrencyServiceSuite) TestGetCurrencyRate_checkResult() {
+func (suite *ServiceSuite) TestGetCurrencyRate_whenExistsCachedValue_checkResult() {
 	// SETUP
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/external-api" {
-			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
-		}
-		w.WriteHeader(http.StatusOK)
-
-		_, err := w.Write([]byte(`[{"ccy":"USD","base_ccy":"UAH","buy":"39.95","sale":"40.87"}]`))
-		if err != nil {
-			return
-		}
-	}))
-
-	defer server.Close()
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
-	})
+	number := 42.2
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
 
 	// ACT
-	currencyRate, err := suite.sut.GetCurrencyRate()
+	err := suite.sut.UpdateCurrencyRates()
+	suite.Require().Nil(err)
+
+	responseDTO, err := suite.sut.GetCurrencyRate()
+
+	// VERIFY
+	suite.Equal(responseDTO.Number, number)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
+}
+
+func (suite *ServiceSuite) TestGetCurrencyRate_whenError() {
+	// SETUP
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
+
+	// ACT
+	responseDTO, err := suite.sut.GetCurrencyRate()
+
+	// VERIFY
+	suite.NotNil(err)
+	suite.Contains(err.Error(), "test error")
+	suite.Equal(float64(0), responseDTO.Number)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
+}
+
+func (suite *ServiceSuite) TestGetCachedCurrency_whenExistsCachedValue_checkResult() {
+	// SETUP
+	number := 42.2
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+
+	// ACT
+	cachedCurrency, err := suite.sut.GetCachedCurrency()
 	suite.Require().Nil(err)
 
 	// VERIFY
-	suite.Equal(currencyRate.Number, 40.87)
+	suite.Equal(cachedCurrency.Number, number)
+	suite.NotNil(cachedCurrency.UpdateDate)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
 }
 
-func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_errWhileGet() {
+func (suite *ServiceSuite) TestGetCachedCurrency_whenNoCachedValue_checkResult() {
 	// SETUP
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/external-api" {
-			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
-		}
-		http.Error(w, "simulated error", http.StatusInternalServerError)
-	}))
+	number := 42.2
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
 
-	defer server.Close()
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
-	})
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
+	suite.Require().Nil(err)
 
-	var apiErr *myerrors.APIError
+	cachedCurrency, err := suite.sut.GetCachedCurrency()
+	suite.Require().Nil(err)
+
+	// VERIFY
+	suite.Equal(cachedCurrency.Number, number)
+	suite.NotNil(cachedCurrency.UpdateDate)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
+}
+
+func (suite *ServiceSuite) TestGetCachedCurrency_whenError() {
+	// SETUP
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
+
+	// ACT
+	cachedCurrency, err := suite.sut.GetCachedCurrency()
+
+	// VERIFY
+	suite.NotNil(err)
+	suite.Contains(err.Error(), "test error")
+	suite.Equal(float64(0), cachedCurrency.Number)
+	suite.NotNil(cachedCurrency.UpdateDate)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
+}
+
+func (suite *ServiceSuite) TestUpdateCurrencyRates_checkResult() {
+	// SETUP
+	number := 42.2
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+
+	// ACT
+	err := suite.sut.UpdateCurrencyRates()
+
+	// VERIFY
+	suite.Nil(err)
+	suite.currencyProviderMock.AssertExpectations(suite.T())
+}
+
+func (suite *ServiceSuite) TestUpdateCurrencyRates_whenError() {
+	// SETUP
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
 
 	// ACT
 	err := suite.sut.UpdateCurrencyRates()
 
 	// VERIFY
 	suite.NotNil(err)
-	suite.True(errors.As(err, &apiErr))
-}
-
-func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_nonOKStatusCode() {
-	// SETUP
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/external-api" {
-			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
-		}
-
-		w.WriteHeader(http.StatusOK)
-		_, err := w.Write([]byte(`{`))
-		if err != nil {
-			return
-		}
-	}))
-
-	defer server.Close()
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
-	})
-
-	var apiErr *myerrors.InvalidStateError
-
-	// ACT
-	err := suite.sut.GetCurrencyInfo()
-
-	// VERIFY
-	suite.NotNil(err)
-	suite.True(errors.As(err, &apiErr))
-}
-
-func (suite *CurrencyServiceSuite) TestUpdateCurrencyRates_invalidURL() {
-	// SETUP
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: "invalid-url",
-	})
-
-	var apiErr *myerrors.APIError
-
-	// ACT
-	err := suite.sut.GetCurrencyInfo()
-
-	// VERIFY
-	suite.NotNil(err)
-	suite.True(errors.As(err, &apiErr))
-}
-
-func (suite *CurrencyServiceSuite) TestGetCurrencyInfo_noCurrencyUSD() {
-	// SETUP
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/external-api" {
-			suite.Failf("Expected to request '/fixedvalue', got: %s", r.URL.Path)
-		}
-		w.WriteHeader(http.StatusOK)
-
-		_, err := w.Write([]byte(`[{"ccy":"EUR","base_ccy":"UAH","buy":"42.52","sale":"43.24"}]`))
-		if err != nil {
-			return
-		}
-	}))
-
-	defer server.Close()
-	suite.sut = NewCurrencyService(config.CurrencyRaterConfig{
-		ThirdPartyAPIPrivateBank: server.URL + "/external-api",
-	})
-
-	var apiErr *myerrors.APIError
-
-	// ACT
-	err := suite.sut.GetCurrencyInfo()
-
-	// VERIFY
-	suite.NotNil(err)
-	suite.True(errors.As(err, &apiErr))
+	suite.Contains(err.Error(), "test error")
+	suite.currencyProviderMock.AssertExpectations(suite.T())
 }

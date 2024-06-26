@@ -2,24 +2,25 @@ package user
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/repository/user"
+	"genesis-currency-api/internal/model"
 	"genesis-currency-api/pkg/dto"
 	apperrors "genesis-currency-api/pkg/errors"
 )
 
 //todo update docs
 
-type ServiceInterface interface {
-	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
-	GetAll() ([]dto.UserResponseDTO, error)
+type Repository interface {
+	Create(user model.User) (*model.User, error)
+	GetAll() (*[]model.User, error)
+	ExistsByEmail(email string) bool
 }
 
 type Service struct {
-	userRepository *user.Repository
+	userRepository Repository
 }
 
 // NewService is a factory function for Service
-func NewService(userRepository *user.Repository) *Service {
+func NewService(userRepository Repository) *Service {
 	return &Service{
 		userRepository: userRepository,
 	}

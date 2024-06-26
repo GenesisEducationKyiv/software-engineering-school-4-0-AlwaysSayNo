@@ -17,44 +17,41 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type UserControllerImplTestSuite struct {
+type HandlerTestSuite struct {
 	suite.Suite
-	router           *gin.Engine
-	mockUserService  *mocks.UserServiceInterface
-	mockEmailService *mocks.EmailServiceInterface
+	router    *gin.Engine
+	saverMock *mocks.Saver
 }
 
-func TestUserControllerImplTestSuite(t *testing.T) {
-	suite.Run(t, new(UserControllerImplTestSuite))
+func TestHandlerTestSuite(t *testing.T) {
+	suite.Run(t, new(HandlerTestSuite))
 }
 
-func (suite *UserControllerImplTestSuite) SetupTest() {
+func (suite *HandlerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.router = gin.New()
 
-	suite.mockUserService = new(mocks.UserServiceInterface)
-	suite.mockEmailService = new(mocks.EmailServiceInterface)
-
+	suite.saverMock = new(mocks.Saver)
 	suite.router.Use(middleware.ErrorHandler())
 
-	userHandler := user.NewHandler(suite.mockUserService)
+	userHandler := user.NewHandler(suite.saverMock)
 	user.RegisterRoutes(suite.router, *userHandler)
 }
 
-func (suite *UserControllerImplTestSuite) TestAdd_checkResult() {
+func (suite *HandlerTestSuite) TestAdd_checkResult() {
 	// SETUP
 	saveDto := dto.UserSaveRequestDTO{
 		Email: "test@example.com",
 	}
 
-	suite.mockUserService.On("Save", saveDto).Return(dto.UserResponseDTO{
+	suite.saverMock.On("Save", saveDto).Return(&dto.UserResponseDTO{
 		ID:    1,
 		Email: "test@example.com",
 	}, nil)
 
 	form := url.Values{}
 	form.Add("email", "test@example.com")
-	req, _ := http.NewRequest("POST", "/api/subscribe", strings.NewReader(form.Encode()))
+	req, _ := http.NewRequest("POST", "/api/v1/subscribe", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp := httptest.NewRecorder()
 
@@ -65,21 +62,20 @@ func (suite *UserControllerImplTestSuite) TestAdd_checkResult() {
 	suite.Equal(http.StatusOK, resp.Code)
 	suite.Contains(resp.Body.String(), "E-mail додано")
 
-	suite.mockUserService.AssertExpectations(suite.T())
+	suite.saverMock.AssertExpectations(suite.T())
 }
 
-func (suite *UserControllerImplTestSuite) TestAdd_whenError() {
+func (suite *HandlerTestSuite) TestAdd_whenError() {
 	// SETUP
 	saveDto := dto.UserSaveRequestDTO{
 		Email: "exist@example.com",
 	}
 
-	suite.mockUserService.On("Save", saveDto).Return(dto.UserResponseDTO{},
-		errors.NewUserWithEmailExistsError())
+	suite.saverMock.On("Save", saveDto).Return(nil, errors.NewUserWithEmailExistsError())
 
 	form := url.Values{}
 	form.Add("email", "exist@example.com")
-	req, _ := http.NewRequest("POST", "/api/subscribe", strings.NewReader(form.Encode()))
+	req, _ := http.NewRequest("POST", "/api/v1/subscribe", strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	resp := httptest.NewRecorder()
 
@@ -90,5 +86,5 @@ func (suite *UserControllerImplTestSuite) TestAdd_whenError() {
 	suite.Equal(http.StatusBadRequest, resp.Code)
 	suite.Contains(resp.Body.String(), "Повертати, якщо e-mail вже є в базі даних")
 
-	suite.mockUserService.AssertExpectations(suite.T())
+	suite.saverMock.AssertExpectations(suite.T())
 }
