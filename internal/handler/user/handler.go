@@ -9,7 +9,7 @@ import (
 )
 
 type Saver interface {
-	Save(user dto.UserSaveRequestDTO) (dto.UserResponseDTO, error)
+	Save(user dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error)
 }
 
 type Handler struct {
@@ -22,13 +22,13 @@ func NewHandler(saver Saver) *Handler {
 	}
 }
 
-func (c *Handler) Add(ctx *gin.Context) {
+func (h *Handler) Add(ctx *gin.Context) {
 	email := ctx.PostForm("email")
 
 	var saveDto dto.UserSaveRequestDTO
 	saveDto.Email = email
 
-	_, err := c.saver.Save(saveDto)
+	_, err := h.saver.Save(saveDto)
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return
@@ -39,6 +39,6 @@ func (c *Handler) Add(ctx *gin.Context) {
 
 // RegisterRoutes creates an instance of Handler and registers routes for it.
 func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api")
+	routes := r.Group("/api/v1/")
 	routes.POST("/subscribe", handler.Add)
 }

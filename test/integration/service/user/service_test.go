@@ -1,17 +1,18 @@
 //go:build integration
 
-package integration_test
+package user_test
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	repouser "genesis-currency-api/internal/repository/user"
+	servuser "genesis-currency-api/internal/service/user"
 	"log"
 	"path/filepath"
 	"testing"
 
 	"genesis-currency-api/internal/model"
-	"genesis-currency-api/internal/service"
 	"genesis-currency-api/pkg/config"
 	"genesis-currency-api/pkg/dto"
 	myerrors "genesis-currency-api/pkg/errors"
@@ -31,7 +32,7 @@ type UserServiceSuite struct {
 	suite.Suite
 	DB        *gorm.DB
 	tx        *gorm.DB
-	service   service.UserServiceInterface
+	service   *servuser.Service
 	container testcontainers.Container
 }
 
@@ -151,7 +152,8 @@ func (suite *UserServiceSuite) SetupTest() {
 	suite.Require().NotNil(tx)
 	suite.tx = tx
 
-	suite.service = service.NewUserService(tx)
+	repository := repouser.NewRepository(suite.tx)
+	suite.service = servuser.NewService(repository)
 }
 
 func (suite *UserServiceSuite) TearDownTest() {
@@ -188,8 +190,7 @@ func (suite *UserServiceSuite) TestSave_whenUserAlreadyExists() {
 	user, err := suite.service.Save(saveRequestDto)
 
 	// VERIFY
-	suite.Equal(int64(0), user.ID)
-	suite.Equal("", user.Email)
+	suite.Nil(user)
 	suite.NotNil(err)
 
 	suite.True(errors.As(err, &userWithEmailExistsError))

@@ -22,15 +22,16 @@ type Handler struct {
 	emailSender EmailSender
 }
 
-func NewHandler(userGetter UserGetter, emailSender EmailSender) *Handler {
+func NewHandler(userGetter UserGetter,
+	emailSender EmailSender) *Handler {
 	return &Handler{
 		userGetter:  userGetter,
 		emailSender: emailSender,
 	}
 }
 
-func (c *Handler) FindAll(ctx *gin.Context) {
-	result, err := c.userGetter.GetAll()
+func (h *Handler) FindAll(ctx *gin.Context) {
+	result, err := h.userGetter.GetAll()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return
@@ -39,8 +40,8 @@ func (c *Handler) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &result)
 }
 
-func (c *Handler) SendEmails(ctx *gin.Context) {
-	err := c.emailSender.SendEmails()
+func (h *Handler) SendEmails(ctx *gin.Context) {
+	err := h.emailSender.SendEmails()
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return
@@ -51,7 +52,7 @@ func (c *Handler) SendEmails(ctx *gin.Context) {
 
 // RegisterRoutes registers routes for passed Handler.
 func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api/util")
+	routes := r.Group("/api/v1/util")
 	routes.GET("/users", handler.FindAll)
 	routes.POST("/emails/send", handler.SendEmails)
 }

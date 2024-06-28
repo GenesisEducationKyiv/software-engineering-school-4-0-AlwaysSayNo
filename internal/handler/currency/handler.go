@@ -24,8 +24,8 @@ func NewHandler(rater Rater) *Handler {
 	}
 }
 
-func (c *Handler) GetLatest(ctx *gin.Context) {
-	if result, err := c.rater.GetCurrencyRate(); err != nil {
+func (h *Handler) GetLatest(ctx *gin.Context) {
+	if result, err := h.rater.GetCurrencyRate(); err != nil {
 		errors.AttachToCtx(err, ctx)
 	} else {
 		ctx.String(http.StatusOK, "%f", result.Number)
@@ -34,6 +34,6 @@ func (c *Handler) GetLatest(ctx *gin.Context) {
 
 // RegisterRoutes registers routes for passed Handler
 func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api/rate")
+	routes := r.Group("/api/v1/rate")
 	routes.GET("/", handler.GetLatest)
 }
