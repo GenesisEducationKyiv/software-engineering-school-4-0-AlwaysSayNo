@@ -1,6 +1,7 @@
 package currency
 
 import (
+	"fmt"
 	"genesis-currency-api/pkg/util/date"
 	"log"
 	"time"
@@ -29,7 +30,11 @@ func NewService(currencyProvider Provider) *Service {
 // GetCurrencyRate returns short information about currency rate.
 func (s *Service) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
 	currencyDTO, err := s.getCurrencyDTO()
-	return currencyDTO.CurrencyResponseDTO, err
+	if err != nil {
+		return dto.CurrencyResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
+	}
+
+	return currencyDTO.CurrencyResponseDTO, nil
 }
 
 func (s *Service) GetCachedCurrency() (dto.CachedCurrency, error) {

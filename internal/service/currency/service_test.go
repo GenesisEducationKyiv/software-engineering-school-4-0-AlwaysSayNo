@@ -49,6 +49,7 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenExistsCachedValue_checkResult
 	suite.Require().Nil(err)
 
 	responseDTO, err := suite.sut.GetCurrencyRate()
+	suite.Require().Nil(err)
 
 	// VERIFY
 	suite.Equal(responseDTO.Number, number)

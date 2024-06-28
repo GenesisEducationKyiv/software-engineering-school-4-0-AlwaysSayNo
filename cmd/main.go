@@ -1,7 +1,7 @@
 package main
 
 import (
-	"genesis-currency-api/internal/external/api/currency/cdn_jsdelivr"
+	"genesis-currency-api/internal/external/api/currency/cdnjsdelivr"
 	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
 	"genesis-currency-api/internal/external/api/currency/private"
 	repouser "genesis-currency-api/internal/repository/user"
@@ -75,7 +75,7 @@ func getCurrencyProviderChain() servcurrency.Provider {
 	if err != nil {
 		log.Fatal("creating Bank Gov Ua currency provider")
 	}
-	jsDelivrClient, err := cdn_jsdelivr.NewClient(config.LoadCurrencyServiceConfig())
+	jsDelivrClient, err := cdnjsdelivr.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating JS Deliver currency provider")
 	}

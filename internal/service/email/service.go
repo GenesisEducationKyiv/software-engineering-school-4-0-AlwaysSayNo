@@ -15,10 +15,6 @@ import (
 	"genesis-currency-api/pkg/errors"
 )
 
-type ServiceInterface interface {
-	SendEmails() error
-}
-
 type UserGetter interface {
 	GetAll() ([]dto.UserResponseDTO, error)
 }
