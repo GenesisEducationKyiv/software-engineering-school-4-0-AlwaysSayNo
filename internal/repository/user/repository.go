@@ -9,8 +9,8 @@ type Repository struct {
 	DB *gorm.DB
 }
 
-func NewRepository(DB *gorm.DB) *Repository {
-	return &Repository{DB: DB}
+func NewRepository(db *gorm.DB) *Repository {
+	return &Repository{DB: db}
 }
 
 func (r *Repository) Create(user model.User) (*model.User, error) {

@@ -7,8 +7,6 @@ import (
 	apperrors "genesis-currency-api/pkg/errors"
 )
 
-//todo update docs
-
 type Repository interface {
 	Create(user model.User) (*model.User, error)
 	GetAll() (*[]model.User, error)
@@ -27,7 +25,7 @@ func NewService(userRepository Repository) *Service {
 }
 
 // Save saves user's information into the database. Only users with unique emails are saved.
-// Returns UserResponseDTO with additional information or error.
+// Returns dto.UserResponseDTO with additional information or error.
 func (s *Service) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error) {
 	userModel := dto.SaveRequestToModel(saveRequestDTO)
 
@@ -47,7 +45,7 @@ func (s *Service) Save(saveRequestDTO dto.UserSaveRequestDTO) (*dto.UserResponse
 }
 
 // GetAll is used to get all available in database users' information.
-// Returns all available UserResponseDTO.
+// Returns all available dto.UserResponseDTO.
 func (s *Service) GetAll() ([]dto.UserResponseDTO, error) {
 	users, err := s.userRepository.GetAll()
 	if err != nil {
