@@ -22,6 +22,7 @@ func SendEmailsJob(cron *cron.Cron, emailSender EmailSender) {
 			log.Println("Finish job: Send Emails")
 		}
 	})
+
 	if err != nil {
 		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
 		return

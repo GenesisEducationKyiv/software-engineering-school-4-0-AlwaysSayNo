@@ -22,6 +22,7 @@ func UpdateCurrencyJob(cron *cron.Cron, currencyUpdater CurrencyUpdater) {
 			log.Println("Finish job: Update Currency Rates")
 		}
 	})
+
 	if err != nil {
 		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
 		return
