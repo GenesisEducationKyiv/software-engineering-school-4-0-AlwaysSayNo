@@ -1,8 +1,8 @@
-package currency_test
+package service_test
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/service/currency"
+	"genesis-currency-api/internal/currency/service"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/dto"
 	"github.com/stretchr/testify/suite"
@@ -11,7 +11,7 @@ import (
 
 type ServiceSuite struct {
 	suite.Suite
-	sut                  *currency.Service
+	sut                  *service.Service
 	currencyProviderMock *mocks.Provider
 }
 
@@ -22,7 +22,7 @@ func TestServiceImplSuite(t *testing.T) {
 func (suite *ServiceSuite) SetupTest() {
 	suite.currencyProviderMock = new(mocks.Provider)
 
-	suite.sut = currency.NewService(suite.currencyProviderMock)
+	suite.sut = service.NewService(suite.currencyProviderMock)
 }
 
 func (suite *ServiceSuite) TestGetCurrencyRate_whenNoCachedValue_checkResult() {

@@ -1,4 +1,4 @@
-package currency
+package service
 
 import (
 	"fmt"

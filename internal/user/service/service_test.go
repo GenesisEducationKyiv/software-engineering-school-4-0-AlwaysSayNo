@@ -1,10 +1,10 @@
-package user_test
+package service_test
 
 import (
 	"errors"
 	"fmt"
 	"genesis-currency-api/internal/model"
-	"genesis-currency-api/internal/service/user"
+	"genesis-currency-api/internal/user/service"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/dto"
 	myerrors "genesis-currency-api/pkg/errors"
@@ -14,7 +14,7 @@ import (
 
 type ServiceSuite struct {
 	suite.Suite
-	sut                *user.Service
+	sut                *service.Service
 	userRepositoryMock *mocks.Repository
 }
 
@@ -25,7 +25,7 @@ func TestServiceImplSuite(t *testing.T) {
 func (suite *ServiceSuite) SetupTest() {
 	suite.userRepositoryMock = new(mocks.Repository)
 
-	suite.sut = user.NewService(suite.userRepositoryMock)
+	suite.sut = service.NewService(suite.userRepositoryMock)
 }
 
 func (suite *ServiceSuite) TestSave_checkResult() {

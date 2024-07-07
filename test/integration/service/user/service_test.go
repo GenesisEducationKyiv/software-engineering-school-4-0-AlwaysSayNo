@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	repouser "genesis-currency-api/internal/repository/user"
-	servuser "genesis-currency-api/internal/service/user"
+	servuser "genesis-currency-api/internal/user/service"
 	"log"
 	"path/filepath"
 	"testing"

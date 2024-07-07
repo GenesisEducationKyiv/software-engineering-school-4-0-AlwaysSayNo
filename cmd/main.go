@@ -1,16 +1,16 @@
 package main
 
 import (
-	handler2 "genesis-currency-api/internal/currency/api/handler"
-	handler3 "genesis-currency-api/internal/email/api/handler"
+	handcurrency "genesis-currency-api/internal/currency/api/handler"
+	servcurrency "genesis-currency-api/internal/currency/service"
+	handemail "genesis-currency-api/internal/email/api/handler"
+	servemail "genesis-currency-api/internal/email/service"
 	"genesis-currency-api/internal/external/api/currency/cdnjsdelivr"
 	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
 	"genesis-currency-api/internal/external/api/currency/private"
 	repouser "genesis-currency-api/internal/repository/user"
-	servcurrency "genesis-currency-api/internal/service/currency"
-	"genesis-currency-api/internal/service/email"
-	servuser "genesis-currency-api/internal/service/user"
-	"genesis-currency-api/internal/user/api/handler"
+	handuser "genesis-currency-api/internal/user/api/handler"
+	servuser "genesis-currency-api/internal/user/service"
 	"log"
 
 	"genesis-currency-api/pkg/config"
@@ -42,20 +42,20 @@ func main() {
 	// SERVICES
 	currencyService := servcurrency.NewService(currencyProvider)
 	userService := servuser.NewService(userRepository)
-	emailService := email.NewService(userService, currencyService, config.LoadEmailServiceConfig())
+	emailService := servemail.NewService(userService, currencyService, config.LoadEmailServiceConfig())
 
 	// JOBS
 	job.StartAllJobs(currencyService, emailService)
 
 	// HANDLERS
-	currencyHandler := handler2.NewHandler(currencyService)
-	handler2.RegisterRoutes(r, *currencyHandler)
+	currencyHandler := handcurrency.NewHandler(currencyService)
+	handcurrency.RegisterRoutes(r, *currencyHandler)
 
-	userHandler := handler.NewHandler(userService)
-	handler.RegisterRoutes(r, *userHandler)
+	userHandler := handuser.NewHandler(userService)
+	handuser.RegisterRoutes(r, *userHandler)
 
-	emailHandler := handler3.NewHandler(emailService)
-	handler3.RegisterRoutes(r, *emailHandler)
+	emailHandler := handemail.NewHandler(emailService)
+	handemail.RegisterRoutes(r, *emailHandler)
 
 	// START SERVER
 	cnf := config.LoadServerConfigConfig()
