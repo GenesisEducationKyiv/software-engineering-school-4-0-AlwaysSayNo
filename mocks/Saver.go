@@ -3,8 +3,7 @@
 package mocks
 
 import (
-	dto "genesis-currency-api/pkg/dto"
-
+	dto "genesis-currency-api/internal/shared/dto/user"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -14,27 +13,27 @@ type Saver struct {
 }
 
 // Save provides a mock function with given fields: _a0
-func (_m *Saver) Save(_a0 dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error) {
+func (_m *Saver) Save(_a0 dto.SaveRequestDTO) (*dto.ResponseDTO, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Save")
 	}
 
-	var r0 *dto.UserResponseDTO
+	var r0 *dto.ResponseDTO
 	var r1 error
-	if rf, ok := ret.Get(0).(func(dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error)); ok {
+	if rf, ok := ret.Get(0).(func(dto.SaveRequestDTO) (*dto.ResponseDTO, error)); ok {
 		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(dto.UserSaveRequestDTO) *dto.UserResponseDTO); ok {
+	if rf, ok := ret.Get(0).(func(dto.SaveRequestDTO) *dto.ResponseDTO); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*dto.UserResponseDTO)
+			r0 = ret.Get(0).(*dto.ResponseDTO)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(dto.UserSaveRequestDTO) error); ok {
+	if rf, ok := ret.Get(1).(func(dto.SaveRequestDTO) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)

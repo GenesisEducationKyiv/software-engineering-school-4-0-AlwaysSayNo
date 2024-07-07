@@ -1,16 +1,16 @@
 package main
 
 import (
-	ratecdnjsdelivr "genesis-currency-api/internal/currency/api/external/rater/cdnjsdelivr"
-	rategovua "genesis-currency-api/internal/currency/api/external/rater/gov_ua"
-	rateprivate "genesis-currency-api/internal/currency/api/external/rater/private"
-	handcurrency "genesis-currency-api/internal/currency/api/handler"
-	servcurrency "genesis-currency-api/internal/currency/service"
-	handemail "genesis-currency-api/internal/email/api/handler"
-	servemail "genesis-currency-api/internal/email/service"
-	handuser "genesis-currency-api/internal/user/api/handler"
-	repouser "genesis-currency-api/internal/user/repository"
-	servuser "genesis-currency-api/internal/user/service"
+	ratecdnjsdelivr "genesis-currency-api/internal/module/currency/api/external/rater/cdnjsdelivr"
+	rategovua "genesis-currency-api/internal/module/currency/api/external/rater/gov_ua"
+	rateprivate "genesis-currency-api/internal/module/currency/api/external/rater/private"
+	handcurrency "genesis-currency-api/internal/module/currency/api/handler"
+	servcurrency "genesis-currency-api/internal/module/currency/service"
+	handemail "genesis-currency-api/internal/module/email/api/handler"
+	servemail "genesis-currency-api/internal/module/email/service"
+	handuser "genesis-currency-api/internal/module/user/api/handler"
+	repouser "genesis-currency-api/internal/module/user/repository"
+	servuser "genesis-currency-api/internal/module/user/service"
 	"log"
 
 	"genesis-currency-api/pkg/config"

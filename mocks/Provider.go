@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	dto "genesis-currency-api/pkg/dto"
+	dto "genesis-currency-api/internal/module/currency/dto"
 
 	mock "github.com/stretchr/testify/mock"
 )
