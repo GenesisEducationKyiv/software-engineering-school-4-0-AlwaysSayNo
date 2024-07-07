@@ -34,7 +34,7 @@ func (s *Service) GetCurrencyRate() (sharcurrdto.ResponseDTO, error) {
 		return sharcurrdto.ResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
 	}
 
-	return currencyDTO.CurrencyResponseDTO, nil
+	return currencyDTO.ResponseDTO, nil
 }
 
 func (s *Service) GetCachedCurrency() (sharcurrdto.CachedCurrency, error) {
@@ -63,8 +63,8 @@ func (s *Service) UpdateCurrencyRates() error {
 
 	// save updated data to cache
 	s.currencyDTO = sharcurrdto.CachedCurrency{
-		UpdateDate:          date.Format(time.Now()),
-		CurrencyResponseDTO: *currencyRate,
+		UpdateDate:  date.Format(time.Now()),
+		ResponseDTO: *currencyRate,
 	}
 
 	log.Println("Finish updating currency rates")

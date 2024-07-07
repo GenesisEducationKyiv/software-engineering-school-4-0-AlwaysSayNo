@@ -34,7 +34,7 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.router.Use(middleware.ErrorHandler())
 
 	utilHandler := handler.NewHandler(suite.emailSenderMock)
-	handler.RegisterRoutes(suite.router, *utilHandler)
+	handler.RegisterRoutes(suite.router, utilHandler)
 }
 
 func (suite *HandlerTestSuite) TestSendEmails_checkResult() {
