@@ -3,14 +3,15 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"genesis-currency-api/internal/module/email/config"
-	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
-	"genesis-currency-api/internal/shared/dto/user"
 	"html/template"
 	"log"
 	"net/smtp"
 	"os"
 	"path/filepath"
+
+	"genesis-currency-api/internal/module/email/config"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
+	"genesis-currency-api/internal/shared/dto/user"
 
 	"genesis-currency-api/pkg/errors"
 )

@@ -2,11 +2,12 @@ package service_test
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/module/currency/dto"
+	"testing"
+
 	"genesis-currency-api/internal/module/currency/service"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"genesis-currency-api/mocks"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type ServiceSuite struct {
@@ -28,7 +29,7 @@ func (suite *ServiceSuite) SetupTest() {
 func (suite *ServiceSuite) TestGetCurrencyRate_whenNoCachedValue_checkResult() {
 	// SETUP
 	number := 42.2
-	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
 	responseDTO, err := suite.sut.GetCurrencyRate()
@@ -42,7 +43,7 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenNoCachedValue_checkResult() {
 func (suite *ServiceSuite) TestGetCurrencyRate_whenExistsCachedValue_checkResult() {
 	// SETUP
 	number := 42.2
-	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
 	err := suite.sut.UpdateCurrencyRates()
@@ -73,7 +74,7 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenError() {
 func (suite *ServiceSuite) TestGetCachedCurrency_whenExistsCachedValue_checkResult() {
 	// SETUP
 	number := 42.2
-	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
 	cachedCurrency, err := suite.sut.GetCachedCurrency()
@@ -88,7 +89,7 @@ func (suite *ServiceSuite) TestGetCachedCurrency_whenExistsCachedValue_checkResu
 func (suite *ServiceSuite) TestGetCachedCurrency_whenNoCachedValue_checkResult() {
 	// SETUP
 	number := 42.2
-	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
 	err := suite.sut.UpdateCurrencyRates()
@@ -121,7 +122,7 @@ func (suite *ServiceSuite) TestGetCachedCurrency_whenError() {
 func (suite *ServiceSuite) TestUpdateCurrencyRates_checkResult() {
 	// SETUP
 	number := 42.2
-	suite.currencyProviderMock.On("GetCurrencyRate").Return(&dto.CurrencyResponseDTO{Number: number}, nil)
+	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
 	err := suite.sut.UpdateCurrencyRates()

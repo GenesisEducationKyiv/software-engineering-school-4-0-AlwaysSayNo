@@ -8,11 +8,11 @@ import (
 )
 
 type Provider interface {
-	GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
 }
 
 type Service interface {
-	GetCurrencyRate() (sharcurrdto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (sharcurrdto.ResponseDTO, error)
 	GetCachedCurrency() (sharcurrdto.CachedCurrency, error)
 	UpdateCurrencyRates() error
 }

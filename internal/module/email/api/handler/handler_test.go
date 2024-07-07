@@ -2,11 +2,12 @@ package handler_test
 
 import (
 	"errors"
-	"genesis-currency-api/internal/module/email/api/handler"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"genesis-currency-api/internal/module/email/api/handler"
 
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"

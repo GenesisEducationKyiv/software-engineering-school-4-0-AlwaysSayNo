@@ -2,14 +2,15 @@ package service
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/module/currency/util/date"
-	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"log"
 	"time"
+
+	"genesis-currency-api/internal/module/currency/util/date"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 )
 
 type Provider interface {
-	GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
 }
 
 type Service struct {
@@ -27,10 +28,10 @@ func NewService(currencyProvider Provider) *Service {
 }
 
 // GetCurrencyRate returns short information about currency rate.
-func (s *Service) GetCurrencyRate() (sharcurrdto.CurrencyResponseDTO, error) {
+func (s *Service) GetCurrencyRate() (sharcurrdto.ResponseDTO, error) {
 	currencyDTO, err := s.getCurrencyDTO()
 	if err != nil {
-		return sharcurrdto.CurrencyResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
+		return sharcurrdto.ResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
 	}
 
 	return currencyDTO.CurrencyResponseDTO, nil

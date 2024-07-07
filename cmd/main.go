@@ -1,8 +1,10 @@
 package main
 
 import (
+	"log"
+
 	"genesis-currency-api/internal/db"
-	config4 "genesis-currency-api/internal/db/config"
+	dbconf "genesis-currency-api/internal/db/config"
 	currencymodule "genesis-currency-api/internal/module/currency"
 	ratecdnjsdelivr "genesis-currency-api/internal/module/currency/api/external/rater/cdnjsdelivr"
 	rategovua "genesis-currency-api/internal/module/currency/api/external/rater/gov_ua"
@@ -16,7 +18,6 @@ import (
 	usermodule "genesis-currency-api/internal/module/user"
 	userhand "genesis-currency-api/internal/module/user/api/handler"
 	userconf "genesis-currency-api/internal/server/config"
-	"log"
 
 	"genesis-currency-api/internal/job"
 	"genesis-currency-api/internal/middleware"
@@ -28,7 +29,7 @@ func main() {
 	envs.Init()
 
 	// DATABASE
-	dbURL := db.GetDatabaseURL(config4.LoadDatabaseConfig())
+	dbURL := db.GetDatabaseURL(dbconf.LoadDatabaseConfig())
 	d := db.Init(dbURL)
 
 	// CURRENCY API HANDLERS

@@ -1,8 +1,9 @@
 package handler
 
 import (
-	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"net/http"
+
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 
 	"genesis-currency-api/pkg/errors"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type Rater interface {
-	GetCurrencyRate() (sharcurrdto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (sharcurrdto.ResponseDTO, error)
 }
 
 type Handler struct {

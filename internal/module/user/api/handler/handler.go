@@ -1,9 +1,10 @@
 package handler
 
 import (
+	"net/http"
+
 	"genesis-currency-api/internal/module/user/dto"
 	"genesis-currency-api/internal/shared/dto/user"
-	"net/http"
 
 	"genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"

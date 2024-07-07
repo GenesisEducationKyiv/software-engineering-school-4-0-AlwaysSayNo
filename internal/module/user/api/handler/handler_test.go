@@ -3,14 +3,15 @@ package handler_test
 import (
 	"encoding/json"
 	"errors"
-	"genesis-currency-api/internal/module/user/api/handler"
-	"genesis-currency-api/internal/module/user/dto"
-	"genesis-currency-api/internal/shared/dto/user"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"genesis-currency-api/internal/module/user/api/handler"
+	"genesis-currency-api/internal/module/user/dto"
+	"genesis-currency-api/internal/shared/dto/user"
 
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"
@@ -37,7 +38,7 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.router.Use(middleware.ErrorHandler())
 
 	userHandler := handler.NewHandler(suite.userService)
-	handler.RegisterRoutes(suite.router, *userHandler)
+	handler.RegisterRoutes(suite.router, userHandler)
 }
 
 func (suite *HandlerTestSuite) TestAdd_checkResult() {

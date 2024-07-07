@@ -3,13 +3,14 @@ package service_test
 import (
 	"errors"
 	"fmt"
+	"testing"
+
 	"genesis-currency-api/internal/module/user/dto"
 	"genesis-currency-api/internal/module/user/model"
 	"genesis-currency-api/internal/module/user/service"
 	"genesis-currency-api/mocks"
 	myerrors "genesis-currency-api/pkg/errors"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type ServiceSuite struct {

@@ -1,25 +1,26 @@
 package dto
 
 import (
-	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"strconv"
+
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 )
 
-func JSDeliverAPICurrencyResponseToDTO(dto *JSDeliverAPICurrencyResponseDTO) sharcurrdto.CurrencyResponseDTO {
-	return sharcurrdto.CurrencyResponseDTO{
+func JSDeliverAPICurrencyResponseToDTO(dto *JSDeliverAPICurrencyResponseDTO) sharcurrdto.ResponseDTO {
+	return sharcurrdto.ResponseDTO{
 		Number: dto.Usd.Uah,
 	}
 }
 
-func GovUaAPICurrencyResponseDTOToDTO(dto *GovUaAPICurrencyResponseDTO) sharcurrdto.CurrencyResponseDTO {
-	return sharcurrdto.CurrencyResponseDTO{
+func GovUaAPICurrencyResponseDTOToDTO(dto *GovUaAPICurrencyResponseDTO) sharcurrdto.ResponseDTO {
+	return sharcurrdto.ResponseDTO{
 		Number: dto.Rate,
 	}
 }
 
-func PrivateAPICurrencyResponseToDTO(dto *PrivateAPICurrencyResponseDTO) sharcurrdto.CurrencyResponseDTO {
+func PrivateAPICurrencyResponseToDTO(dto *PrivateAPICurrencyResponseDTO) sharcurrdto.ResponseDTO {
 	sale, _ := strconv.ParseFloat(dto.Sale, 64)
-	return sharcurrdto.CurrencyResponseDTO{
+	return sharcurrdto.ResponseDTO{
 		Number: sale,
 	}
 }

@@ -8,15 +8,20 @@ dependenciesRules:
   - package: "cmd.**"
     shouldOnlyDependsOn:
       internal:
-        - "internal.external.**"
-        - "internal.handler.**"
+        - "internal.db.config"
+        - "internal.module.currency"
+        - "internal.module.currency.**"
+        - "internal.module.email.**"
+        - "internal.module.user.**"
+        - "internal.module.currency.config"
+        - "internal.server.config"
+
         - "internal.job.**"
         - "internal.middleware.**"
-        - "internal.repository.**"
-        - "internal.service.**"
 
-        - "pkg.common.**"
-        - "pkg.config.**"
+        - "pkg/common/envs"
+      external:
+        - "github.com/gin-gonic.**"
 
   - package: "internal.external.api.**"
     shouldOnlyDependsOn:

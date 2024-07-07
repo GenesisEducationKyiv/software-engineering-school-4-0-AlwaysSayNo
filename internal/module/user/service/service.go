@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+
 	"genesis-currency-api/internal/module/user/dto"
 	"genesis-currency-api/internal/module/user/model"
 	"genesis-currency-api/internal/shared/dto/user"

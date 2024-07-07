@@ -2,13 +2,14 @@ package handler_test
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/middleware"
-	"genesis-currency-api/internal/module/currency/api/handler"
-	"genesis-currency-api/internal/module/currency/dto"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
+
+	"genesis-currency-api/internal/middleware"
+	"genesis-currency-api/internal/module/currency/api/handler"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 
 	"genesis-currency-api/mocks"
 	"github.com/gin-gonic/gin"
@@ -33,12 +34,12 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.router.Use(middleware.ErrorHandler())
 
 	currencyHandler := handler.NewHandler(suite.raterMock)
-	handler.RegisterRoutes(suite.router, *currencyHandler)
+	handler.RegisterRoutes(suite.router, currencyHandler)
 }
 
 func (suite *HandlerTestSuite) TestGetLatest_checkResult() {
 	// SETUP
-	rate := dto.CurrencyResponseDTO{
+	rate := sharcurrdto.ResponseDTO{
 		Number: 39.35,
 	}
 	suite.raterMock.On("GetCurrencyRate").Return(rate, nil)
@@ -60,7 +61,7 @@ func (suite *HandlerTestSuite) TestGetLatest_checkResult() {
 func (suite *HandlerTestSuite) TestGetLatest_whenReturnError() {
 	// SETUP
 	suite.raterMock.On("GetCurrencyRate").
-		Return(dto.CurrencyResponseDTO{}, fmt.Errorf("test error"))
+		Return(sharcurrdto.ResponseDTO{}, fmt.Errorf("test error"))
 
 	req, _ := http.NewRequest("GET", "/api/v1/rate/", nil)
 	resp := httptest.NewRecorder()
