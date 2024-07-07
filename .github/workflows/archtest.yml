@@ -1,4 +1,4 @@
-name: Lint
+name: Architecture test
 
 on: [push]
 
@@ -18,8 +18,8 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Install GolangCI-Lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - name: Install Arch-Go
+        run: go install github.com/fdaines/arch-go@latest
 
-      - name: Run GolangCI-Lint
-        run: golangci-lint run ./...
+      - name: Run Arch-Go
+        run: arch-go
