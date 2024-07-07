@@ -1,4 +1,4 @@
-package user
+package handler
 
 import (
 	"net/http"
@@ -8,17 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Saver interface {
+type UserService interface {
 	Save(user dto.UserSaveRequestDTO) (*dto.UserResponseDTO, error)
+	GetAll() ([]dto.UserResponseDTO, error)
 }
 
 type Handler struct {
-	saver Saver
+	userService UserService
 }
 
-func NewHandler(saver Saver) *Handler {
+func NewHandler(saver UserService) *Handler {
 	return &Handler{
-		saver: saver,
+		userService: saver,
 	}
 }
 
@@ -28,7 +29,7 @@ func (h *Handler) Add(ctx *gin.Context) {
 	var saveDto dto.UserSaveRequestDTO
 	saveDto.Email = email
 
-	_, err := h.saver.Save(saveDto)
+	_, err := h.userService.Save(saveDto)
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return
@@ -37,8 +38,19 @@ func (h *Handler) Add(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "E-mail додано")
 }
 
+func (h *Handler) FindAll(ctx *gin.Context) {
+	result, err := h.userService.GetAll()
+	if err != nil {
+		errors.AttachToCtx(err, ctx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, &result)
+}
+
 // RegisterRoutes creates an instance of Handler and registers routes for it.
 func RegisterRoutes(r *gin.Engine, handler Handler) {
 	routes := r.Group("/api/v1/")
 	routes.POST("/subscribe", handler.Add)
+	routes.GET("/users", handler.FindAll)
 }

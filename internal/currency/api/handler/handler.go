@@ -1,4 +1,4 @@
-package currency
+package handler
 
 import (
 	"net/http"

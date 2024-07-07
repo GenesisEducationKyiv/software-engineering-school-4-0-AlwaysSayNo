@@ -1,26 +1,27 @@
-package user_test
+package handler_test
 
 import (
+	"encoding/json"
+	"errors"
+	"genesis-currency-api/internal/user/api/handler"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
 
-	"genesis-currency-api/internal/handler/user"
-
 	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/dto"
-	"genesis-currency-api/pkg/errors"
+	myerrors "genesis-currency-api/pkg/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
 
 type HandlerTestSuite struct {
 	suite.Suite
-	router    *gin.Engine
-	saverMock *mocks.Saver
+	router      *gin.Engine
+	userService *mocks.UserService
 }
 
 func TestHandlerTestSuite(t *testing.T) {
@@ -31,11 +32,11 @@ func (suite *HandlerTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 	suite.router = gin.New()
 
-	suite.saverMock = new(mocks.Saver)
+	suite.userService = new(mocks.UserService)
 	suite.router.Use(middleware.ErrorHandler())
 
-	userHandler := user.NewHandler(suite.saverMock)
-	user.RegisterRoutes(suite.router, *userHandler)
+	userHandler := handler.NewHandler(suite.userService)
+	handler.RegisterRoutes(suite.router, *userHandler)
 }
 
 func (suite *HandlerTestSuite) TestAdd_checkResult() {
@@ -44,7 +45,7 @@ func (suite *HandlerTestSuite) TestAdd_checkResult() {
 		Email: "test@example.com",
 	}
 
-	suite.saverMock.On("Save", saveDto).Return(&dto.UserResponseDTO{
+	suite.userService.On("Save", saveDto).Return(&dto.UserResponseDTO{
 		ID:    1,
 		Email: "test@example.com",
 	}, nil)
@@ -62,7 +63,7 @@ func (suite *HandlerTestSuite) TestAdd_checkResult() {
 	suite.Equal(http.StatusOK, resp.Code)
 	suite.Contains(resp.Body.String(), "E-mail додано")
 
-	suite.saverMock.AssertExpectations(suite.T())
+	suite.userService.AssertExpectations(suite.T())
 }
 
 func (suite *HandlerTestSuite) TestAdd_whenError() {
@@ -71,7 +72,7 @@ func (suite *HandlerTestSuite) TestAdd_whenError() {
 		Email: "exist@example.com",
 	}
 
-	suite.saverMock.On("Save", saveDto).Return(nil, errors.NewUserWithEmailExistsError())
+	suite.userService.On("Save", saveDto).Return(nil, myerrors.NewUserWithEmailExistsError())
 
 	form := url.Values{}
 	form.Add("email", "exist@example.com")
@@ -86,5 +87,47 @@ func (suite *HandlerTestSuite) TestAdd_whenError() {
 	suite.Equal(http.StatusBadRequest, resp.Code)
 	suite.Contains(resp.Body.String(), "Повертати, якщо e-mail вже є в базі даних")
 
-	suite.saverMock.AssertExpectations(suite.T())
+	suite.userService.AssertExpectations(suite.T())
+}
+
+func (suite *HandlerTestSuite) TestFindAll_checkResult() {
+	// SETUP
+	users := []dto.UserResponseDTO{
+		{Email: "user1@example.com"},
+		{Email: "user2@example.com"},
+	}
+	suite.userService.On("GetAll").Return(users, nil)
+
+	req, _ := http.NewRequest("GET", "/api/v1/users", nil)
+	resp := httptest.NewRecorder()
+
+	// ACT
+	suite.router.ServeHTTP(resp, req)
+	var responseBody []dto.UserResponseDTO
+	err := json.Unmarshal(resp.Body.Bytes(), &responseBody)
+	suite.Require().NoError(err)
+
+	// VERIFY
+	suite.Equal(http.StatusOK, resp.Code)
+	suite.Equal(len(responseBody), 2)
+	suite.Equal(responseBody[0].Email, users[0].Email)
+	suite.Equal(responseBody[1].Email, users[1].Email)
+
+	suite.userService.AssertExpectations(suite.T())
+}
+
+func (suite *HandlerTestSuite) TestFindAll_whenError() {
+	// SETUP
+	suite.userService.On("GetAll").Return(nil, errors.New("test"))
+
+	req, _ := http.NewRequest("GET", "/api/v1/users", nil)
+	resp := httptest.NewRecorder()
+
+	// ACT
+	suite.router.ServeHTTP(resp, req)
+
+	// VERIFY
+	suite.Equal(http.StatusInternalServerError, resp.Code)
+
+	suite.userService.AssertExpectations(suite.T())
 }

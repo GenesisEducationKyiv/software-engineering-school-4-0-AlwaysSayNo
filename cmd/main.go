@@ -1,6 +1,8 @@
 package main
 
 import (
+	handler2 "genesis-currency-api/internal/currency/api/handler"
+	handler3 "genesis-currency-api/internal/email/api/handler"
 	"genesis-currency-api/internal/external/api/currency/cdnjsdelivr"
 	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
 	"genesis-currency-api/internal/external/api/currency/private"
@@ -8,11 +10,8 @@ import (
 	servcurrency "genesis-currency-api/internal/service/currency"
 	"genesis-currency-api/internal/service/email"
 	servuser "genesis-currency-api/internal/service/user"
+	"genesis-currency-api/internal/user/api/handler"
 	"log"
-
-	"genesis-currency-api/internal/handler/currency"
-	"genesis-currency-api/internal/handler/user"
-	"genesis-currency-api/internal/handler/util"
 
 	"genesis-currency-api/pkg/config"
 
@@ -49,14 +48,14 @@ func main() {
 	job.StartAllJobs(currencyService, emailService)
 
 	// HANDLERS
-	currencyHandler := currency.NewHandler(currencyService)
-	currency.RegisterRoutes(r, *currencyHandler)
+	currencyHandler := handler2.NewHandler(currencyService)
+	handler2.RegisterRoutes(r, *currencyHandler)
 
-	userHandler := user.NewHandler(userService)
-	user.RegisterRoutes(r, *userHandler)
+	userHandler := handler.NewHandler(userService)
+	handler.RegisterRoutes(r, *userHandler)
 
-	utilHandler := util.NewHandler(userService, emailService)
-	util.RegisterRoutes(r, *utilHandler)
+	emailHandler := handler3.NewHandler(emailService)
+	handler3.RegisterRoutes(r, *emailHandler)
 
 	// START SERVER
 	cnf := config.LoadServerConfigConfig()

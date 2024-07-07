@@ -1,14 +1,13 @@
-package currency_test
+package handler_test
 
 import (
 	"fmt"
+	"genesis-currency-api/internal/currency/api/handler"
 	"genesis-currency-api/internal/middleware"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"testing"
-
-	"genesis-currency-api/internal/handler/currency"
 
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/dto"
@@ -33,8 +32,8 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.raterMock = new(mocks.Rater)
 	suite.router.Use(middleware.ErrorHandler())
 
-	currencyHandler := currency.NewHandler(suite.raterMock)
-	currency.RegisterRoutes(suite.router, *currencyHandler)
+	currencyHandler := handler.NewHandler(suite.raterMock)
+	handler.RegisterRoutes(suite.router, *currencyHandler)
 }
 
 func (suite *HandlerTestSuite) TestGetLatest_checkResult() {
