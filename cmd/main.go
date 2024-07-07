@@ -1,24 +1,26 @@
 package main
 
 import (
-	"genesis-currency-api/internal/external/api/currency/cdnjsdelivr"
-	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
-	"genesis-currency-api/internal/external/api/currency/private"
-	repouser "genesis-currency-api/internal/repository/user"
-	servcurrency "genesis-currency-api/internal/service/currency"
-	"genesis-currency-api/internal/service/email"
-	servuser "genesis-currency-api/internal/service/user"
 	"log"
 
-	"genesis-currency-api/internal/handler/currency"
-	"genesis-currency-api/internal/handler/user"
-	"genesis-currency-api/internal/handler/util"
-
-	"genesis-currency-api/pkg/config"
+	"genesis-currency-api/internal/db"
+	dbconf "genesis-currency-api/internal/db/config"
+	currencymodule "genesis-currency-api/internal/module/currency"
+	ratecdnjsdelivr "genesis-currency-api/internal/module/currency/api/external/rater/cdnjsdelivr"
+	rategovua "genesis-currency-api/internal/module/currency/api/external/rater/gov_ua"
+	rateprivate "genesis-currency-api/internal/module/currency/api/external/rater/private"
+	currencyhand "genesis-currency-api/internal/module/currency/api/handler"
+	currencyconf "genesis-currency-api/internal/module/currency/config"
+	currencyserv "genesis-currency-api/internal/module/currency/service"
+	emailmodule "genesis-currency-api/internal/module/email"
+	emailhand "genesis-currency-api/internal/module/email/api/handler"
+	emailconf "genesis-currency-api/internal/module/email/config"
+	usermodule "genesis-currency-api/internal/module/user"
+	userhand "genesis-currency-api/internal/module/user/api/handler"
+	userconf "genesis-currency-api/internal/server/config"
 
 	"genesis-currency-api/internal/job"
 	"genesis-currency-api/internal/middleware"
-	"genesis-currency-api/pkg/common/db"
 	"genesis-currency-api/pkg/common/envs"
 	"github.com/gin-gonic/gin"
 )
@@ -27,55 +29,47 @@ func main() {
 	envs.Init()
 
 	// DATABASE
-	dbURL := db.GetDatabaseURL(config.LoadDatabaseConfig())
+	dbURL := db.GetDatabaseURL(dbconf.LoadDatabaseConfig())
 	d := db.Init(dbURL)
 
-	// REPOSITORIES
-	userRepository := repouser.NewRepository(d)
+	// CURRENCY API HANDLERS
+	currencyProvider := getCurrencyProviderChain()
+
+	// MODULES
+	userModule := usermodule.Init(d)
+	currencyModule := currencymodule.Init(currencyProvider)
+	emailModule := emailmodule.Init(userModule.Service, currencyModule.Service, emailconf.LoadEmailServiceConfig())
 
 	// ENGINE
 	r := gin.Default()
 	r.Use(middleware.ErrorHandler())
 
-	// CURRENCY API HANDLERS
-	currencyProvider := getCurrencyProviderChain()
-
-	// SERVICES
-	currencyService := servcurrency.NewService(currencyProvider)
-	userService := servuser.NewService(userRepository)
-	emailService := email.NewService(userService, currencyService, config.LoadEmailServiceConfig())
-
 	// JOBS
-	job.StartAllJobs(currencyService, emailService)
+	job.StartAllJobs(currencyModule.Service, emailModule.Service)
 
 	// HANDLERS
-	currencyHandler := currency.NewHandler(currencyService)
-	currency.RegisterRoutes(r, *currencyHandler)
-
-	userHandler := user.NewHandler(userService)
-	user.RegisterRoutes(r, *userHandler)
-
-	utilHandler := util.NewHandler(userService, emailService)
-	util.RegisterRoutes(r, *utilHandler)
+	currencyhand.RegisterRoutes(r, currencyModule.Handler)
+	userhand.RegisterRoutes(r, userModule.Handler)
+	emailhand.RegisterRoutes(r, emailModule.Handler)
 
 	// START SERVER
-	cnf := config.LoadServerConfigConfig()
+	cnf := userconf.LoadServerConfigConfig()
 	if err := r.Run(cnf.ApplicationPort); err != nil {
 		log.Fatal("while server bootstrapping: ", err)
 	}
 }
 
-func getCurrencyProviderChain() servcurrency.Provider {
+func getCurrencyProviderChain() currencyserv.Provider {
 	// GET PROVIDERS
-	privateClient, err := private.NewClient(config.LoadCurrencyServiceConfig())
+	privateClient, err := rateprivate.NewClient(currencyconf.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating Private Bank currency provider")
 	}
-	govUaClient, err := govua.NewClient(config.LoadCurrencyServiceConfig())
+	govUaClient, err := rategovua.NewClient(currencyconf.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating Bank Gov Ua currency provider")
 	}
-	jsDelivrClient, err := cdnjsdelivr.NewClient(config.LoadCurrencyServiceConfig())
+	jsDelivrClient, err := ratecdnjsdelivr.NewClient(currencyconf.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating JS Deliver currency provider")
 	}
