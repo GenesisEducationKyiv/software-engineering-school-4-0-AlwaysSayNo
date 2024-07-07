@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	model "genesis-currency-api/internal/model"
+	"genesis-currency-api/internal/user/model"
 
 	mock "github.com/stretchr/testify/mock"
 )

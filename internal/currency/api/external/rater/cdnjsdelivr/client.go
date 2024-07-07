@@ -1,11 +1,10 @@
-package private
+package cdnjsdelivr
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/external/api/currency/abstract"
+	"genesis-currency-api/internal/currency/api/external/rater/abstract"
 	"genesis-currency-api/pkg/config"
 	"genesis-currency-api/pkg/dto"
-	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util/parser"
 )
 
@@ -13,25 +12,21 @@ type CurrencyRater interface {
 	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
 }
 
-const (
-	USD = "USD"
-)
-
 type Client struct {
 	abstractClient abstract.Client
 }
 
-// NewClient is a factory function for Bank Gov Ua API Client.
+// NewClient is a factory function for JsDelivr API Client.
 func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
-	apiURL, err := parser.ParseURL(cnf.ThirdPartyAPIBankGovUa)
+	apiURL, err := parser.ParseURL(cnf.ThirdPartyAPICDNJSDeliver)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parsing JsDelivr API URL")
 	}
 
 	c := &Client{
 		abstractClient: abstract.Client{
 			APIURL:       apiURL,
-			ProviderName: "Bank Gov Ua API",
+			ProviderName: "JsDelivr API",
 		},
 	}
 
@@ -44,24 +39,16 @@ func (c *Client) GetCurrencyRate() (*dto.CurrencyResponseDTO, error) {
 	return c.abstractClient.ProcessCurrencyResponseDTO(responseDTO, err)
 }
 
-// getUSDCurrencyFromAPI retrieves a full set of data from the 3rd party API call.
-// Then it looks for USD currency and in case of occurrence maps response to dto.CurrencyResponseDTO.
-// Returns a dto.CurrencyResponseDTO from all available from 3rd party API currencies.
+// getUSDCurrencyFromAPI calls JsDelivr API and maps it into dto.CurrencyResponseDTO.
 func (c *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
-	var apiResponses []dto.GovUaAPICurrencyResponseDTO
-	err := c.abstractClient.CallAPI(&apiResponses)
+	var apiResponse dto.JSDeliverAPICurrencyResponseDTO
+	err := c.abstractClient.CallAPI(&apiResponse)
 	if err != nil {
 		return nil, fmt.Errorf("calling API: %w", err)
 	}
 
-	for _, r := range apiResponses {
-		if r.FromCcy == USD {
-			apiResponse := dto.GovUaAPICurrencyResponseDTOToDTO(&r)
-			return &apiResponse, nil
-		}
-	}
-
-	return nil, errors.NewAPIError("No currency USD was found", nil)
+	responseDTO := dto.JSDeliverAPICurrencyResponseToDTO(&apiResponse)
+	return &responseDTO, nil
 }
 
 // SetNext sets a next rater into raters chain.

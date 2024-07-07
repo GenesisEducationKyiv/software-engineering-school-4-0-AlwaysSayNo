@@ -3,7 +3,7 @@ package service_test
 import (
 	"errors"
 	"fmt"
-	"genesis-currency-api/internal/model"
+	"genesis-currency-api/internal/user/model"
 	"genesis-currency-api/internal/user/service"
 	"genesis-currency-api/mocks"
 	"genesis-currency-api/pkg/dto"

@@ -1,7 +1,7 @@
-package user
+package repository
 
 import (
-	"genesis-currency-api/internal/model"
+	"genesis-currency-api/internal/user/model"
 	"gorm.io/gorm"
 )
 

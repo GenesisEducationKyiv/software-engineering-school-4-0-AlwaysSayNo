@@ -1,15 +1,15 @@
 package main
 
 import (
+	ratecdnjsdelivr "genesis-currency-api/internal/currency/api/external/rater/cdnjsdelivr"
+	rategovua "genesis-currency-api/internal/currency/api/external/rater/gov_ua"
+	rateprivate "genesis-currency-api/internal/currency/api/external/rater/private"
 	handcurrency "genesis-currency-api/internal/currency/api/handler"
 	servcurrency "genesis-currency-api/internal/currency/service"
 	handemail "genesis-currency-api/internal/email/api/handler"
 	servemail "genesis-currency-api/internal/email/service"
-	"genesis-currency-api/internal/external/api/currency/cdnjsdelivr"
-	govua "genesis-currency-api/internal/external/api/currency/gov_ua"
-	"genesis-currency-api/internal/external/api/currency/private"
-	repouser "genesis-currency-api/internal/repository/user"
 	handuser "genesis-currency-api/internal/user/api/handler"
+	repouser "genesis-currency-api/internal/user/repository"
 	servuser "genesis-currency-api/internal/user/service"
 	"log"
 
@@ -66,15 +66,15 @@ func main() {
 
 func getCurrencyProviderChain() servcurrency.Provider {
 	// GET PROVIDERS
-	privateClient, err := private.NewClient(config.LoadCurrencyServiceConfig())
+	privateClient, err := rateprivate.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating Private Bank currency provider")
 	}
-	govUaClient, err := govua.NewClient(config.LoadCurrencyServiceConfig())
+	govUaClient, err := rategovua.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating Bank Gov Ua currency provider")
 	}
-	jsDelivrClient, err := cdnjsdelivr.NewClient(config.LoadCurrencyServiceConfig())
+	jsDelivrClient, err := ratecdnjsdelivr.NewClient(config.LoadCurrencyServiceConfig())
 	if err != nil {
 		log.Fatal("creating JS Deliver currency provider")
 	}

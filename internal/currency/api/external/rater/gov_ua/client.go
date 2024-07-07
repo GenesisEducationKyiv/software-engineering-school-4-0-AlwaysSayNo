@@ -2,7 +2,7 @@ package private
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/external/api/currency/abstract"
+	"genesis-currency-api/internal/currency/api/external/rater/abstract"
 	"genesis-currency-api/pkg/config"
 	"genesis-currency-api/pkg/dto"
 	"genesis-currency-api/pkg/errors"
@@ -21,9 +21,9 @@ type Client struct {
 	abstractClient abstract.Client
 }
 
-// NewClient is a factory function for Private Bank API Client.
+// NewClient is a factory function for Bank Gov Ua API Client.
 func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
-	apiURL, err := parser.ParseURL(cnf.ThirdPartyAPIPrivateBank)
+	apiURL, err := parser.ParseURL(cnf.ThirdPartyAPIBankGovUa)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 	c := &Client{
 		abstractClient: abstract.Client{
 			APIURL:       apiURL,
-			ProviderName: "Private Bank API",
+			ProviderName: "Bank Gov Ua API",
 		},
 	}
 
@@ -48,7 +48,7 @@ func (c *Client) GetCurrencyRate() (*dto.CurrencyResponseDTO, error) {
 // Then it looks for USD currency and in case of occurrence maps response to dto.CurrencyResponseDTO.
 // Returns a dto.CurrencyResponseDTO from all available from 3rd party API currencies.
 func (c *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
-	var apiResponses []dto.PrivateAPICurrencyResponseDTO
+	var apiResponses []dto.GovUaAPICurrencyResponseDTO
 	err := c.abstractClient.CallAPI(&apiResponses)
 	if err != nil {
 		return nil, fmt.Errorf("calling API: %w", err)
@@ -56,7 +56,7 @@ func (c *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
 
 	for _, r := range apiResponses {
 		if r.FromCcy == USD {
-			apiResponse := dto.PrivateAPICurrencyResponseToDTO(&r)
+			apiResponse := dto.GovUaAPICurrencyResponseDTOToDTO(&r)
 			return &apiResponse, nil
 		}
 	}

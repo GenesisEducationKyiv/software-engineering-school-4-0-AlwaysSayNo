@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"genesis-currency-api/internal/model"
+	"genesis-currency-api/internal/user/model"
 )
 
 type UserResponseDTO struct {
