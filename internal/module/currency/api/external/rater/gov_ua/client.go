@@ -3,8 +3,8 @@ package private
 import (
 	"fmt"
 	"genesis-currency-api/internal/module/currency/api/external/rater/abstract"
+	"genesis-currency-api/internal/module/currency/config"
 	"genesis-currency-api/internal/module/currency/dto"
-	"genesis-currency-api/pkg/config"
 	"genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util/parser"
 )

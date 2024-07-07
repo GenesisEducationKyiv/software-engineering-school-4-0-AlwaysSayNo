@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"genesis-currency-api/internal/module/currency/dto"
+	"genesis-currency-api/internal/module/email/config"
 	"genesis-currency-api/internal/shared/dto/user"
 	"html/template"
 	"log"
 	"net/smtp"
 	"os"
 	"path/filepath"
-
-	"genesis-currency-api/pkg/config"
 
 	"genesis-currency-api/pkg/errors"
 )

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"genesis-currency-api/internal/db/config"
 	"genesis-currency-api/internal/module/user/model"
 	repouser "genesis-currency-api/internal/module/user/repository"
 	servuser "genesis-currency-api/internal/module/user/service"
@@ -14,7 +15,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"genesis-currency-api/pkg/config"
 	myerrors "genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util"
 	"github.com/docker/go-connections/nat"

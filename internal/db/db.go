@@ -2,10 +2,10 @@ package db
 
 import (
 	"fmt"
+	"genesis-currency-api/internal/db/config"
 	"log"
 	"net/url"
 
-	"genesis-currency-api/pkg/config"
 	_ "github.com/golang-migrate/migrate/v4/source/file" // blank import needed for migration purposes
 
 	gormPostgres "gorm.io/driver/postgres"
