@@ -3,7 +3,7 @@ package abstract
 import (
 	"encoding/json"
 	"fmt"
-	"genesis-currency-api/internal/module/currency/dto"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"genesis-currency-api/pkg/errors"
 	"io"
 	"log"
@@ -11,7 +11,7 @@ import (
 )
 
 type CurrencyRater interface {
-	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error)
 }
 
 type Client struct {
@@ -21,8 +21,8 @@ type Client struct {
 }
 
 // ProcessCurrencyResponseDTO based on the input parameters generates the output.
-func (c *Client) ProcessCurrencyResponseDTO(responseDTO *dto.CurrencyResponseDTO,
-	err error) (*dto.CurrencyResponseDTO, error) {
+func (c *Client) ProcessCurrencyResponseDTO(responseDTO *sharcurrdto.CurrencyResponseDTO,
+	err error) (*sharcurrdto.CurrencyResponseDTO, error) {
 	if err == nil {
 		log.Printf("Success response from %s: %v\n", c.ProviderName, *responseDTO)
 		return responseDTO, nil

@@ -5,12 +5,13 @@ import (
 	"genesis-currency-api/internal/module/currency/api/external/rater/abstract"
 	"genesis-currency-api/internal/module/currency/config"
 	"genesis-currency-api/internal/module/currency/dto"
+	"genesis-currency-api/internal/module/currency/util/parser"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"genesis-currency-api/pkg/errors"
-	"genesis-currency-api/pkg/util/parser"
 )
 
 type CurrencyRater interface {
-	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error)
 }
 
 const (
@@ -39,7 +40,7 @@ func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 }
 
 // GetCurrencyRate gets data from its API and processes it with abstract client.
-func (c *Client) GetCurrencyRate() (*dto.CurrencyResponseDTO, error) {
+func (c *Client) GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error) {
 	responseDTO, err := c.getUSDCurrencyFromAPI()
 	return c.abstractClient.ProcessCurrencyResponseDTO(responseDTO, err)
 }
@@ -47,7 +48,7 @@ func (c *Client) GetCurrencyRate() (*dto.CurrencyResponseDTO, error) {
 // getUSDCurrencyFromAPI retrieves a full set of data from the 3rd party API call.
 // Then it looks for USD currency and in case of occurrence maps response to dto.CurrencyResponseDTO.
 // Returns a dto.CurrencyResponseDTO from all available from 3rd party API currencies.
-func (c *Client) getUSDCurrencyFromAPI() (*dto.CurrencyResponseDTO, error) {
+func (c *Client) getUSDCurrencyFromAPI() (*sharcurrdto.CurrencyResponseDTO, error) {
 	var apiResponses []dto.GovUaAPICurrencyResponseDTO
 	err := c.abstractClient.CallAPI(&apiResponses)
 	if err != nil {

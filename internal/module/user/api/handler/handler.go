@@ -48,10 +48,3 @@ func (h *Handler) FindAll(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, &result)
 }
-
-// RegisterRoutes creates an instance of Handler and registers routes for it.
-func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api/v1/")
-	routes.POST("/subscribe", handler.Add)
-	routes.GET("/users", handler.FindAll)
-}

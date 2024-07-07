@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"genesis-currency-api/internal/module/currency/dto"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"net/http"
 
 	"genesis-currency-api/pkg/errors"
@@ -10,7 +10,7 @@ import (
 )
 
 type Rater interface {
-	GetCurrencyRate() (dto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (sharcurrdto.CurrencyResponseDTO, error)
 }
 
 type Handler struct {
@@ -29,10 +29,4 @@ func (h *Handler) GetLatest(ctx *gin.Context) {
 	} else {
 		ctx.String(http.StatusOK, "%f", result.Number)
 	}
-}
-
-// RegisterRoutes registers routes for passed Handler
-func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api/v1/rate")
-	routes.GET("/", handler.GetLatest)
 }

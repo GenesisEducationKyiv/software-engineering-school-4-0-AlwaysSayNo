@@ -3,8 +3,8 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"genesis-currency-api/internal/module/currency/dto"
 	"genesis-currency-api/internal/module/email/config"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"genesis-currency-api/internal/shared/dto/user"
 	"html/template"
 	"log"
@@ -20,7 +20,7 @@ type UserGetter interface {
 }
 
 type DatedCurrencyGetter interface {
-	GetCachedCurrency() (dto.CachedCurrency, error)
+	GetCachedCurrency() (sharcurrdto.CachedCurrency, error)
 }
 
 type CurrencyEmailData struct {

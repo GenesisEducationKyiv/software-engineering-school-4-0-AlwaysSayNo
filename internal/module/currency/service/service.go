@@ -2,18 +2,18 @@ package service
 
 import (
 	"fmt"
-	"genesis-currency-api/internal/module/currency/dto"
-	"genesis-currency-api/pkg/util/date"
+	"genesis-currency-api/internal/module/currency/util/date"
+	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 	"log"
 	"time"
 )
 
 type Provider interface {
-	GetCurrencyRate() (*dto.CurrencyResponseDTO, error)
+	GetCurrencyRate() (*sharcurrdto.CurrencyResponseDTO, error)
 }
 
 type Service struct {
-	currencyDTO      dto.CachedCurrency
+	currencyDTO      sharcurrdto.CachedCurrency
 	currencyProvider Provider
 }
 
@@ -21,26 +21,26 @@ type Service struct {
 func NewService(currencyProvider Provider) *Service {
 	// A cache value for 3rd party API response.
 	return &Service{
-		dto.CachedCurrency{},
+		sharcurrdto.CachedCurrency{},
 		currencyProvider,
 	}
 }
 
 // GetCurrencyRate returns short information about currency rate.
-func (s *Service) GetCurrencyRate() (dto.CurrencyResponseDTO, error) {
+func (s *Service) GetCurrencyRate() (sharcurrdto.CurrencyResponseDTO, error) {
 	currencyDTO, err := s.getCurrencyDTO()
 	if err != nil {
-		return dto.CurrencyResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
+		return sharcurrdto.CurrencyResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
 	}
 
 	return currencyDTO.CurrencyResponseDTO, nil
 }
 
-func (s *Service) GetCachedCurrency() (dto.CachedCurrency, error) {
+func (s *Service) GetCachedCurrency() (sharcurrdto.CachedCurrency, error) {
 	return s.getCurrencyDTO()
 }
 
-func (s *Service) getCurrencyDTO() (dto.CachedCurrency, error) {
+func (s *Service) getCurrencyDTO() (sharcurrdto.CachedCurrency, error) {
 	if s.currencyDTO.UpdateDate == "" {
 		if err := s.UpdateCurrencyRates(); err != nil {
 			return s.currencyDTO, err
@@ -61,7 +61,7 @@ func (s *Service) UpdateCurrencyRates() error {
 	}
 
 	// save updated data to cache
-	s.currencyDTO = dto.CachedCurrency{
+	s.currencyDTO = sharcurrdto.CachedCurrency{
 		UpdateDate:          date.Format(time.Now()),
 		CurrencyResponseDTO: *currencyRate,
 	}

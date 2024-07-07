@@ -30,9 +30,3 @@ func (h *Handler) SendEmails(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, "Emails are successfully sent")
 }
-
-// RegisterRoutes registers routes for passed Handler.
-func RegisterRoutes(r *gin.Engine, handler Handler) {
-	routes := r.Group("/api/v1")
-	routes.POST("/emails/send", handler.SendEmails)
-}
