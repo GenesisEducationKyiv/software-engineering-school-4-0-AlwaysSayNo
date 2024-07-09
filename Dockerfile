@@ -13,6 +13,7 @@ COPY go.mod go.sum ./
 # Install migrate tool
 RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
+
 # Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN --mount=type=cache,target=/go/pkg/mod \
              --mount=type=cache,target=/root/.cache/go-build \

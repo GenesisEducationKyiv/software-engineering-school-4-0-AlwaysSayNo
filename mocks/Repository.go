@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	model "genesis-currency-api/internal/model"
+	model "genesis-currency-api/internal/module/user/model"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -13,9 +13,9 @@ type Repository struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: _a0
-func (_m *Repository) Create(_a0 model.User) (*model.User, error) {
-	ret := _m.Called(_a0)
+// Create provides a mock function with given fields: user
+func (_m *Repository) Create(user model.User) (*model.User, error) {
+	ret := _m.Called(user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -24,10 +24,10 @@ func (_m *Repository) Create(_a0 model.User) (*model.User, error) {
 	var r0 *model.User
 	var r1 error
 	if rf, ok := ret.Get(0).(func(model.User) (*model.User, error)); ok {
-		return rf(_a0)
+		return rf(user)
 	}
 	if rf, ok := ret.Get(0).(func(model.User) *model.User); ok {
-		r0 = rf(_a0)
+		r0 = rf(user)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.User)
@@ -35,7 +35,7 @@ func (_m *Repository) Create(_a0 model.User) (*model.User, error) {
 	}
 
 	if rf, ok := ret.Get(1).(func(model.User) error); ok {
-		r1 = rf(_a0)
+		r1 = rf(user)
 	} else {
 		r1 = ret.Error(1)
 	}

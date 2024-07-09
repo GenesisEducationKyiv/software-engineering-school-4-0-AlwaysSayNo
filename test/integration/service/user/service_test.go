@@ -6,15 +6,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	repouser "genesis-currency-api/internal/repository/user"
-	servuser "genesis-currency-api/internal/service/user"
 	"log"
 	"path/filepath"
 	"testing"
 
-	"genesis-currency-api/internal/model"
-	"genesis-currency-api/pkg/config"
-	"genesis-currency-api/pkg/dto"
+	"genesis-currency-api/internal/db/config"
+	"genesis-currency-api/internal/module/user/dto"
+	"genesis-currency-api/internal/module/user/model"
+	repouser "genesis-currency-api/internal/module/user/repository"
+	servuser "genesis-currency-api/internal/module/user/service"
+
 	myerrors "genesis-currency-api/pkg/errors"
 	"genesis-currency-api/pkg/util"
 	"github.com/docker/go-connections/nat"
@@ -164,7 +165,7 @@ func (suite *UserServiceSuite) TearDownTest() {
 
 func (suite *UserServiceSuite) TestSave_checkResult() {
 	// SETUP
-	saveRequestDto := dto.UserSaveRequestDTO{
+	saveRequestDto := dto.SaveRequestDTO{
 		Email: "test@example.com",
 	}
 
@@ -178,7 +179,7 @@ func (suite *UserServiceSuite) TestSave_checkResult() {
 
 func (suite *UserServiceSuite) TestSave_whenUserAlreadyExists() {
 	// SETUP
-	saveRequestDto := dto.UserSaveRequestDTO{
+	saveRequestDto := dto.SaveRequestDTO{
 		Email: "exists@example.com",
 	}
 	var userWithEmailExistsError *myerrors.UserWithEmailExistsError
