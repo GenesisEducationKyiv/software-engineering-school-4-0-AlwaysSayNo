@@ -6,7 +6,7 @@ import (
 )
 
 type CurrencyUpdater interface {
-	UpdateCurrencyRates() error
+	UpdateCurrencyRates(ctx context.Context) error
 }
 
 // GetUpdateCurrencyJob is a cron function to update currency service cache.
@@ -15,7 +15,7 @@ func GetUpdateCurrencyJob(ctx context.Context, currencyUpdater CurrencyUpdater) 
 	job := func() {
 		log.Println("Start job: Update Currency Rates")
 
-		if err := currencyUpdater.UpdateCurrencyRates(); err != nil {
+		if err := currencyUpdater.UpdateCurrencyRates(ctx); err != nil {
 			log.Printf("error with: Update Currency Rates - %v\n", err)
 		} else {
 			log.Println("Finish job: Update Currency Rates")

@@ -1,6 +1,8 @@
 package currency
 
 import (
+	"context"
+
 	"genesis-currency-api/internal/module/currency/api/handler"
 	"genesis-currency-api/internal/module/currency/service"
 	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
@@ -8,13 +10,13 @@ import (
 )
 
 type Provider interface {
-	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error)
 }
 
 type Service interface {
-	GetCurrencyRate() (sharcurrdto.ResponseDTO, error)
-	GetCachedCurrency() (sharcurrdto.CachedCurrency, error)
-	UpdateCurrencyRates() error
+	GetCurrencyRate(ctx context.Context) (sharcurrdto.ResponseDTO, error)
+	GetCachedCurrency(ctx context.Context) (sharcurrdto.CachedCurrency, error)
+	UpdateCurrencyRates(ctx context.Context) error
 }
 
 type Handler interface {

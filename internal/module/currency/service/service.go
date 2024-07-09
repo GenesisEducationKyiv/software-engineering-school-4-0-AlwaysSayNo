@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -10,7 +11,7 @@ import (
 )
 
 type Provider interface {
-	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error)
 }
 
 type Service struct {
@@ -22,14 +23,14 @@ type Service struct {
 func NewService(currencyProvider Provider) *Service {
 	// A cache value for 3rd party API response.
 	return &Service{
-		sharcurrdto.CachedCurrency{},
-		currencyProvider,
+		currencyDTO:      sharcurrdto.CachedCurrency{},
+		currencyProvider: currencyProvider,
 	}
 }
 
 // GetCurrencyRate returns short information about currency rate.
-func (s *Service) GetCurrencyRate() (sharcurrdto.ResponseDTO, error) {
-	currencyDTO, err := s.getCurrencyDTO()
+func (s *Service) GetCurrencyRate(ctx context.Context) (sharcurrdto.ResponseDTO, error) {
+	currencyDTO, err := s.getCurrencyDTO(ctx)
 	if err != nil {
 		return sharcurrdto.ResponseDTO{}, fmt.Errorf("getting currency rate: %w", err)
 	}
@@ -37,13 +38,13 @@ func (s *Service) GetCurrencyRate() (sharcurrdto.ResponseDTO, error) {
 	return currencyDTO.ResponseDTO, nil
 }
 
-func (s *Service) GetCachedCurrency() (sharcurrdto.CachedCurrency, error) {
-	return s.getCurrencyDTO()
+func (s *Service) GetCachedCurrency(ctx context.Context) (sharcurrdto.CachedCurrency, error) {
+	return s.getCurrencyDTO(ctx)
 }
 
-func (s *Service) getCurrencyDTO() (sharcurrdto.CachedCurrency, error) {
+func (s *Service) getCurrencyDTO(ctx context.Context) (sharcurrdto.CachedCurrency, error) {
 	if s.currencyDTO.UpdateDate == "" {
-		if err := s.UpdateCurrencyRates(); err != nil {
+		if err := s.UpdateCurrencyRates(ctx); err != nil {
 			return s.currencyDTO, err
 		}
 	}
@@ -53,10 +54,10 @@ func (s *Service) getCurrencyDTO() (sharcurrdto.CachedCurrency, error) {
 
 // UpdateCurrencyRates is used to update #currencyDTO by calling 3rd party API.
 // In this case #currencyDTO is a cache value of API response for currency USD.
-func (s *Service) UpdateCurrencyRates() error {
+func (s *Service) UpdateCurrencyRates(ctx context.Context) error {
 	log.Println("Start updating currency rates")
 
-	currencyRate, err := s.currencyProvider.GetCurrencyRate()
+	currencyRate, err := s.currencyProvider.GetCurrencyRate(ctx)
 	if err != nil {
 		return err
 	}
@@ -68,5 +69,6 @@ func (s *Service) UpdateCurrencyRates() error {
 	}
 
 	log.Println("Finish updating currency rates")
+
 	return nil
 }

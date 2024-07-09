@@ -1,6 +1,7 @@
 package private
 
 import (
+	"context"
 	"fmt"
 
 	"genesis-currency-api/internal/module/currency/api/external/rater/abstract"
@@ -12,7 +13,7 @@ import (
 )
 
 type CurrencyRater interface {
-	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error)
 }
 
 const (
@@ -41,17 +42,17 @@ func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 }
 
 // GetCurrencyRate gets data from its API and processes it with abstract client.
-func (c *Client) GetCurrencyRate() (*sharcurrdto.ResponseDTO, error) {
-	responseDTO, err := c.getUSDCurrencyFromAPI()
-	return c.abstractClient.ProcessCurrencyResponseDTO(responseDTO, err)
+func (c *Client) GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error) {
+	responseDTO, err := c.getUSDCurrencyFromAPI(ctx)
+	return c.abstractClient.ProcessCurrencyResponseDTO(ctx, responseDTO, err)
 }
 
 // getUSDCurrencyFromAPI retrieves a full set of data from the 3rd party API call.
 // Then it looks for USD currency and in case of occurrence maps response to dto.CurrencyResponseDTO.
 // Returns a dto.CurrencyResponseDTO from all available from 3rd party API currencies.
-func (c *Client) getUSDCurrencyFromAPI() (*sharcurrdto.ResponseDTO, error) {
+func (c *Client) getUSDCurrencyFromAPI(ctx context.Context) (*sharcurrdto.ResponseDTO, error) {
 	var apiResponses []dto.GovUaAPICurrencyResponseDTO
-	err := c.abstractClient.CallAPI(&apiResponses)
+	err := c.abstractClient.CallAPI(ctx, &apiResponses)
 	if err != nil {
 		return nil, fmt.Errorf("calling API: %w", err)
 	}

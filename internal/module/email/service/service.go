@@ -22,7 +22,7 @@ type UserGetter interface {
 }
 
 type DatedCurrencyGetter interface {
-	GetCachedCurrency() (sharcurrdto.CachedCurrency, error)
+	GetCachedCurrency(ctx context.Context) (sharcurrdto.CachedCurrency, error)
 }
 
 type CurrencyEmailData struct {
@@ -56,7 +56,7 @@ func NewService(userGetter UserGetter,
 // Returns error in case of occurrence.
 func (s *Service) SendEmails(ctx context.Context) error {
 	log.Println("Start sending emails")
-	body, err := s.prepareEmail()
+	body, err := s.prepareEmail(ctx)
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func (s *Service) SendEmails(ctx context.Context) error {
 
 // prepareEmail is used to prepare an email. Email consists of an email_template and rate information.
 // Returns prepared email or error.
-func (s *Service) prepareEmail() (*bytes.Buffer, error) {
+func (s *Service) prepareEmail(ctx context.Context) (*bytes.Buffer, error) {
 	// Get an email_template.
 	tmplPath := filepath.Join("pkg", "common", "templates", "email_template.html")
 
@@ -86,7 +86,7 @@ func (s *Service) prepareEmail() (*bytes.Buffer, error) {
 		return nil, errors.NewInvalidStateError("parsing the template file", err)
 	}
 
-	currency, err := s.currencyGetter.GetCachedCurrency()
+	currency, err := s.currencyGetter.GetCachedCurrency(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package abstract
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -12,7 +13,7 @@ import (
 )
 
 type CurrencyRater interface {
-	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error)
 }
 
 type Client struct {
@@ -22,7 +23,9 @@ type Client struct {
 }
 
 // ProcessCurrencyResponseDTO based on the input parameters generates the output.
-func (c *Client) ProcessCurrencyResponseDTO(responseDTO *sharcurrdto.ResponseDTO,
+func (c *Client) ProcessCurrencyResponseDTO(
+	ctx context.Context,
+	responseDTO *sharcurrdto.ResponseDTO,
 	err error,
 ) (*sharcurrdto.ResponseDTO, error) {
 	if err == nil {
@@ -34,13 +37,13 @@ func (c *Client) ProcessCurrencyResponseDTO(responseDTO *sharcurrdto.ResponseDTO
 
 	log.Printf("Error while calling %s: %v", c.ProviderName, err)
 	log.Println("Try next currency getter")
-	return c.Next.GetCurrencyRate()
+	return c.Next.GetCurrencyRate(ctx)
 }
 
 // CallAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
-func (c *Client) CallAPI(resp any) error {
-	httpResp, err := http.Get(c.APIURL)
+func (c *Client) CallAPI(ctx context.Context, resp any) error {
+	httpResp, err := http.NewRequestWithContext(ctx, http.MethodGet, c.APIURL, nil)
 	if err != nil {
 		return errors.NewAPIError(fmt.Sprintf("doing GET request to %s", c.ProviderName), err)
 	}
@@ -50,8 +53,8 @@ func (c *Client) CallAPI(resp any) error {
 		}
 	}()
 
-	if httpResp.StatusCode != http.StatusOK {
-		return errors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.StatusCode), nil)
+	if httpResp.Response.StatusCode != http.StatusOK {
+		return errors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.Response.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(httpResp.Body)

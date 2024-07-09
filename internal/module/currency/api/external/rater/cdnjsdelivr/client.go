@@ -1,6 +1,7 @@
 package cdnjsdelivr
 
 import (
+	"context"
 	"fmt"
 
 	"genesis-currency-api/internal/module/currency/api/external/rater/abstract"
@@ -11,7 +12,7 @@ import (
 )
 
 type CurrencyRater interface {
-	GetCurrencyRate() (*sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error)
 }
 
 type Client struct {
@@ -36,15 +37,15 @@ func NewClient(cnf config.CurrencyRaterConfig) (*Client, error) {
 }
 
 // GetCurrencyRate gets data from its API and processes it with abstract client.
-func (c *Client) GetCurrencyRate() (*sharcurrdto.ResponseDTO, error) {
-	responseDTO, err := c.getUSDCurrencyFromAPI()
-	return c.abstractClient.ProcessCurrencyResponseDTO(responseDTO, err)
+func (c *Client) GetCurrencyRate(ctx context.Context) (*sharcurrdto.ResponseDTO, error) {
+	responseDTO, err := c.getUSDCurrencyFromAPI(ctx)
+	return c.abstractClient.ProcessCurrencyResponseDTO(ctx, responseDTO, err)
 }
 
 // getUSDCurrencyFromAPI calls JsDelivr API and maps it into dto.CurrencyResponseDTO.
-func (c *Client) getUSDCurrencyFromAPI() (*sharcurrdto.ResponseDTO, error) {
+func (c *Client) getUSDCurrencyFromAPI(ctx context.Context) (*sharcurrdto.ResponseDTO, error) {
 	var apiResponse dto.JSDeliverAPICurrencyResponseDTO
-	err := c.abstractClient.CallAPI(&apiResponse)
+	err := c.abstractClient.CallAPI(ctx, &apiResponse)
 	if err != nil {
 		return nil, fmt.Errorf("calling API: %w", err)
 	}

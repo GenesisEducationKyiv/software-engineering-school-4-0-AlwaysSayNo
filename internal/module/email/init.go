@@ -2,6 +2,7 @@ package email
 
 import (
 	"context"
+
 	"genesis-currency-api/internal/module/email/api/handler"
 	"genesis-currency-api/internal/module/email/config"
 	"genesis-currency-api/internal/module/email/service"
@@ -15,7 +16,7 @@ type UserGetter interface {
 }
 
 type DatedCurrencyGetter interface {
-	GetCachedCurrency() (sharcurrdto.CachedCurrency, error)
+	GetCachedCurrency(ctx context.Context) (sharcurrdto.CachedCurrency, error)
 }
 
 type Service interface {

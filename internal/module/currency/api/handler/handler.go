@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	sharcurrdto "genesis-currency-api/internal/shared/dto/currency"
 
@@ -10,8 +12,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	DefaultRequestTime = 60
+)
+
 type Rater interface {
-	GetCurrencyRate() (sharcurrdto.ResponseDTO, error)
+	GetCurrencyRate(ctx context.Context) (sharcurrdto.ResponseDTO, error)
 }
 
 type Handler struct {
@@ -25,7 +31,10 @@ func NewHandler(rater Rater) *Handler {
 }
 
 func (h *Handler) GetLatest(ctx *gin.Context) {
-	if result, err := h.rater.GetCurrencyRate(); err != nil {
+	appCtx, appCancel := context.WithTimeout(ctx, DefaultRequestTime*time.Second)
+	defer appCancel()
+
+	if result, err := h.rater.GetCurrencyRate(appCtx); err != nil {
 		errors.AttachToCtx(err, ctx)
 	} else {
 		ctx.String(http.StatusOK, "%f", result.Number)

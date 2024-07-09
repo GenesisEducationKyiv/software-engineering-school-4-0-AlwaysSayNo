@@ -3,3 +3,5 @@ migrate-up: make -migrate -path internal/module/user/migrations -database "postg
 
 ## fumpt-all
 fumpt-all: gofumpt -w ./..
+
+lint: golintci-linter run
