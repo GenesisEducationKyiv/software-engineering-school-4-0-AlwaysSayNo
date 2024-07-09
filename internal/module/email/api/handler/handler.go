@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
 	"genesis-currency-api/pkg/errors"
@@ -8,7 +9,7 @@ import (
 )
 
 type EmailSender interface {
-	SendEmails() error
+	SendEmails(ctx context.Context) error
 }
 
 type Handler struct {
@@ -22,7 +23,7 @@ func NewHandler(emailSender EmailSender) *Handler {
 }
 
 func (h *Handler) SendEmails(ctx *gin.Context) {
-	err := h.emailSender.SendEmails()
+	err := h.emailSender.SendEmails(ctx)
 	if err != nil {
 		errors.AttachToCtx(err, ctx)
 		return

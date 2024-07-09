@@ -1,6 +1,7 @@
 package email
 
 import (
+	"context"
 	"genesis-currency-api/internal/module/email/api/handler"
 	"genesis-currency-api/internal/module/email/config"
 	"genesis-currency-api/internal/module/email/service"
@@ -18,7 +19,7 @@ type DatedCurrencyGetter interface {
 }
 
 type Service interface {
-	SendEmails() error
+	SendEmails(ctx context.Context) error
 }
 
 type Handler interface {

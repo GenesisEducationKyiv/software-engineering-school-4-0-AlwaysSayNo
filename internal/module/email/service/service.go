@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"log"
@@ -53,14 +54,14 @@ func NewService(userGetter UserGetter,
 // SendEmails is used to send a currency update email to all subscribed users.
 // It sends information (rate, update date).
 // Returns error in case of occurrence.
-func (s *Service) SendEmails() error {
+func (s *Service) SendEmails(ctx context.Context) error {
 	log.Println("Start sending emails")
 	body, err := s.prepareEmail()
 	if err != nil {
 		return err
 	}
 
-	if err := s.send(body); err != nil {
+	if err := s.send(ctx, body); err != nil {
 		log.Println("Unsuccessful finish emails sending")
 		return fmt.Errorf("sending email body: %w", err)
 	}
@@ -103,7 +104,7 @@ func (s *Service) prepareEmail() (*bytes.Buffer, error) {
 // send sends emails to users using the standard library.
 // If the list of users is empty, it will return an error.
 // Returns error in case of occurrence.
-func (s *Service) send(body *bytes.Buffer) error {
+func (s *Service) send(ctx context.Context, body *bytes.Buffer) error {
 	// Empty users list check.
 	users, err := s.userGetter.GetAll()
 	if len(users) == 0 {
@@ -120,9 +121,18 @@ func (s *Service) send(body *bytes.Buffer) error {
 	message := []byte(fmt.Sprintf("%s\r\n%s\r\n%s", s.cnf.EmailSubject, mime, body.String()))
 	auth := smtp.PlainAuth("", s.cnf.SMTPUser, s.cnf.SMTPPassword, s.cnf.SMTPHost)
 
-	err = smtp.SendMail(s.cnf.SMTPHost+":"+s.cnf.SMTPPort, auth, s.cnf.SMTPUser, to, message)
-	if err != nil {
-		return errors.NewInvalidStateError("while sending email:", err)
+	done := make(chan error)
+	go func() {
+		done <- smtp.SendMail(s.cnf.SMTPHost+":"+s.cnf.SMTPPort, auth, s.cnf.SMTPUser, to, message)
+	}()
+
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("email sending cancelled: %w", ctx.Err())
+	case err := <-done:
+		if err != nil {
+			return errors.NewInvalidStateError("while sending email:", err)
+		}
 	}
 
 	log.Println("Finish sending emails")
