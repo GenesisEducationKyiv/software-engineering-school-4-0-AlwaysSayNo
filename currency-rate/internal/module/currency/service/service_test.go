@@ -1,6 +1,7 @@
 package service_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -32,7 +33,7 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenNoCachedValue_checkResult() {
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
-	responseDTO, err := suite.sut.GetCurrencyRate()
+	responseDTO, err := suite.sut.GetCurrencyRate(context.Background())
 	suite.Require().Nil(err)
 
 	// VERIFY
@@ -46,10 +47,10 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenExistsCachedValue_checkResult
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.UpdateCurrencyRates(context.Background())
 	suite.Require().Nil(err)
 
-	responseDTO, err := suite.sut.GetCurrencyRate()
+	responseDTO, err := suite.sut.GetCurrencyRate(context.Background())
 	suite.Require().Nil(err)
 
 	// VERIFY
@@ -62,7 +63,7 @@ func (suite *ServiceSuite) TestGetCurrencyRate_whenError() {
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
 
 	// ACT
-	responseDTO, err := suite.sut.GetCurrencyRate()
+	responseDTO, err := suite.sut.GetCurrencyRate(context.Background())
 
 	// VERIFY
 	suite.NotNil(err)
@@ -77,7 +78,7 @@ func (suite *ServiceSuite) TestGetCachedCurrency_whenExistsCachedValue_checkResu
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
-	cachedCurrency, err := suite.sut.GetCachedCurrency()
+	cachedCurrency, err := suite.sut.GetCachedCurrency(context.Background())
 	suite.Require().Nil(err)
 
 	// VERIFY
@@ -92,10 +93,10 @@ func (suite *ServiceSuite) TestGetCachedCurrency_whenNoCachedValue_checkResult()
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.UpdateCurrencyRates(context.Background())
 	suite.Require().Nil(err)
 
-	cachedCurrency, err := suite.sut.GetCachedCurrency()
+	cachedCurrency, err := suite.sut.GetCachedCurrency(context.Background())
 	suite.Require().Nil(err)
 
 	// VERIFY
@@ -109,7 +110,7 @@ func (suite *ServiceSuite) TestGetCachedCurrency_whenError() {
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
 
 	// ACT
-	cachedCurrency, err := suite.sut.GetCachedCurrency()
+	cachedCurrency, err := suite.sut.GetCachedCurrency(context.Background())
 
 	// VERIFY
 	suite.NotNil(err)
@@ -125,7 +126,7 @@ func (suite *ServiceSuite) TestUpdateCurrencyRates_checkResult() {
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(&sharcurrdto.ResponseDTO{Number: number}, nil)
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.UpdateCurrencyRates(context.Background())
 
 	// VERIFY
 	suite.Nil(err)
@@ -137,7 +138,7 @@ func (suite *ServiceSuite) TestUpdateCurrencyRates_whenError() {
 	suite.currencyProviderMock.On("GetCurrencyRate").Return(nil, fmt.Errorf("test error"))
 
 	// ACT
-	err := suite.sut.UpdateCurrencyRates()
+	err := suite.sut.UpdateCurrencyRates(context.Background())
 
 	// VERIFY
 	suite.NotNil(err)
