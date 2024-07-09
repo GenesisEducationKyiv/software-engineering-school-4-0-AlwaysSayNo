@@ -1,10 +1,19 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"genesis-currency-api/internal/db"
 	dbconf "genesis-currency-api/internal/db/config"
+	"genesis-currency-api/internal/job"
+	"genesis-currency-api/internal/middleware"
 	currencymodule "genesis-currency-api/internal/module/currency"
 	ratecdnjsdelivr "genesis-currency-api/internal/module/currency/api/external/rater/cdnjsdelivr"
 	rategovua "genesis-currency-api/internal/module/currency/api/external/rater/gov_ua"
@@ -18,15 +27,17 @@ import (
 	usermodule "genesis-currency-api/internal/module/user"
 	userhand "genesis-currency-api/internal/module/user/api/handler"
 	userconf "genesis-currency-api/internal/server/config"
-
-	"genesis-currency-api/internal/job"
-	"genesis-currency-api/internal/middleware"
 	"genesis-currency-api/pkg/common/envs"
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
 	envs.Init()
+
+	// CONTEXT
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// DATABASE
 	dbURL := db.GetDatabaseURL(dbconf.LoadDatabaseConfig())
@@ -45,7 +56,10 @@ func main() {
 	r.Use(middleware.ErrorHandler())
 
 	// JOBS
-	job.StartAllJobs(currencyModule.Service, emailModule.Service)
+	scheduler := job.StartAllJobs(
+		job.GetUpdateCurrencyJob(ctx, currencyModule.Service),
+		job.GetSendEmailsJob(ctx, emailModule.Service),
+	)
 
 	// HANDLERS
 	currencyhand.RegisterRoutes(r, currencyModule.Handler)
@@ -53,10 +67,11 @@ func main() {
 	emailhand.RegisterRoutes(r, emailModule.Handler)
 
 	// START SERVER
-	cnf := userconf.LoadServerConfigConfig()
-	if err := r.Run(cnf.ApplicationPort); err != nil {
-		log.Fatal("while server bootstrapping: ", err)
-	}
+	server := startServer(r)
+	waitServerWorking()
+
+	// STOP SERVER
+	gracefulShutdown(ctx, scheduler, server)
 }
 
 func getCurrencyProviderChain() currencyserv.Provider {
@@ -79,4 +94,58 @@ func getCurrencyProviderChain() currencyserv.Provider {
 	privateClient.SetNext(govUaClient)
 
 	return privateClient
+}
+
+func startServer(r *gin.Engine) *http.Server {
+	cnf := userconf.LoadServerConfigConfig()
+	server := &http.Server{
+		Addr:    cnf.ApplicationPort,
+		Handler: r.Handler(),
+	}
+
+	log.Println("Starting server")
+	go func() {
+		// service connections
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Println("Server is started")
+
+	return server
+}
+
+func waitServerWorking() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	sign := <-quit
+	log.Println("Server received next signal:", sign.String())
+}
+
+func gracefulShutdown(ctx context.Context, scheduler *cron.Cron, server *http.Server) {
+	log.Println("Stopping server")
+
+	cnf := userconf.LoadServerConfigConfig()
+	waitSeconds := cnf.GracefulShutdownWaitTimeSeconds
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(ctx, time.Duration(waitSeconds)*time.Second)
+	defer shutdownCancel()
+
+	// STOP JOBS
+	scheduler.Stop()
+
+	// STOP WEB SERVER
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Fatal("server shutdown:", err)
+	}
+
+	select {
+	case <-shutdownCtx.Done():
+		log.Printf("Timeout of %d seconds\n", waitSeconds)
+	}
+
+	// STOP JOBS (hard)
+
+	log.Println("Server exiting")
 }

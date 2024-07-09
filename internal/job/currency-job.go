@@ -1,19 +1,18 @@
 package job
 
 import (
+	"context"
 	"log"
-
-	"github.com/robfig/cron/v3"
 )
 
 type CurrencyUpdater interface {
 	UpdateCurrencyRates() error
 }
 
-// UpdateCurrencyJob is a cron function to update currency service cache.
+// GetUpdateCurrencyJob is a cron function to update currency service cache.
 // It is executed every hour.
-func UpdateCurrencyJob(cron *cron.Cron, currencyUpdater CurrencyUpdater) {
-	_, err := cron.AddFunc("0 * * * *", func() {
+func GetUpdateCurrencyJob(ctx context.Context, currencyUpdater CurrencyUpdater) WithCron {
+	job := func() {
 		log.Println("Start job: Update Currency Rates")
 
 		if err := currencyUpdater.UpdateCurrencyRates(); err != nil {
@@ -21,10 +20,11 @@ func UpdateCurrencyJob(cron *cron.Cron, currencyUpdater CurrencyUpdater) {
 		} else {
 			log.Println("Finish job: Update Currency Rates")
 		}
-	})
+	}
 
-	if err != nil {
-		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
-		return
+	return WithCron{
+		job:  job,
+		cron: "0 * * * *",
+		name: "UpdateCurrencyJob",
 	}
 }

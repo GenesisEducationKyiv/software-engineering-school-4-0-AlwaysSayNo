@@ -1,19 +1,18 @@
 package job
 
 import (
+	"context"
 	"log"
-
-	"github.com/robfig/cron/v3"
 )
 
 type EmailSender interface {
 	SendEmails() error
 }
 
-// SendEmailsJob is a cron function to send emails to subscribed users.
+// GetSendEmailsJob is a cron function to send emails to subscribed users.
 // It is executed every day at 9:00
-func SendEmailsJob(cron *cron.Cron, emailSender EmailSender) {
-	_, err := cron.AddFunc("0 9 * * *", func() {
+func GetSendEmailsJob(ctx context.Context, emailSender EmailSender) WithCron {
+	job := func() {
 		log.Println("Start job: Send Emails")
 
 		if err := emailSender.SendEmails(); err != nil {
@@ -21,10 +20,11 @@ func SendEmailsJob(cron *cron.Cron, emailSender EmailSender) {
 		} else {
 			log.Println("Finish job: Send Emails")
 		}
-	})
+	}
 
-	if err != nil {
-		log.Printf("failed to start UpdateCurrencyJob scheduler: %v\n", err)
-		return
+	return WithCron{
+		job:  job,
+		cron: "0 9 * * *",
+		name: "SendEmailsJob",
 	}
 }
