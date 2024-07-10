@@ -1,6 +1,8 @@
 package config
 
-import "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/common/envs"
+import (
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
+)
 
 type EmailServiceConfig struct {
 	SMTPHost     string

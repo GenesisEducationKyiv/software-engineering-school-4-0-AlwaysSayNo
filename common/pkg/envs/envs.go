@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Init() {
-	viper.SetConfigFile("./pkg/common/envs/.env")
+func Init(path string) {
+	viper.SetConfigFile(path)
 	viper.AutomaticEnv() // allow viper automatically read os variables
 
 	err := viper.ReadInConfig()

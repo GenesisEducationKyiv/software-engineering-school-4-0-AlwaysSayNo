@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
 	"log"
 	"net/http"
 	"os"
@@ -27,13 +28,12 @@ import (
 	usermodule "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user"
 	userhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/api/handler"
 	userconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/server/config"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/common/envs"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
 )
 
 func main() {
-	envs.Init()
+	envs.Init("./pkg/common/envs/.env")
 
 	// CONTEXT
 	ctx, cancel := context.WithCancel(context.Background())
