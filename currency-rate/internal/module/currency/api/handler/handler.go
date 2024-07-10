@@ -2,12 +2,11 @@ package handler
 
 import (
 	"context"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"net/http"
 	"time"
 
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
-
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,7 +34,7 @@ func (h *Handler) GetLatest(ctx *gin.Context) {
 	defer appCancel()
 
 	if result, err := h.rater.GetCurrencyRate(appCtx); err != nil {
-		errors.AttachToCtx(err, ctx)
+		apperrors.AttachToCtx(err, ctx)
 	} else {
 		ctx.String(http.StatusOK, "%f", result.Number)
 	}

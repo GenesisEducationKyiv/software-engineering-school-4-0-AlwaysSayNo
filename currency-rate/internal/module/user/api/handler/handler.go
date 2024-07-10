@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"net/http"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/dto"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
 
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,7 +33,7 @@ func (h *Handler) Add(ctx *gin.Context) {
 
 	_, err := h.userService.Save(saveDto)
 	if err != nil {
-		errors.AttachToCtx(err, ctx)
+		apperrors.AttachToCtx(err, ctx)
 		return
 	}
 
@@ -43,7 +43,7 @@ func (h *Handler) Add(ctx *gin.Context) {
 func (h *Handler) FindAll(ctx *gin.Context) {
 	result, err := h.userService.GetAll()
 	if err != nil {
-		errors.AttachToCtx(err, ctx)
+		apperrors.AttachToCtx(err, ctx)
 		return
 	}
 

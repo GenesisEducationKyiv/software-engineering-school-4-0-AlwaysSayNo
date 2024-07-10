@@ -3,10 +3,10 @@ package service
 import (
 	"fmt"
 
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/dto"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/model"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
-	apperrors "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 )
 
 type Repository interface {

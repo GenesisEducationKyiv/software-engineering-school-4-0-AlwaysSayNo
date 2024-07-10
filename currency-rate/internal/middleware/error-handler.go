@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"net/http"
 
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,11 +20,11 @@ func ErrorHandler() gin.HandlerFunc {
 			err := c.Errors[0].Err
 
 			switch e := err.(type) {
-			case *errors.ValidationError:
+			case *apperrors.ValidationError:
 				c.JSON(http.StatusBadRequest, ErrorResponse{Message: e.Error()})
-			case *errors.UserWithEmailExistsError:
+			case *apperrors.UserWithEmailExistsError:
 				c.JSON(http.StatusBadRequest, "Повертати, якщо e-mail вже є в базі даних")
-			case *errors.InvalidInputError:
+			case *apperrors.InvalidInputError:
 				c.JSON(http.StatusBadRequest, ErrorResponse{Message: e.Error()})
 			default:
 				c.JSON(http.StatusInternalServerError, ErrorResponse{Message: "unknown error"})

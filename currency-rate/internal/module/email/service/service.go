@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"html/template"
 	"log"
 	"net/smtp"
@@ -13,8 +14,6 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/email/config"
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
-
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 )
 
 type UserGetter interface {
@@ -78,12 +77,12 @@ func (s *Service) prepareEmail(ctx context.Context) (*bytes.Buffer, error) {
 
 	tmpl, err := os.ReadFile(tmplPath)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("reading the template file", err)
+		return nil, apperrors.NewInvalidStateError("reading the template file", err)
 	}
 
 	t, err := template.New("email").Parse(string(tmpl))
 	if err != nil {
-		return nil, errors.NewInvalidStateError("parsing the template file", err)
+		return nil, apperrors.NewInvalidStateError("parsing the template file", err)
 	}
 
 	currency, err := s.currencyGetter.GetCachedCurrency(ctx)
@@ -95,7 +94,7 @@ func (s *Service) prepareEmail(ctx context.Context) (*bytes.Buffer, error) {
 	var body bytes.Buffer
 	err = t.Execute(&body, currency)
 	if err != nil {
-		return nil, errors.NewInvalidStateError("executing template:", err)
+		return nil, apperrors.NewInvalidStateError("executing template:", err)
 	}
 
 	return &body, nil
@@ -108,7 +107,7 @@ func (s *Service) send(ctx context.Context, body *bytes.Buffer) error {
 	// Empty users list check.
 	users, err := s.userGetter.GetAll()
 	if len(users) == 0 {
-		return errors.NewInvalidStateError("emails list is empty", err)
+		return apperrors.NewInvalidStateError("emails list is empty", err)
 	}
 
 	to := make([]string, 0, len(users))
@@ -131,7 +130,7 @@ func (s *Service) send(ctx context.Context, body *bytes.Buffer) error {
 		return fmt.Errorf("email sending cancelled: %w", ctx.Err())
 	case err := <-done:
 		if err != nil {
-			return errors.NewInvalidStateError("while sending email:", err)
+			return apperrors.NewInvalidStateError("while sending email:", err)
 		}
 	}
 

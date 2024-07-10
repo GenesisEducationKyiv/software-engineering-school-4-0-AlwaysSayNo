@@ -3,13 +3,13 @@ package private
 import (
 	"context"
 	"fmt"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/external/rater/abstract"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/dto"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/util/parser"
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 )
 
 type CurrencyRater interface {
@@ -64,7 +64,7 @@ func (c *Client) getUSDCurrencyFromAPI(ctx context.Context) (*sharcurrdto.Respon
 		}
 	}
 
-	return nil, errors.NewAPIError("No currency USD was found", nil)
+	return nil, apperrors.NewAPIError("No currency USD was found", nil)
 }
 
 // SetNext sets a next rater into raters chain.

@@ -1,8 +1,8 @@
-package errors
+package apperrors
 
 import "fmt"
 
-// customError is used to create own types of errors and handle them appropriately.
+// customError is used to create own types of apperrors and handle them appropriately.
 // It implements interface for standard error.
 type customError struct {
 	Message string

@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"net/http"
 
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ func NewHandler(emailSender EmailSender) *Handler {
 func (h *Handler) SendEmails(ctx *gin.Context) {
 	err := h.emailSender.SendEmails(ctx)
 	if err != nil {
-		errors.AttachToCtx(err, ctx)
+		apperrors.AttachToCtx(err, ctx)
 		return
 	}
 

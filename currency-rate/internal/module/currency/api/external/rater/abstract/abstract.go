@@ -4,12 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"io"
 	"log"
 	"net/http"
 
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/errors"
 )
 
 type CurrencyRater interface {
@@ -45,7 +45,7 @@ func (c *Client) ProcessCurrencyResponseDTO(
 func (c *Client) CallAPI(ctx context.Context, resp any) error {
 	httpResp, err := http.NewRequestWithContext(ctx, http.MethodGet, c.APIURL, nil)
 	if err != nil {
-		return errors.NewAPIError(fmt.Sprintf("doing GET request to %s", c.ProviderName), err)
+		return apperrors.NewAPIError(fmt.Sprintf("doing GET request to %s", c.ProviderName), err)
 	}
 	defer func() {
 		if err := httpResp.Body.Close(); err != nil {
@@ -54,12 +54,12 @@ func (c *Client) CallAPI(ctx context.Context, resp any) error {
 	}()
 
 	if httpResp.Response.StatusCode != http.StatusOK {
-		return errors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.Response.StatusCode), nil)
+		return apperrors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.Response.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(httpResp.Body)
 	if err != nil {
-		return errors.NewInvalidStateError("reading response body", err)
+		return apperrors.NewInvalidStateError("reading response body", err)
 	}
 
 	if err := json.Unmarshal(body, &resp); err != nil {
