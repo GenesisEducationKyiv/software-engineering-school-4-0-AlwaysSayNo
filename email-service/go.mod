@@ -4,7 +4,10 @@ go 1.22.3
 
 replace github.com/AlwaysSayNo/genesis-currency-api/common => ../common
 
-require github.com/AlwaysSayNo/genesis-currency-api/common v0.0.0-00010101000000-000000000000
+require (
+	github.com/AlwaysSayNo/genesis-currency-api/common v0.0.0-00010101000000-000000000000
+	github.com/rabbitmq/amqp091-go v1.10.0
+)
 
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect

@@ -137,7 +137,7 @@ func gracefulShutdown(ctx context.Context, scheduler *cron.Cron, server *http.Se
 
 	// STOP WEB SERVER
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatal("server shutdown:", err)
+		log.Printf("server shutdown: %v", err)
 	}
 
 	select {
