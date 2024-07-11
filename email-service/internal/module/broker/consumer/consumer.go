@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"fmt"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -10,17 +11,69 @@ import (
 
 var listenerMutex = sync.Mutex{}
 
-type Listener func([]byte) error
-
 type Consumer struct {
 	conn      *amqp.Connection
 	channel   *amqp.Channel
 	messages  <-chan amqp.Delivery
-	listeners []Listener
+	listeners []broker.Listener //todo how to do this properly
 	cnf       config.ConsumerConfig
 }
 
-func (c *Consumer) Subscribe(listener Listener) {
+func NewConsumer(cnf config.ConsumerConfig) (*Consumer, error) {
+	conn, err := amqp.Dial(cnf.BrokerURI)
+	if err != nil {
+		return nil, fmt.Errorf("dialing amqp: %w", err)
+	}
+
+	ch, err := conn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("getting channel: %w", err)
+	}
+
+	q, err := ch.QueueDeclare(
+		cnf.QueueName, // name
+		false,         // durable
+		false,         // delete when unused
+		false,         // exclusive
+		false,         // no-wait
+		nil,           // arguments
+	)
+	if err != nil {
+		return nil, fmt.Errorf("declaring queue: %w", err)
+	}
+
+	err = ch.Qos(
+		1,     // prefetch count
+		0,     // prefetch size
+		false, // global
+	)
+	if err != nil {
+		return nil, fmt.Errorf("setting QoS: %w", err)
+	}
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		return nil, fmt.Errorf("delivery creating: %w", err)
+	}
+
+	return &Consumer{
+		conn:      conn,
+		channel:   ch,
+		messages:  msgs,
+		listeners: make([]broker.Listener, 0),
+		cnf:       cnf,
+	}, nil
+}
+
+func (c *Consumer) Subscribe(listener broker.Listener) {
 	log.Printf("Start subscribing new listener")
 
 	listenerMutex.Lock()
@@ -69,55 +122,4 @@ func (c *Consumer) Close() error {
 
 	log.Println("Stop listening")
 	return nil
-}
-
-func NewConsumer(cnf config.ConsumerConfig) (*Consumer, error) {
-	conn, err := amqp.Dial(cnf.BrokerURI)
-	if err != nil {
-		return nil, fmt.Errorf("dialing amqp: %w", err)
-	}
-
-	ch, err := conn.Channel()
-	if err != nil {
-		return nil, fmt.Errorf("getting channel: %w", err)
-	}
-
-	q, err := ch.QueueDeclare(
-		cnf.QueueName, // name
-		false,         // durable
-		false,         // delete when unused
-		false,         // exclusive
-		false,         // no-wait
-		nil,           // arguments
-	)
-
-	err = ch.Qos(
-		1,     // prefetch count
-		0,     // prefetch size
-		false, // global
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("declaring queue: %w", err)
-	}
-	msgs, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	if err != nil {
-		return nil, fmt.Errorf("delivery creating: %w", err)
-	}
-
-	return &Consumer{
-		conn:      conn,
-		channel:   ch,
-		messages:  msgs,
-		listeners: make([]Listener, 0),
-		cnf:       cnf,
-	}, nil
 }

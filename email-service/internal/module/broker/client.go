@@ -1,4 +1,4 @@
-package client
+package broker
 
 import (
 	"context"
@@ -15,8 +15,16 @@ const (
 	MailerCommandType = "SendEmails"
 )
 
+type Listener func([]byte) error
+
 type Mailer interface {
 	SendEmail(ctx context.Context, emails []string, subject, message string) error
+}
+
+type Consumer interface {
+	Subscribe(listener Listener)
+	Listen(stop <-chan struct{})
+	Close() error
 }
 
 type Command struct {
@@ -27,14 +35,14 @@ type Command struct {
 }
 
 type Data struct {
-	Emails  []string
-	Subject string
-	Body    string
+	Emails  []string `json:"emails"`
+	Subject string   `json:"subject"`
+	Body    string   `json:"body"`
 }
 
 type Client struct {
 	stop     chan struct{}
-	consumer *consumer.Consumer
+	consumer Consumer
 }
 
 func NewClient(cnf config.ConsumerConfig) (*Client, error) {

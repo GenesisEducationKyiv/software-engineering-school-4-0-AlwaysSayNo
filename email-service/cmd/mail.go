@@ -3,7 +3,7 @@ package cmd
 import (
 	"context"
 	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/client"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker"
 	conscnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
 	mailcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service"
@@ -23,7 +23,7 @@ func main() {
 
 	mailer := getMailer(mailcnf.LoadMailerConfig())
 
-	mailerClient, err := client.NewClient(conscnf.LoadConsumerConfig())
+	mailerClient, err := broker.NewClient(conscnf.LoadConsumerConfig())
 	if err != nil {
 		log.Fatalf("making mailer client: %v", err)
 	}
@@ -60,7 +60,7 @@ func waitServerWorking() {
 	log.Println("Server received next signal:", sign.String())
 }
 
-func gracefulShutdown(ctx context.Context, mailerClient client.Client) {
+func gracefulShutdown(ctx context.Context, mailerClient broker.Client) {
 	log.Println("Stopping server")
 
 	cnf := servcnf.LoadServerConfigConfig()
