@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail"
+	prodcnf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer/config"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier"
 	"log"
 	"net/http"
 	"os"
@@ -22,8 +25,6 @@ import (
 	currencyhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/handler"
 	currencyconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/config"
 	currencyserv "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/service"
-	emailmodule "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/email"
-	emailhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/email/api/handler"
 	emailconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/email/config"
 	usermodule "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user"
 	userhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/api/handler"
@@ -49,7 +50,11 @@ func main() {
 	// MODULES
 	userModule := usermodule.Init(d)
 	currencyModule := currencymodule.Init(currencyProvider)
-	emailModule := emailmodule.Init(userModule.Service, currencyModule.Service, emailconf.LoadEmailServiceConfig())
+	//emailModule := emailmodule.Init(userModule.Service, currencyModule.Service, emailconf.LoadEmailServiceConfig())
+
+	// EMAIL PRODUCER CLIENT
+	mailClient := getMailClient()
+	mailNotifier := notifier.NewEmailNotifier(mailClient, currencyModule.Service, userModule.Service, emailconf.LoadEmailServiceConfig())
 
 	// ENGINE
 	r := gin.Default()
@@ -58,20 +63,20 @@ func main() {
 	// JOBS
 	scheduler := job.StartAllJobs(
 		job.GetUpdateCurrencyJob(ctx, currencyModule.Service),
-		job.GetSendEmailsJob(ctx, emailModule.Service),
+		job.GetSendEmailsJob(ctx, mailNotifier),
 	)
 
 	// HANDLERS
 	currencyhand.RegisterRoutes(r, currencyModule.Handler)
 	userhand.RegisterRoutes(r, userModule.Handler)
-	emailhand.RegisterRoutes(r, emailModule.Handler)
+	//emailhand.RegisterRoutes(r, emailModule.Handler)
 
 	// START SERVER
 	server := startServer(r)
 	waitServerWorking()
 
 	// STOP SERVER
-	gracefulShutdown(ctx, scheduler, server)
+	gracefulShutdown(ctx, scheduler, server, mailClient)
 }
 
 func getCurrencyProviderChain() currencyserv.Provider {
@@ -94,6 +99,15 @@ func getCurrencyProviderChain() currencyserv.Provider {
 	privateClient.SetNext(govUaClient)
 
 	return privateClient
+}
+
+func getMailClient() *mail.Client {
+	mailClient, err := mail.NewClient(prodcnf.LoadProducerConfig())
+	if err != nil {
+		log.Fatalf("generating mail client: %v", err)
+	}
+
+	return mailClient
 }
 
 func startServer(r *gin.Engine) *http.Server {
@@ -123,7 +137,7 @@ func waitServerWorking() {
 	log.Println("Server received next signal:", sign.String())
 }
 
-func gracefulShutdown(ctx context.Context, scheduler *cron.Cron, server *http.Server) {
+func gracefulShutdown(ctx context.Context, scheduler *cron.Cron, server *http.Server, mailClient *mail.Client) {
 	log.Println("Stopping server")
 
 	cnf := userconf.LoadServerConfigConfig()
@@ -138,6 +152,11 @@ func gracefulShutdown(ctx context.Context, scheduler *cron.Cron, server *http.Se
 	// STOP WEB SERVER
 	if err := server.Shutdown(shutdownCtx); err != nil {
 		log.Printf("server shutdown: %v", err)
+	}
+
+	// STOP MAIL CLIENT
+	if err := mailClient.Close(); err != nil {
+		log.Printf("stopping mail client: %v", err)
 	}
 
 	select {
