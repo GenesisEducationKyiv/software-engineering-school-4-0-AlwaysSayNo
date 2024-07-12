@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

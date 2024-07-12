@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
 	"io"
 	"log"
 	"net/http"

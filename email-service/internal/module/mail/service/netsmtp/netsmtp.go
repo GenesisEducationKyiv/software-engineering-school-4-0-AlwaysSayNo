@@ -3,8 +3,8 @@ package netsmtp
 import (
 	"context"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/apperrors"
 	"log"
 	"net/smtp"
 )

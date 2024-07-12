@@ -1,6 +1,6 @@
 package config
 
-import "github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
+import "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/envs"
 
 type ProducerConfig struct {
 	BrokerURI string

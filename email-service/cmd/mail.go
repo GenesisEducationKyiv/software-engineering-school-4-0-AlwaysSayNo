@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker"
 	conscnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
 	mailcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
@@ -10,6 +9,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/console"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/netsmtp"
 	servcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/server/config"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/envs"
 	"log"
 	"os"
 	"os/signal"

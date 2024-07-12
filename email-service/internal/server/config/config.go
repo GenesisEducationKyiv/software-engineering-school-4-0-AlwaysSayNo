@@ -1,6 +1,6 @@
 package config
 
-import "github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
+import "github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/envs"
 
 type ServerConfig struct {
 	GracefulShutdownWaitTimeSeconds int

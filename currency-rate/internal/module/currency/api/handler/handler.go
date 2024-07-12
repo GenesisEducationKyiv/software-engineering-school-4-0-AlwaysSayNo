@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
 	"net/http"
 	"time"
 
