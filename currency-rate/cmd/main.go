@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/envs"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail"
 	prodcnf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier"
 	emailconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/config"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/envs"
 	"log"
 	"net/http"
 	"os"
@@ -28,6 +28,7 @@ import (
 	currencyserv "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/service"
 	usermodule "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user"
 	userhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/api/handler"
+	notihand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/api/handler"
 	userconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/server/config"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
@@ -50,11 +51,10 @@ func main() {
 	// MODULES
 	userModule := usermodule.Init(d)
 	currencyModule := currencymodule.Init(currencyProvider)
-	//emailModule := emailmodule.Init(userModule.Service, currencyModule.Service, emailconf.LoadEmailServiceConfig())
 
-	// EMAIL PRODUCER CLIENT
 	mailClient := getMailClient()
-	mailNotifier := notifier.NewEmailNotifier(mailClient, currencyModule.Service, userModule.Service, emailconf.LoadEmailServiceConfig())
+	notifierModule := notifier.Init(mailClient, currencyModule.Service,
+		userModule.Service, emailconf.LoadEmailServiceConfig())
 
 	// ENGINE
 	r := gin.Default()
@@ -63,13 +63,13 @@ func main() {
 	// JOBS
 	scheduler := job.StartAllJobs(
 		job.GetUpdateCurrencyJob(ctx, currencyModule.Service),
-		job.GetSendEmailsJob(ctx, mailNotifier),
+		job.GetSendEmailsJob(ctx, notifierModule.EmailNotifier),
 	)
 
 	// HANDLERS
 	currencyhand.RegisterRoutes(r, currencyModule.Handler)
 	userhand.RegisterRoutes(r, userModule.Handler)
-	//emailhand.RegisterRoutes(r, emailModule.Handler)
+	notihand.RegisterRoutes(r, notifierModule.Handler)
 
 	// START SERVER
 	server := startServer(r)

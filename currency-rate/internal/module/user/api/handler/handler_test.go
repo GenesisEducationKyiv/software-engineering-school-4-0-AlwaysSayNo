@@ -14,8 +14,8 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/dto"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
 
-	myerrors "github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/middleware"
+	myerrors "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
@@ -39,7 +39,7 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.emailNotifier = new(mocks.EmailNotifier)
 	suite.router.Use(middleware.ErrorHandler())
 
-	userHandler := handler.NewHandler(suite.userService, suite.emailNotifier)
+	userHandler := handler.NewHandler(suite.userService)
 	handler.RegisterRoutes(suite.router, userHandler)
 }
 
