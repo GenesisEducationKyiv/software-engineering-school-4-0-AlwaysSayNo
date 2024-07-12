@@ -3,6 +3,7 @@ package handler_test
 import (
 	"encoding/json"
 	"errors"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/mocks"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -15,15 +16,15 @@ import (
 
 	myerrors "github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/middleware"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )
 
 type HandlerTestSuite struct {
 	suite.Suite
-	router      *gin.Engine
-	userService *mocks.UserService
+	router        *gin.Engine
+	userService   *mocks.UserService
+	emailNotifier *mocks.EmailNotifier
 }
 
 func TestHandlerTestSuite(t *testing.T) {
@@ -35,9 +36,10 @@ func (suite *HandlerTestSuite) SetupTest() {
 	suite.router = gin.New()
 
 	suite.userService = new(mocks.UserService)
+	suite.emailNotifier = new(mocks.EmailNotifier)
 	suite.router.Use(middleware.ErrorHandler())
 
-	userHandler := handler.NewHandler(suite.userService)
+	userHandler := handler.NewHandler(suite.userService, suite.emailNotifier)
 	handler.RegisterRoutes(suite.router, userHandler)
 }
 

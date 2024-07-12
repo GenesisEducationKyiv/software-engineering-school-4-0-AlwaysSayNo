@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
 	"net/http"
 
@@ -15,13 +16,19 @@ type UserService interface {
 	GetAll() ([]user.ResponseDTO, error)
 }
 
-type Handler struct {
-	userService UserService
+type MailNotifier interface {
+	Notify(ctx context.Context) error
 }
 
-func NewHandler(saver UserService) *Handler {
+type Handler struct {
+	userService  UserService
+	mailNotifier MailNotifier
+}
+
+func NewHandler(saver UserService, emailNotifier MailNotifier) *Handler {
 	return &Handler{
-		userService: saver,
+		userService:  saver,
+		mailNotifier: emailNotifier,
 	}
 }
 
@@ -48,4 +55,14 @@ func (h *Handler) FindAll(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, &result)
+}
+
+func (h *Handler) SendEmails(ctx *gin.Context) {
+	err := h.mailNotifier.Notify(ctx)
+	if err != nil {
+		apperrors.AttachToCtx(err, ctx)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Emails are successfully sent")
 }
