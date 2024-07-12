@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/AlwaysSayNo/genesis-currency-api/common/pkg/apperrors"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/email/config"
+	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/config"
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
 	"html/template"

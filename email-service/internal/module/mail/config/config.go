@@ -18,6 +18,5 @@ func LoadMailerConfig() MailerConfig {
 		SMTPPort:     envs.Get("SMTP_PORT"),
 		SMTPUser:     envs.Get("SMTP_USER"),
 		SMTPPassword: envs.Get("SMTP_PASSWORD"),
-		EmailSubject: envs.Get("EMAIL_SUBJECT"),
 	}
 }

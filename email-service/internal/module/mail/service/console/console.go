@@ -1,4 +1,4 @@
-package service
+package console
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 	"log"
 )
 
-type ConsoleMailer struct {
+type Mailer struct {
 	cnf config.MailerConfig
 }
 
-func (m *ConsoleMailer) SendEmail(
+func (m *Mailer) SendEmail(
 	_ context.Context, emails []string,
 	subject, message string,
 ) error {
@@ -24,6 +24,6 @@ func (m *ConsoleMailer) SendEmail(
 	return nil
 }
 
-func NewConsoleMailer(cnf config.MailerConfig) *ConsoleMailer {
-	return &ConsoleMailer{cnf: cnf}
+func NewConsoleMailer(cnf config.MailerConfig) *Mailer {
+	return &Mailer{cnf: cnf}
 }

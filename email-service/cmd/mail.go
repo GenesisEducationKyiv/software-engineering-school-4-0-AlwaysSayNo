@@ -7,6 +7,8 @@ import (
 	conscnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
 	mailcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/console"
+	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/netsmtp"
 	servcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/server/config"
 	"log"
 	"os"
@@ -44,9 +46,9 @@ func getMailer(cnf mailcnf.MailerConfig) *service.Mailer {
 
 	switch cnf.Type {
 	case "console":
-		mailer = service.NewConsoleMailer(cnf)
+		mailer = console.NewConsoleMailer(cnf)
 	case "net/smtp":
-		mailer = service.NewNetSMTPMailer(cnf)
+		mailer = netsmtp.NewNetSMTPMailer(cnf)
 	}
 
 	return &mailer
