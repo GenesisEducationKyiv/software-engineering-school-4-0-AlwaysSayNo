@@ -3,7 +3,6 @@ module github.com/AlwaysSayNo/genesis-currency-api/currency-rate
 go 1.22.3
 
 require (
-	github.com/AlwaysSayNo/genesis-currency-api/common v0.0.0-00010101000000-000000000000
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/robfig/cron/v3 v3.0.1
@@ -113,5 +112,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/AlwaysSayNo/genesis-currency-api/common => ../common
