@@ -2,7 +2,6 @@ package consumer
 
 import (
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -11,11 +10,13 @@ import (
 
 var listenerMutex = sync.Mutex{}
 
+type Listener func([]byte) error
+
 type Consumer struct {
 	conn      *amqp.Connection
 	channel   *amqp.Channel
 	messages  <-chan amqp.Delivery
-	listeners []broker.Listener //todo how to do this properly
+	listeners []Listener //todo how to do this properly
 	cnf       config.ConsumerConfig
 }
 
@@ -68,12 +69,12 @@ func NewConsumer(cnf config.ConsumerConfig) (*Consumer, error) {
 		conn:      conn,
 		channel:   ch,
 		messages:  msgs,
-		listeners: make([]broker.Listener, 0),
+		listeners: make([]Listener, 0),
 		cnf:       cnf,
 	}, nil
 }
 
-func (c *Consumer) Subscribe(listener broker.Listener) {
+func (c *Consumer) Subscribe(listener Listener) {
 	log.Printf("Start subscribing new listener")
 
 	listenerMutex.Lock()
@@ -81,7 +82,7 @@ func (c *Consumer) Subscribe(listener broker.Listener) {
 
 	c.listeners = append(c.listeners, listener)
 
-	log.Printf("Finish subscribing new listener. Length: %d", len(c.listeners)+1)
+	log.Printf("Finish subscribing new listener. Length: %d", len(c.listeners))
 }
 
 func (c *Consumer) Listen(stop <-chan struct{}) {

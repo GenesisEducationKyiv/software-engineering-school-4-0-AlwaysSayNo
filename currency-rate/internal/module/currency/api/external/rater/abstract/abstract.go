@@ -43,7 +43,12 @@ func (c *Client) ProcessCurrencyResponseDTO(
 // CallAPI prepares and executes call to the 3rd party API.
 // Returns all available from 3rd party API currencies with the original schema.
 func (c *Client) CallAPI(ctx context.Context, resp any) error {
-	httpResp, err := http.NewRequestWithContext(ctx, http.MethodGet, c.APIURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.APIURL, nil)
+	if err != nil {
+		return apperrors.NewAPIError(fmt.Sprintf("making GET request to %s", c.ProviderName), err)
+	}
+
+	httpResp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return apperrors.NewAPIError(fmt.Sprintf("doing GET request to %s", c.ProviderName), err)
 	}
@@ -53,8 +58,8 @@ func (c *Client) CallAPI(ctx context.Context, resp any) error {
 		}
 	}()
 
-	if httpResp.Response.StatusCode != http.StatusOK {
-		return apperrors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.Response.StatusCode), nil)
+	if httpResp.StatusCode != http.StatusOK {
+		return apperrors.NewAPIError(fmt.Sprintf("unexpected response status code: %d\n", httpResp.StatusCode), nil)
 	}
 
 	body, err := io.ReadAll(httpResp.Body)

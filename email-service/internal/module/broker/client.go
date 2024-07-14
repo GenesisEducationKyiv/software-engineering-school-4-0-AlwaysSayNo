@@ -15,20 +15,18 @@ const (
 	MailerCommandType = "SendEmails"
 )
 
-type Listener func([]byte) error
-
 type Mailer interface {
 	SendEmail(ctx context.Context, emails []string, subject, message string) error
 }
 
 type Consumer interface {
-	Subscribe(listener Listener)
+	Subscribe(listener consumer.Listener)
 	Listen(stop <-chan struct{})
 	Close() error
 }
 
 type Command struct {
-	ID        int    `json:"id"`
+	ID        string `json:"id"`
 	Type      string `json:"type"`
 	Timestamp string `json:"timestamp"`
 	Data      Data   `json:"data"`
@@ -74,7 +72,7 @@ func (c *Client) Subscribe(ctx context.Context, mailer Mailer) error {
 			return nil
 		}
 
-		log.Printf("Command (id: %d, timestamp: %s)", cmd.ID, cmd.Timestamp)
+		log.Printf("Command (id: %s, timestamp: %s)", cmd.ID, cmd.Timestamp)
 
 		return mailer.SendEmail(ctx, cmd.Data.Emails, cmd.Data.Subject, cmd.Data.Body)
 	})

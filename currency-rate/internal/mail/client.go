@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	eventType = "SendEmail"
+	eventType = "SendEmails"
 )
 
 type Command struct {

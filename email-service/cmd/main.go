@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -49,6 +49,8 @@ func getMailer(cnf mailcnf.MailerConfig) *service.Mailer {
 		mailer = console.NewConsoleMailer(cnf)
 	case "net/smtp":
 		mailer = netsmtp.NewNetSMTPMailer(cnf)
+	default:
+		mailer = console.NewConsoleMailer(cnf)
 	}
 
 	return &mailer
