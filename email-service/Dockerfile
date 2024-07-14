@@ -6,9 +6,6 @@ WORKDIR /app
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
-# Завантажуємо та встановлюємо інструмент migrate
-RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-
 RUN --mount=type=cache,target=/go/pkg/mod \
   --mount=type=cache,target=/root/.cache/go-build \
   go mod download
@@ -30,23 +27,11 @@ ENV GIN_MODE=release
 
 WORKDIR /
 
-# Install bash and required libraries
-RUN apk add --no-cache bash libc6-compat
-
 # Copy the app binary from the build stage
 COPY --from=build /app/main /main
 
 # Copy the .env file
 COPY --from=build /app/pkg/common/envs/.env ./pkg/common/envs/.env
-
-# Copy migrate binary
-COPY --from=build /go/bin/migrate /usr/local/bin/migrate
-
-# Copy migration files
-COPY --from=build /app/internal/module/user/migrations /migrations
-
-# Copy template files
-COPY --from=build /app/pkg/common/templates /pkg/common/templates
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
