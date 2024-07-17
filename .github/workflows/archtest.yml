@@ -1,0 +1,25 @@
+name: Architecture test
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.3'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Install Arch-Go
+        run: go install github.com/fdaines/arch-go@latest
+
+      - name: Run Arch-Go
+        run: arch-go

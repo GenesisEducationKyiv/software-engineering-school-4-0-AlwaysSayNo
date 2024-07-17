@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  my_postgres:
+    image: postgres:15.1
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.9.11-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    restart: always
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+    healthcheck:
+      test: rabbitmq-diagnostics -q status
+      start_period: 10s
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  currency-rate-service:
+    container_name: currency-rate-service
+    build:
+      context: ./currency-rate
+      dockerfile: Dockerfile
+    depends_on:
+      my_postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./currency-rate/.env
+    command: /bin/sh -c "migrate -path /migrations -database 'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable' up && ./main"
+
+  email-service:
+    container_name: email-service
+    build:
+      context: ./email-service
+      dockerfile: Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./email-service/.env
+
+volumes:
+  postgres_volume:
