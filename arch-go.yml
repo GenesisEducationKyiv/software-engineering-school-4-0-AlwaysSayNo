@@ -20,6 +20,7 @@ dependenciesRules:
         - "internal.middleware.**"
 
         - "pkg/common/envs"
+
       external:
         - "github.com/gin-gonic.**"
 
