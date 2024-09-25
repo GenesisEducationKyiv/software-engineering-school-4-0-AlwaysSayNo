@@ -17,6 +17,18 @@ import (
 	"time"
 )
 
+// mailerClient
+//	- has an emailConsumer:
+//		- subscribes to RabbitMQ and listens to events
+//		- has listeners slice - functions which process messages from the queue
+// 		- Subscribe - subscribes a new consumer to the listeners slice
+// 		- Listen - function that listens either to queue or to the stop channel
+// 		- handleMessage - sends messages to the listeners
+//		- Close - closes connections to the queue
+//	- Subscribe - receives a mailer, creates a function and passes it to the consumer
+//	- Close - stops emailConsumer#Listen routine and calls emailConsumer#Close function
+//	- defines an interface for mailer command
+
 func main() {
 	envs.Init("./pkg/common/envs/.env")
 

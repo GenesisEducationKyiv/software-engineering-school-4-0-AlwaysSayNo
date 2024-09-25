@@ -46,7 +46,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - ./currency-rate/.env
+      - .env
     command: /bin/sh -c "migrate -path /migrations -database 'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable' up && ./main"
 
   email-service:

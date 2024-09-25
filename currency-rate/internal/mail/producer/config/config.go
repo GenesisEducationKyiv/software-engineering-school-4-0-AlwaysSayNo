@@ -9,7 +9,7 @@ type ProducerConfig struct {
 
 func LoadProducerConfig() ProducerConfig {
 	return ProducerConfig{
-		BrokerURI: envs.Get("BROKER_URI"),
-		QueueName: envs.Get("QUEUE_NAME"),
+		BrokerURI: envs.Get("CURRENCY_SERVICE_BROKER_URI"),
+		QueueName: envs.Get("CURRENCY_SERVICE_QUEUE_NAME"),
 	}
 }

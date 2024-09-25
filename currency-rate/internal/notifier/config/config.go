@@ -10,6 +10,6 @@ type EmailServiceConfig struct {
 
 func LoadEmailServiceConfig() EmailServiceConfig {
 	return EmailServiceConfig{
-		EmailSubject: envs.Get("EMAIL_SUBJECT"),
+		EmailSubject: envs.Get("CURRENCY_SERVICE_EMAIL_SUBJECT"),
 	}
 }

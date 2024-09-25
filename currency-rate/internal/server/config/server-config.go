@@ -11,7 +11,7 @@ type ServerConfig struct {
 
 func LoadServerConfigConfig() ServerConfig {
 	return ServerConfig{
-		ApplicationPort:                 envs.Get("APP_PORT"),
-		GracefulShutdownWaitTimeSeconds: envs.GetInt("GRACEFUL_SHUTDOWN_WAIT_TIME_SECONDS"),
+		ApplicationPort:                 envs.Get("CURRENCY_SERVICE_APP_PORT"),
+		GracefulShutdownWaitTimeSeconds: envs.GetInt("CURRENCY_SERVICE_GRACEFUL_SHUTDOWN_WAIT_TIME_SECONDS"),
 	}
 }
