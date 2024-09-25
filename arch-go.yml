@@ -1,0 +1,110 @@
+version: 1
+
+threshold:
+  compliance: 100
+  coverage: 80
+
+dependenciesRules:
+  - package: "cmd.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.db.config"
+        - "internal.module.currency"
+        - "internal.module.currency.**"
+        - "internal.module.email.**"
+        - "internal.module.user.**"
+        - "internal.module.currency.config"
+        - "internal.server.config"
+
+        - "internal.job.**"
+        - "internal.middleware.**"
+
+        - "pkg/common/envs"
+      external:
+        - "github.com/gin-gonic.**"
+
+  - package: "internal.external.api.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "pkg.config"
+        - "pkg.dto"
+        - "pkg.util.**"
+        - "pkg.errors"
+        - "internal.external.api.**"
+
+  - package: "internal.handler.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.service.**"
+        - "pkg.dto.**"
+        - "pkg.errors.**"
+        - "internal.service.**"
+        - "mocks.**"
+      external:
+        - "github.com.gin-gonic"
+
+  - package: "internal.job.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.service.**"
+        - "pkg.errors.**"
+
+  - package: "internal.middleware.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "pkg.errors.**"
+
+  - package: "internal.model.**"
+    shouldOnlyDependsOn:
+      internal:
+
+  - package: "internal.repository.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.model.**"
+      external:
+        - "gorm.io"
+
+  - package: "internal.service.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.model.**"
+        - "mocks.**"
+        - "pkg.util.**"
+        - "pkg.dto.**"
+        - "pkg.errors.**"
+        - "pkg.config.**"
+      external:
+        - "gorm.io"
+
+  - package: "pkg.common.db.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "pkg.config.**"
+      external:
+        - "gorm.io.gorm"
+        - "gorm.io"
+        - "github.com.golang-migrate.migrate"
+
+  - package: "pkg.common.envs.**"
+    shouldOnlyDependsOn:
+      external:
+        - "github.com.spf13.viper"
+
+  - package: "pkg.common.config.**"
+    shouldOnlyDependsOn:
+      internal:
+        - "pkg.common.envs"
+
+  - package: "pkg.dto"
+    shouldOnlyDependsOn:
+      internal:
+        - "internal.model"
+
+  - package: "pkg.errors"
+    shouldOnlyDependsOn:
+      internal:
+
+  - package: "pkg.util"
+    shouldOnlyDependsOn:
+      internal:
