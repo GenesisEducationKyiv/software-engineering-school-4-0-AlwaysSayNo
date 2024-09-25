@@ -58,7 +58,7 @@ services:
       rabbitmq:
         condition: service_healthy
     env_file:
-      - ./email-service/.env
+      - .env
 
 volumes:
   postgres_volume:

@@ -9,7 +9,7 @@ type ConsumerConfig struct {
 
 func LoadConsumerConfig() ConsumerConfig {
 	return ConsumerConfig{
-		BrokerURI: envs.Get("BROKER_URI"),
-		QueueName: envs.Get("QUEUE_NAME"),
+		BrokerURI: envs.Get("EMAIL_SERVICE_BROKER_URI"),
+		QueueName: envs.Get("EMAIL_SERVICE_QUEUE_NAME"),
 	}
 }

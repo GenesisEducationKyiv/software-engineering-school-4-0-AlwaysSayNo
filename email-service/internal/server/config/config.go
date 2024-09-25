@@ -8,6 +8,6 @@ type ServerConfig struct {
 
 func LoadServerConfigConfig() ServerConfig {
 	return ServerConfig{
-		GracefulShutdownWaitTimeSeconds: envs.GetInt("GRACEFUL_SHUTDOWN_WAIT_TIME_SECONDS"),
+		GracefulShutdownWaitTimeSeconds: envs.GetInt("EMAIL_SERVICE_GRACEFUL_SHUTDOWN_WAIT_TIME_SECONDS"),
 	}
 }
