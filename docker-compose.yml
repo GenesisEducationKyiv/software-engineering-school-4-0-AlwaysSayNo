@@ -47,7 +47,7 @@ services:
       - "8080:8080"
     env_file:
       - .env
-    command: /bin/sh -c "migrate -path /migrations -database 'postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable' up && ./main"
+    command: /bin/sh -c "migrate -path /migrations -database 'postgres://${CURRENCY_SERVICE_DB_USER}:${CURRENCY_SERVICE_DB_PASSWORD}@${CURRENCY_SERVICE_DB_HOST}:${CURRENCY_SERVICE_DB_PORT}/${CURRENCY_SERVICE_DB_NAME}?sslmode=disable' up && ./main"
 
   email-service:
     container_name: email-service
