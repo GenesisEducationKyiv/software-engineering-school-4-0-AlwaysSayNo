@@ -4,7 +4,7 @@ This project implements a service with an API that allows users to:
 
 - Get the current exchange rate of USD to UAH.
 - Subscribe an email to receive updates on exchange rate changes.
-- Send daily emails with the current exchange rate to all subscribed users.
+- Send daily emails with the current exchange rate to all subscribed users. 
 
 ## Features
 
