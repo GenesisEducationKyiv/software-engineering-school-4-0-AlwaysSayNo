@@ -37,7 +37,7 @@ RUN apk add --no-cache bash libc6-compat
 COPY --from=build /app/main /main
 
 # Copy the .env file
-COPY --from=build /app/pkg/common/envs/.env ./pkg/common/envs/.env
+COPY --from=build /app/pkg/envs/.env ./pkg/envs/.env
 
 # Copy migrate binary
 COPY --from=build /go/bin/migrate /usr/local/bin/migrate
@@ -46,7 +46,7 @@ COPY --from=build /go/bin/migrate /usr/local/bin/migrate
 COPY --from=build /app/internal/module/user/migrations /migrations
 
 # Copy template files
-COPY --from=build /app/pkg/common/templates /pkg/common/templates
+COPY --from=build /app/pkg/templates /pkg/templates
 
 # Expose port 8080 to the outside world
 EXPOSE 8080

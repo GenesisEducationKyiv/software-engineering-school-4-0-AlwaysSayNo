@@ -31,7 +31,7 @@ WORKDIR /
 COPY --from=build /app/main /main
 
 # Copy the .env file
-COPY --from=build /app/pkg/common/envs/.env ./pkg/common/envs/.env
+COPY --from=build /app/pkg/envs/.env ./pkg/envs/.env
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
