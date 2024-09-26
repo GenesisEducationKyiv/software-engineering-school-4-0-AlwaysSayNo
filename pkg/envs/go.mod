@@ -1,4 +1,4 @@
-module github.com/AlwaysSayNo/genesis-currency-api/pkg/envs
+module github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs
 
 go 1.22.3
 
