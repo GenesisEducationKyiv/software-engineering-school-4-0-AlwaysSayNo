@@ -9,7 +9,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/console"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/netsmtp"
 	servcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/server/config"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/envs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"
 	"log"
 	"os"
 	"os/signal"
@@ -30,7 +30,7 @@ import (
 //	- defines an interface for mailer command
 
 func main() {
-	envs.Init("./pkg/common/envs/.env")
+	envs.Init("./pkg/envs/.env")
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
