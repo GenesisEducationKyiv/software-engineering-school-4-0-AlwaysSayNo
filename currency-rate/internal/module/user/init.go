@@ -39,8 +39,8 @@ func Init(db *gorm.DB) *Module {
 	userHandler := handler.NewHandler(userService)
 
 	return &Module{
-		Repository: newRepository,
-		Service:    userService,
-		Handler:    userHandler,
+		newRepository,
+		userService,
+		userHandler,
 	}
 }

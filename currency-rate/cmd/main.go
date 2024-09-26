@@ -7,7 +7,7 @@ import (
 	prodcnf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier"
 	emailconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/config"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/envs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"
 	"log"
 	"net/http"
 	"os"

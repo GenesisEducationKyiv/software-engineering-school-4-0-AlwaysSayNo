@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/envs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"
 )
 
 type CurrencyRaterConfig struct {
