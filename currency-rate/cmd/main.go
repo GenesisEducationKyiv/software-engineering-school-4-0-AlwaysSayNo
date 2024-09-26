@@ -35,7 +35,7 @@ import (
 )
 
 func main() {
-	envs.Init("./pkg/common/envs/.env")
+	envs.Init("./pkg/envs/.env")
 
 	// CONTEXT
 	ctx, cancel := context.WithCancel(context.Background())
