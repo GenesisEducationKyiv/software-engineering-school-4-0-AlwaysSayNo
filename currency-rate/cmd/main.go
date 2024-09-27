@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail"
-	prodcnf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer/config"
+	prodcnf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier"
 	emailconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/config"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"

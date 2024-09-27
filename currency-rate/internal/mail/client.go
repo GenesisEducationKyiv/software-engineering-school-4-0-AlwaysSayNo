@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer/config"
+	myproducer "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/mail/producer"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker/producer"
 	"strconv"
 	"time"
 )
@@ -37,8 +37,8 @@ type Client struct {
 	lastCommandID int
 }
 
-func NewClient(cnf config.ProducerConfig) (*Client, error) {
-	emailProducer, err := producer.NewProducer(cnf)
+func NewClient(cnf myproducer.Config) (*Client, error) {
+	emailProducer, err := producer.NewProducer(producer.Config(cnf))
 	if err != nil {
 		return nil, fmt.Errorf("creating consumer: %w", err)
 	}
