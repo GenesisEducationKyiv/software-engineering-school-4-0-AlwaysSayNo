@@ -5,4 +5,5 @@ use (
 	pkg/envs
 	email-service
 	pkg/apperrors
+	pkg/broker
 )
