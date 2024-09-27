@@ -6,8 +6,8 @@ github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors v0.1.0 h1:EM9MbY683rw7vciYlN8kpaePIOJclUCV+tAUtBusThY=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors v0.1.0/go.mod h1:egPcYulO3jfXR2LT0BBpWDurLiUWccEbzbk+TA7ZnYE=
-github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.1.0 h1:nj2KZLVn2pJDEY0YnHxkw3WcZzl+Ht5Mt6rvwy0XMMo=
-github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.1.0/go.mod h1:PPxpfhM3hWfY3P67o1nPd9CoZJDZSzy0DBp1wImN1P4=
+github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.2.0 h1:hg6YraU+4YdJb3AkJ+ffJIhrLXCpFWiDnUCnLbjKd+c=
+github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.2.0/go.mod h1:PPxpfhM3hWfY3P67o1nPd9CoZJDZSzy0DBp1wImN1P4=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1 h1:NWCP1Rx5tFQIJ0UFsUH626pbz66rL8uDS2F+mT1upLM=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1/go.mod h1:1aaVo5SWI7IamFg04g8lBvhoB1VNAdtNQBlIAUeB+uA=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=

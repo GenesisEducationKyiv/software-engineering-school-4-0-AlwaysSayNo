@@ -4,6 +4,7 @@ go 1.22.3
 
 require (
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors v0.1.0
+	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.2.0
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1
 	github.com/rabbitmq/amqp091-go v1.10.0
 )

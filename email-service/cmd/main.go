@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker"
-	conscnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
+	conscnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
 	mailcnf "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/service/console"

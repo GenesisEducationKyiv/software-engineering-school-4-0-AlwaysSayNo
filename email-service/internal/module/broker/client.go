@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
+	myconsumer "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker/consumer"
 	"log"
 	"time"
 )
@@ -43,8 +43,8 @@ type Client struct {
 	consumer Consumer
 }
 
-func NewClient(cnf config.ConsumerConfig) (*Client, error) {
-	emailConsumer, err := consumer.NewConsumer(cnf)
+func NewClient(cnf myconsumer.Config) (*Client, error) {
+	emailConsumer, err := consumer.NewConsumer(consumer.Config(cnf))
 	if err != nil {
 		return nil, fmt.Errorf("creating consumer: %w", err)
 	}
