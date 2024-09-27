@@ -2,7 +2,7 @@ package handler
 
 import (
 	"context"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

@@ -9,7 +9,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/model"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/service"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/mocks"
-	myerrors "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	myerrors "github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"github.com/stretchr/testify/suite"
 )
 

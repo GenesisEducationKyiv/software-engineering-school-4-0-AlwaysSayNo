@@ -7,7 +7,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/notifier/config"
 	sharcurrdto "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/currency"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"html/template"
 	"log"
 	"os"

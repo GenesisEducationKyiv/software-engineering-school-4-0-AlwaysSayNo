@@ -3,6 +3,7 @@ module github.com/AlwaysSayNo/genesis-currency-api/currency-rate
 go 1.22.3
 
 require (
+	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors v0.1.0
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1
 	github.com/docker/go-connections v0.5.0
 	github.com/gin-gonic/gin v1.10.0

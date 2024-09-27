@@ -15,7 +15,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/middleware"
-	myerrors "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	myerrors "github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 )

@@ -3,7 +3,7 @@ package private
 import (
 	"context"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/external/rater/abstract"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/config"

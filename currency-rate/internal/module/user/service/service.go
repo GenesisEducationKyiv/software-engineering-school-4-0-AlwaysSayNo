@@ -6,7 +6,7 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/dto"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/model"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/shared/dto/user"
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/apperrors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 )
 
 type Repository interface {

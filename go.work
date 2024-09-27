@@ -4,4 +4,5 @@ use (
 	currency-rate
 	pkg/envs
 	email-service
+	pkg/apperrors
 )
