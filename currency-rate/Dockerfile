@@ -6,7 +6,7 @@ WORKDIR /app
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
-# Завантажуємо та встановлюємо інструмент migrate
+# Download golang-migrate
 RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 RUN --mount=type=cache,target=/go/pkg/mod \

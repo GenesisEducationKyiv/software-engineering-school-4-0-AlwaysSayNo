@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD is_subscribed BOOLEAN NOT NULL DEFAULT TRUE;

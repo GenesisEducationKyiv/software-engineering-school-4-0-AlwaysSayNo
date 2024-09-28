@@ -39,27 +39,27 @@ type Data struct {
 }
 
 type Client struct {
-	stop     chan struct{}
-	consumer Consumer
+	stop          chan struct{}
+	queueConsumer Consumer
 }
 
 func NewClient(cnf myconsumer.Config) (*Client, error) {
-	emailConsumer, err := consumer.NewConsumer(consumer.Config(cnf))
+	queueConsumer, err := consumer.NewConsumer(consumer.Config(cnf))
 	if err != nil {
 		return nil, fmt.Errorf("creating consumer: %w", err)
 	}
 
 	stop := make(chan struct{})
-	go emailConsumer.Listen(stop)
+	go queueConsumer.Listen(stop)
 
 	return &Client{
-		stop:     stop,
-		consumer: emailConsumer,
+		stop:          stop,
+		queueConsumer: queueConsumer,
 	}, nil
 }
 
 func (c *Client) Subscribe(ctx context.Context, mailer Mailer) error {
-	c.consumer.Subscribe(func(body []byte) error {
+	c.queueConsumer.Subscribe(func(body []byte) error {
 		ctx, cancel := context.WithTimeout(ctx, MailTimeout)
 		defer cancel()
 
@@ -92,5 +92,5 @@ func unmarshal(body []byte) (*Command, error) {
 
 func (c *Client) Close() error {
 	close(c.stop)
-	return c.consumer.Close()
+	return c.queueConsumer.Close()
 }

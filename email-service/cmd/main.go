@@ -29,6 +29,16 @@ import (
 //	- Close - stops emailConsumer#Listen routine and calls emailConsumer#Close function
 //	- defines an interface for mailer command
 
+// We save in local db next information: current currency (just db), users' emails;
+// All information we receive from currency-rate service through commands from RabbitMQ;
+// On currency-rate side we can either for each repository create a decorator, which will store in the target repository
+// data and after that publish (this service might be responsible for SAGA)
+// or this responsibility might take the service calling repositories;
+// Remove current mail publishing command and its appropriate listener;
+// Instead of them create 2 new commands and 2 listeners;
+// + Each service should spin up its own db:(;
+// + For email-service its own migrations should be created;
+// Create a repository for email-service
 func main() {
 	envs.Init("./pkg/envs/.env")
 
