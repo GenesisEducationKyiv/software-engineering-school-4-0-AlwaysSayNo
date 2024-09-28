@@ -38,7 +38,7 @@ import (
 // Instead of them create 2 new commands and 2 listeners;
 // + Each service should spin up its own db:(;
 // + For email-service its own migrations should be created;
-// Create a repository for email-service
+// + Create a repository for email-service
 func main() {
 	envs.Init("./pkg/envs/.env")
 
