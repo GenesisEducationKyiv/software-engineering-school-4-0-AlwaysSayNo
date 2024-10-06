@@ -37,11 +37,6 @@ func NewEmailService(userGetter UserGetter,
 	}
 }
 
-// alter template
-// remove template info from currency service
-// move docker info into email service
-// remove send email logic from currency service
-
 func (es *Service) SendCurrencyPriceEmails(ctx context.Context, mailTransport service.Mailer) error {
 	log.Println("Start sending currency price emails")
 	body, err := es.prepareCurrencyEmail(ctx)
