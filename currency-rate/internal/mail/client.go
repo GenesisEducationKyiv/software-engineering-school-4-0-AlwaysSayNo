@@ -38,13 +38,13 @@ type Client struct {
 }
 
 func NewClient(cnf myproducer.Config) (*Client, error) {
-	emailProducer, err := producer.NewProducer(producer.Config(cnf))
+	queueProducer, err := producer.NewProducer(producer.Config(cnf))
 	if err != nil {
 		return nil, fmt.Errorf("creating consumer: %w", err)
 	}
 
 	return &Client{
-		producer:      emailProducer,
+		producer:      queueProducer,
 		lastCommandID: 0,
 	}, nil
 }

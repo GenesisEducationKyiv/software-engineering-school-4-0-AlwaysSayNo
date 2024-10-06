@@ -20,10 +20,10 @@ func (ur *UserRepository) Create(ctx context.Context, user model.User) (*model.U
 	return &user, result.Error
 }
 
-func (ur *UserRepository) GetAllSubscribed() (*[]model.User, error) {
+func (ur *UserRepository) GetAllSubscribed(ctx context.Context) (*[]model.User, error) {
 	var users []model.User
 
-	result := ur.DB.Where("is_subscribed = ?", true).Find(&users)
+	result := ur.DB.WithContext(ctx).Where("is_subscribed = ?", true).Find(&users)
 
 	return &users, result.Error
 }

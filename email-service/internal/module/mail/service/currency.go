@@ -9,7 +9,7 @@ import (
 
 type CurrencyRepository interface {
 	Add(ctx context.Context, currency model.Currency) (*model.Currency, error)
-	FindLatest() (*model.Currency, error)
+	FindLatest(ctx context.Context) (*model.Currency, error)
 }
 
 type CurrencyService struct {
@@ -32,8 +32,8 @@ func (cs *CurrencyService) Save(ctx context.Context, currencyAddDTO dto.Currency
 	return nil
 }
 
-func (cs *CurrencyService) FindLatest() (*dto.CurrencyDTO, error) {
-	currencyModel, err := cs.currencyRepository.FindLatest()
+func (cs *CurrencyService) FindLatest(ctx context.Context) (*dto.CurrencyDTO, error) {
+	currencyModel, err := cs.currencyRepository.FindLatest(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("finding latest currency: %w", err)
 	}

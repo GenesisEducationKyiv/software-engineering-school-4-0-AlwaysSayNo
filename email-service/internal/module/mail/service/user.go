@@ -12,7 +12,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user model.User) (*model.User, error)
 	ExistsByEmail(email string) bool
 	GetByEmail(email string) (*model.User, error)
-	GetAllSubscribed() (*[]model.User, error)
+	GetAllSubscribed(ctx context.Context) (*[]model.User, error)
 }
 
 type UserService struct {
@@ -62,8 +62,8 @@ func (us *UserService) ChangeUserSubscriptionStatus(ctx context.Context, email s
 	return nil
 }
 
-func (us *UserService) GetAllSubscribed() ([]dto.UserResponseDTO, error) {
-	users, err := us.userRepository.GetAllSubscribed()
+func (us *UserService) GetAllSubscribed(ctx context.Context) ([]dto.UserResponseDTO, error) {
+	users, err := us.userRepository.GetAllSubscribed(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting all users from database: %w", err)
 	}

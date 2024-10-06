@@ -6,6 +6,7 @@ require (
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors v0.1.0
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.2.0
 	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1
+	github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/scheduler v0.1.0
 	github.com/docker/go-connections v0.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-migrate/migrate/v4 v4.17.1

@@ -22,17 +22,17 @@ func (cr *CurrencyRepository) Add(ctx context.Context, currency model.Currency) 
 	return &currency, result.Error
 }
 
-func (cr *CurrencyRepository) FindLatest() (*model.Currency, error) {
+func (cr *CurrencyRepository) FindLatest(ctx context.Context) (*model.Currency, error) {
 	var currency model.Currency
 
-	result := cr.DB.Last(&currency)
+	result := cr.DB.WithContext(ctx).Last(&currency)
 
 	return &currency, result.Error
 }
 
-func (r *CurrencyRepository) ExistsByEmail(email string) bool {
+func (cr *CurrencyRepository) ExistsByEmail(email string) bool {
 	var user model.User
-	if result := r.DB.Where("email = ?", email).First(&user); result.Error != nil {
+	if result := cr.DB.Where("email = ?", email).First(&user); result.Error != nil {
 		// result.Error - there is no user with such email
 		return false
 	}

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"net/http"
 
@@ -14,10 +13,6 @@ import (
 type UserService interface {
 	Save(user dto.SaveRequestDTO) (*user.ResponseDTO, error)
 	GetAll() ([]user.ResponseDTO, error)
-}
-
-type MailNotifier interface {
-	Notify(ctx context.Context) error
 }
 
 type Handler struct {

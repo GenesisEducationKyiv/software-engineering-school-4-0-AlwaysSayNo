@@ -2,6 +2,7 @@ package job
 
 import (
 	"context"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/scheduler"
 	"log"
 )
 
@@ -11,7 +12,7 @@ type CurrencyUpdater interface {
 
 // GetUpdateCurrencyJob is a cron function to update currency service cache.
 // It is executed every hour.
-func GetUpdateCurrencyJob(ctx context.Context, currencyUpdater CurrencyUpdater) WithCron {
+func GetUpdateCurrencyJob(ctx context.Context, currencyUpdater CurrencyUpdater) scheduler.WithCron {
 	job := func() {
 		log.Println("Start job: Update Currency Rates")
 
@@ -22,9 +23,9 @@ func GetUpdateCurrencyJob(ctx context.Context, currencyUpdater CurrencyUpdater) 
 		}
 	}
 
-	return WithCron{
-		job:  job,
-		cron: "0 * * * *",
-		name: "UpdateCurrencyJob",
+	return scheduler.WithCron{
+		Job:  job,
+		Cron: "0 * * * *",
+		Name: "UpdateCurrencyJob",
 	}
 }
