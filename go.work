@@ -6,4 +6,5 @@ use (
 	email-service
 	pkg/apperrors
 	pkg/broker
+	pkg/scheduler
 )
