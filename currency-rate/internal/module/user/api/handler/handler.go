@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"net/http"
 
@@ -11,8 +12,8 @@ import (
 )
 
 type UserService interface {
-	Save(user dto.SaveRequestDTO) (*user.ResponseDTO, error)
-	GetAll() ([]user.ResponseDTO, error)
+	Save(ctx context.Context, user dto.SaveRequestDTO) (*user.ResponseDTO, error)
+	GetAll(ctx context.Context) ([]user.ResponseDTO, error)
 }
 
 type Handler struct {
@@ -31,7 +32,7 @@ func (h *Handler) Add(ctx *gin.Context) {
 	var saveDto dto.SaveRequestDTO
 	saveDto.Email = email
 
-	_, err := h.userService.Save(saveDto)
+	_, err := h.userService.Save(ctx, saveDto)
 	if err != nil {
 		apperrors.AttachToCtx(err, ctx)
 		return
@@ -41,7 +42,7 @@ func (h *Handler) Add(ctx *gin.Context) {
 }
 
 func (h *Handler) FindAll(ctx *gin.Context) {
-	result, err := h.userService.GetAll()
+	result, err := h.userService.GetAll(ctx)
 	if err != nil {
 		apperrors.AttachToCtx(err, ctx)
 		return

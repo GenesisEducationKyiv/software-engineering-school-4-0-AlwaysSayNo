@@ -45,6 +45,7 @@ import (
 // data and after that publish (this service might be responsible for SAGA)
 // or this responsibility might take the service calling repositories;
 // Remove current mail publishing command and its appropriate listener;
+// Unsubscribe user
 // Instead of them create 2 new commands and 2 listeners;
 // + Each service should spin up its own db:(;
 // + For email-service its own migrations should be created;

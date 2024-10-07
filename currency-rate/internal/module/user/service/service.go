@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/dto"
@@ -10,9 +11,9 @@ import (
 )
 
 type Repository interface {
-	Create(user model.User) (*model.User, error)
-	GetAll() (*[]model.User, error)
-	ExistsByEmail(email string) bool
+	Create(ctx context.Context, user model.User) (*model.User, error)
+	GetAll(ctx context.Context) (*[]model.User, error)
+	ExistsByEmail(ctx context.Context, email string) bool
 }
 
 type Service struct {
@@ -28,15 +29,15 @@ func NewService(userRepository Repository) *Service {
 
 // Save saves user's information into the database. Only users with unique emails are saved.
 // Returns dto.UserResponseDTO with additional information or error.
-func (s *Service) Save(saveRequestDTO dto.SaveRequestDTO) (*user.ResponseDTO, error) {
+func (s *Service) Save(ctx context.Context, saveRequestDTO dto.SaveRequestDTO) (*user.ResponseDTO, error) {
 	userModel := dto.SaveRequestToModel(saveRequestDTO)
 
 	// Check email uniqueness.
-	if s.userRepository.ExistsByEmail(userModel.Email) {
+	if s.userRepository.ExistsByEmail(ctx, userModel.Email) {
 		return nil, apperrors.NewUserWithEmailExistsError()
 	}
 
-	savedUser, err := s.userRepository.Create(userModel)
+	savedUser, err := s.userRepository.Create(ctx, userModel)
 	if err != nil {
 		return nil, fmt.Errorf("saving savedUser in database: %w", err)
 	}
@@ -48,8 +49,8 @@ func (s *Service) Save(saveRequestDTO dto.SaveRequestDTO) (*user.ResponseDTO, er
 
 // GetAll is used to get all available in database users' information.
 // Returns all available dto.UserResponseDTO.
-func (s *Service) GetAll() ([]user.ResponseDTO, error) {
-	users, err := s.userRepository.GetAll()
+func (s *Service) GetAll(ctx context.Context) ([]user.ResponseDTO, error) {
+	users, err := s.userRepository.GetAll(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting all users from database: %w", err)
 	}

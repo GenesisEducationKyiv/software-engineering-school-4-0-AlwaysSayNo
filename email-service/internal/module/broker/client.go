@@ -14,7 +14,7 @@ import (
 const (
 	Timeout                      = 10 * time.Second
 	CurrencyUpdatedEvent         = "CurrencyUpdated"
-	SubscribeUserSubscribedEvent = "UserSubscribed"
+	UserSubscribedEvent          = "UserSubscribed"
 	UserSubscriptionUpdatedEvent = "UserSubscriptionUpdated"
 )
 
@@ -117,14 +117,14 @@ func (c *Client) SubscribeUserSubscribedEvent(ctx context.Context, service UserS
 
 		event, err := unmarshalEvent(body)
 		if err != nil {
-			return fmt.Errorf("unmarshalling SubscribeUserSubscribedEvent: %w", err)
+			return fmt.Errorf("unmarshalling UserSubscribedEvent: %w", err)
 		}
 
-		if event.Type != SubscribeUserSubscribedEvent {
+		if event.Type != UserSubscribedEvent {
 			return nil
 		}
 
-		log.Printf("SubscribeUserSubscribedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+		log.Printf("UserSubscribedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
 
 		var data UserSubscribedData
 		if err := json.Unmarshal(event.Data, &data); err != nil {

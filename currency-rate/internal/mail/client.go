@@ -11,20 +11,16 @@ import (
 )
 
 const (
-	eventType = "SendEmails"
+	CurrencyUpdatedEvent         = "CurrencyUpdated"
+	UserSubscribedEvent          = "UserSubscribed"
+	UserSubscriptionUpdatedEvent = "UserSubscriptionUpdated"
 )
 
-type Command struct {
-	ID        string `json:"id"`
-	Type      string `json:"type"`
-	Timestamp string `json:"timestamp"`
-	Data      any    `json:"data"`
-}
-
-type data struct {
-	Emails  []string `json:"emails"`
-	Subject string   `json:"subject"`
-	Body    string   `json:"body"`
+type Event struct {
+	ID        string      `json:"id"`
+	Type      string      `json:"type"`
+	Timestamp string      `json:"timestamp"`
+	Data      interface{} `json:"data"`
 }
 
 type Producer interface {
@@ -49,16 +45,8 @@ func NewClient(cnf myproducer.Config) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) SendEmail(
-	ctx context.Context,
-	emails []string, subject string, message string) error {
-	data := data{
-		Emails:  emails,
-		Subject: subject,
-		Body:    message,
-	}
-
-	cmd := c.createCommand(data)
+func (c *Client) SendEvent(ctx context.Context, eventType string, data any) error {
+	cmd := c.createCommand(eventType, data)
 
 	body, err := c.marshal(cmd)
 	if err != nil {
@@ -72,9 +60,9 @@ func (c *Client) SendEmail(
 	return nil
 }
 
-func (c *Client) createCommand(data data) Command {
+func (c *Client) createCommand(eventType string, data any) Event {
 	c.lastCommandID++
-	return Command{
+	return Event{
 		ID:        strconv.Itoa(c.lastCommandID),
 		Type:      eventType,
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -82,10 +70,10 @@ func (c *Client) createCommand(data data) Command {
 	}
 }
 
-func (c *Client) marshal(command Command) ([]byte, error) {
-	body, err := json.Marshal(command)
+func (c *Client) marshal(event Event) ([]byte, error) {
+	body, err := json.Marshal(event)
 	if err != nil {
-		return nil, fmt.Errorf("marshalling command: %w", err)
+		return nil, fmt.Errorf("marshalling event: %w", err)
 	}
 
 	return body, nil

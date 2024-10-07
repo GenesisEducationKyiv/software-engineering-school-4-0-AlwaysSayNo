@@ -10,6 +10,8 @@ github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker v0.2.0/go.mod h1:PPxpfhM3hWfY3P67o1nPd9CoZJDZSzy0DBp1wImN1P4=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1 h1:NWCP1Rx5tFQIJ0UFsUH626pbz66rL8uDS2F+mT1upLM=
 github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs v0.1.1/go.mod h1:1aaVo5SWI7IamFg04g8lBvhoB1VNAdtNQBlIAUeB+uA=
+github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/scheduler v0.1.0 h1:uA+AHBmyEPPpmDrT4O3NxoeDll4jD/QH4FgbfoIWxmw=
+github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/scheduler v0.1.0/go.mod h1:S6q52dvBwV8LKAoBo44aLnQHjQunRfbxiYFGn/TX23w=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/Microsoft/hcsshim v0.11.5 h1:haEcLNpj9Ka1gd3B3tAEs9CpE0c+1IhoL59w/exYU38=

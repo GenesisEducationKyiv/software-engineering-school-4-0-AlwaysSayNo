@@ -29,13 +29,3 @@ func (cr *CurrencyRepository) FindLatest(ctx context.Context) (*model.Currency, 
 
 	return &currency, result.Error
 }
-
-func (cr *CurrencyRepository) ExistsByEmail(email string) bool {
-	var user model.User
-	if result := cr.DB.Where("email = ?", email).First(&user); result.Error != nil {
-		// result.Error - there is no user with such email
-		return false
-	}
-
-	return true
-}
