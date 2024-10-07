@@ -70,17 +70,17 @@ func main() {
 		log.Fatalf("making mailer client: %v", err)
 	}
 
-	err = brokerClient.SubscribeCurrencyUpdateEvent(ctx, mailModule.CurrencyService)
+	err = brokerClient.SubscribeCurrencyUpdateEvent(ctx, &mailModule.CurrencyService)
 	if err != nil {
 		log.Fatalf("subscribing on CurrencyUpdateEvent: %v", err)
 	}
 
-	err = brokerClient.SubscribeUserSubscribedEvent(ctx, mailModule.UserService)
+	err = brokerClient.SubscribeUserSubscribedEvent(ctx, &mailModule.UserService)
 	if err != nil {
 		log.Fatalf("subscribing on UserSubscribedEvent: %v", err)
 	}
 
-	err = brokerClient.SubscribeUserSubscriptionUpdatedEvent(ctx, mailModule.UserService)
+	err = brokerClient.SubscribeUserSubscriptionUpdatedEvent(ctx, &mailModule.UserService)
 	if err != nil {
 		log.Fatalf("subscribing on UserSubscriptionUpdatedEvent: %v", err)
 	}
@@ -89,10 +89,10 @@ func main() {
 	r := gin.Default()
 
 	// HANDLERS
-	registerRoutes(r, mailModule.EmailHandler)
+	registerRoutes(r, &mailModule.EmailHandler)
 
 	allJobs := scheduler.StartAllJobs(
-		job.GetSendCurrencyEmailsJob(ctx, mailModule.EmailService, *mailTransport),
+		job.GetSendCurrencyEmailsJob(ctx, &mailModule.EmailService, *mailTransport),
 	)
 
 	server := startServer(r)
@@ -117,7 +117,7 @@ func getMailer(cnf mailcnf.MailerConfig) *service.Mailer {
 	return &mailer
 }
 
-func registerRoutes(r *gin.Engine, emailHandler mailmodule.EmailHandler) {
+func registerRoutes(r *gin.Engine, emailHandler mailmodule.Handler) {
 	mailGroup := r.Group("/api/v1/mail")
 	mailGroup.POST("/currency/send", emailHandler.SendCurrencyPriceEmails)
 }

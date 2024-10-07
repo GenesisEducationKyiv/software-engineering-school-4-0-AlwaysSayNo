@@ -47,10 +47,10 @@ func main() {
 	currencyProvider := getCurrencyProviderChain()
 
 	// MODULES
-	userModule := usermodule.Init(d)
-	currencyModule := currencymodule.Init(currencyProvider)
+	brokerClient := getBrokerClient()
 
-	mailClient := getMailClient()
+	userModule := usermodule.Init(d, brokerClient)
+	currencyModule := currencymodule.Init(currencyProvider, brokerClient)
 
 	// ENGINE
 	r := gin.Default()
@@ -58,19 +58,19 @@ func main() {
 
 	// JOBS
 	allJobs := scheduler.StartAllJobs(
-		job.GetUpdateCurrencyJob(ctx, currencyModule.Service),
+		job.GetUpdateCurrencyJob(ctx, &currencyModule.Service),
 	)
 
 	// HANDLERS
-	currencyhand.RegisterRoutes(r, currencyModule.Handler)
-	userhand.RegisterRoutes(r, userModule.Handler)
+	currencyhand.RegisterRoutes(r, &currencyModule.Handler)
+	userhand.RegisterRoutes(r, &userModule.Handler)
 
 	// START SERVER
 	server := startServer(r)
 	waitServerWorking()
 
 	// STOP SERVER
-	gracefulShutdown(ctx, allJobs, server, mailClient)
+	gracefulShutdown(ctx, allJobs, server, brokerClient)
 }
 
 func getCurrencyProviderChain() currencyserv.Provider {
@@ -95,13 +95,13 @@ func getCurrencyProviderChain() currencyserv.Provider {
 	return privateClient
 }
 
-func getMailClient() *mail.Client {
-	mailClient, err := mail.NewClient(prodcnf.LoadProducerConfig())
+func getBrokerClient() *mail.Client {
+	brokerClient, err := mail.NewClient(prodcnf.LoadProducerConfig())
 	if err != nil {
-		log.Fatalf("generating mail client: %v", err)
+		log.Fatalf("generating broker client: %v", err)
 	}
 
-	return mailClient
+	return brokerClient
 }
 
 func startServer(r *gin.Engine) *http.Server {
