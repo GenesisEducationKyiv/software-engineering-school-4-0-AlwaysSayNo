@@ -5,8 +5,15 @@ import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/decorator"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/repository"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/service"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+type Handler interface {
+	Add(ctx *gin.Context)
+	FindAll(ctx *gin.Context)
+	ChangeSubscriptionStatus(ctx *gin.Context)
+}
 
 type Module struct {
 	Repository          repository.Repository
@@ -19,14 +26,15 @@ func Init(db *gorm.DB, producerClient decorator.ProducerClient) *Module {
 	userRepository := repository.NewRepository(db)
 
 	userService := service.NewService(userRepository)
-	userHandler := handler.NewHandler(userService)
 
-	userRepositoryDecorator := decorator.NewRepositoryDecorator(userRepository, producerClient)
+	userServiceDecorator := decorator.NewServiceDecorator(userService, producerClient)
+
+	userHandler := handler.NewHandler(userServiceDecorator)
 
 	return &Module{
 		*userRepository,
 		*userService,
 		*userHandler,
-		*userRepositoryDecorator,
+		*userServiceDecorator,
 	}
 }

@@ -14,8 +14,16 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{DB: db}
 }
 
-func (r *Repository) Create(ctx context.Context, user model.User) (*model.User, error) {
+func (r *Repository) Save(ctx context.Context, user model.User) (*model.User, error) {
 	result := r.DB.WithContext(ctx).Create(&user)
+
+	return &user, result.Error
+}
+
+func (r *Repository) Get(ctx context.Context, id int) (*model.User, error) {
+	var user model.User
+
+	result := r.DB.WithContext(ctx).Find(&user, id)
 
 	return &user, result.Error
 }
@@ -33,6 +41,16 @@ func (r *Repository) GetAll(ctx context.Context) (*[]model.User, error) {
 func (r *Repository) ExistsByEmail(ctx context.Context, email string) bool {
 	var user model.User
 	if result := r.DB.WithContext(ctx).Where("email = ?", email).First(&user); result.Error != nil {
+		// result.Error - there is no user with such email
+		return false
+	}
+
+	return true
+}
+
+func (r *Repository) ExistsById(ctx context.Context, id int) bool {
+	var user model.User
+	if result := r.DB.WithContext(ctx).Where("id = ?", id).First(&user); result.Error != nil {
 		// result.Error - there is no user with such email
 		return false
 	}

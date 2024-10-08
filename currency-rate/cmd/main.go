@@ -22,11 +22,9 @@ import (
 	ratecdnjsdelivr "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/external/rater/cdnjsdelivr"
 	rategovua "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/external/rater/gov_ua"
 	rateprivate "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/external/rater/private"
-	currencyhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/handler"
 	currencyconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/config"
 	currencyserv "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/service"
 	usermodule "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user"
-	userhand "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/api/handler"
 	userconf "github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/server/config"
 	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
@@ -62,8 +60,7 @@ func main() {
 	)
 
 	// HANDLERS
-	currencyhand.RegisterRoutes(r, &currencyModule.Handler)
-	userhand.RegisterRoutes(r, &userModule.Handler)
+	registerRoutes(r, &currencyModule.Handler, &userModule.Handler)
 
 	// START SERVER
 	server := startServer(r)
@@ -102,6 +99,16 @@ func getBrokerClient() *mail.Client {
 	}
 
 	return brokerClient
+}
+
+func registerRoutes(r *gin.Engine, currencyHandler currencymodule.Handler, userHandler usermodule.Handler) {
+	rateGroup := r.Group("/api/v1/rate")
+	rateGroup.GET("/", currencyHandler.GetLatest)
+
+	rootGroup := r.Group("/api/v1/")
+	rootGroup.POST("/subscribe", userHandler.Add)
+	rootGroup.GET("/users", userHandler.FindAll)
+	rootGroup.PUT("/users/subscribe", userHandler.FindAll)
 }
 
 func startServer(r *gin.Engine) *http.Server {

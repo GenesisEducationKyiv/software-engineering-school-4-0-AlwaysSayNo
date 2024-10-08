@@ -7,8 +7,9 @@ import (
 
 func ToDTO(entity model.User) shareduser.ResponseDTO {
 	return shareduser.ResponseDTO{
-		ID:    entity.ID,
-		Email: entity.Email,
+		ID:           entity.ID,
+		Email:        entity.Email,
+		IsSubscribed: entity.IsSubscribed,
 	}
 }
 

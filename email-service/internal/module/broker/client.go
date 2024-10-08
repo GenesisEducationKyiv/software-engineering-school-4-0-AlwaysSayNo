@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	myconsumer "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/dto"
+	userdto "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/dto"
 	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker/consumer"
 	"log"
 	"time"
@@ -23,11 +23,11 @@ type Mailer interface {
 }
 
 type CurrencyService interface {
-	Save(ctx context.Context, currencyAddDTO dto.CurrencyAddDTO) error
+	Save(ctx context.Context, currencyAddDTO userdto.CurrencyAddDTO) error
 }
 
 type UserService interface {
-	Save(ctx context.Context, userSaveDTO dto.UserSaveDTO) error
+	Save(ctx context.Context, userSaveDTO userdto.UserSaveDTO) error
 	ChangeUserSubscriptionStatus(ctx context.Context, email string, isSubscribed bool) error
 }
 
@@ -100,10 +100,15 @@ func (c *Client) SubscribeCurrencyUpdateEvent(ctx context.Context, service Curre
 			return fmt.Errorf("unmarshalling CurrencyUpdateData: %w", err)
 		}
 
-		if err := service.Save(ctx, dto.CurrencyUpdateDataToCurrencyAddDTO(&data)); err != nil {
+		dto := userdto.CurrencyAddDTO{
+			Number: data.Number,
+			Date:   data.Date,
+		}
+		if err := service.Save(ctx, dto); err != nil {
 			return fmt.Errorf("saving CurrencyUpdateData: %w", err)
 		}
 
+		log.Printf("Finish processing CurrencyUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
 		return nil
 	})
 
@@ -131,9 +136,14 @@ func (c *Client) SubscribeUserSubscribedEvent(ctx context.Context, service UserS
 			return fmt.Errorf("unmarshalling UserSubscribedData: %w", err)
 		}
 
-		if err := service.Save(ctx, dto.UserSubscribedDataToUserSaveDTO(&data)); err != nil {
+		dto := userdto.UserSaveDTO{
+			Email: data.Email,
+		}
+		if err := service.Save(ctx, dto); err != nil {
 			return fmt.Errorf("saving UserSubscribedData: %w", err)
 		}
+
+		log.Printf("Finish processing UserSubscribedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
 
 		return nil
 	})
@@ -165,6 +175,8 @@ func (c *Client) SubscribeUserSubscriptionUpdatedEvent(ctx context.Context, serv
 		if err := service.ChangeUserSubscriptionStatus(ctx, data.Email, data.IsSubscribed); err != nil {
 			return fmt.Errorf("changing user's subscription: %w", err)
 		}
+
+		log.Printf("Finish processing UserSubscriptionUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
 
 		return nil
 	})

@@ -2,10 +2,15 @@ package currency
 
 import (
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/user/decorator"
+	"github.com/gin-gonic/gin"
 
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/api/handler"
 	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/internal/module/currency/service"
 )
+
+type Handler interface {
+	GetLatest(ctx *gin.Context)
+}
 
 type Module struct {
 	Service service.Service
