@@ -1,0 +1,10 @@
+go 1.22.3
+
+use (
+	currency-rate
+	pkg/envs
+	email-service
+	pkg/apperrors
+	pkg/broker
+	pkg/scheduler
+)

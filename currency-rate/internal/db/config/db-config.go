@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/AlwaysSayNo/genesis-currency-api/currency-rate/pkg/envs"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"
 )
 
 type DatabaseConfig struct {
@@ -14,10 +14,10 @@ type DatabaseConfig struct {
 
 func LoadDatabaseConfig() DatabaseConfig {
 	return DatabaseConfig{
-		DBUser:     envs.Get("DB_USER"),
-		DBPassword: envs.Get("DB_PASSWORD"),
-		DBHost:     envs.Get("DB_HOST"),
-		DBPort:     envs.Get("DB_PORT"),
-		DBName:     envs.Get("DB_NAME"),
+		DBUser:     envs.Get("CURRENCY_SERVICE_DB_USER"),
+		DBPassword: envs.Get("CURRENCY_SERVICE_DB_PASSWORD"),
+		DBHost:     envs.Get("CURRENCY_SERVICE_DB_HOST"),
+		DBPort:     envs.Get("CURRENCY_SERVICE_DB_PORT"),
+		DBName:     envs.Get("CURRENCY_SERVICE_DB_NAME"),
 	}
 }

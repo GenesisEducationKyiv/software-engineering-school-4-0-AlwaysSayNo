@@ -1,6 +1,6 @@
 package config
 
-import "github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/envs"
+import "github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/envs"
 
 type MailerConfig struct {
 	Type         string
@@ -13,10 +13,10 @@ type MailerConfig struct {
 
 func LoadMailerConfig() MailerConfig {
 	return MailerConfig{
-		Type:         envs.Get("MAILER_TYPE"),
-		SMTPHost:     envs.Get("SMTP_HOST"),
-		SMTPPort:     envs.Get("SMTP_PORT"),
-		SMTPUser:     envs.Get("SMTP_USER"),
-		SMTPPassword: envs.Get("SMTP_PASSWORD"),
+		Type:         envs.Get("EMAIL_SERVICE_MAILER_TYPE"),
+		SMTPHost:     envs.Get("EMAIL_SERVICE_SMTP_HOST"),
+		SMTPPort:     envs.Get("EMAIL_SERVICE_SMTP_PORT"),
+		SMTPUser:     envs.Get("EMAIL_SERVICE_SMTP_USER"),
+		SMTPPassword: envs.Get("EMAIL_SERVICE_SMTP_PASSWORD"),
 	}
 }

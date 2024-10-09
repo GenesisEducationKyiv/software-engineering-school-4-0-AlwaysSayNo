@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/config"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/pkg/apperrors"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/apperrors"
 	"log"
 	"net/smtp"
 )

@@ -4,19 +4,31 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
-	"github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer/config"
+	myconsumer "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/broker/consumer"
+	userdto "github.com/AlwaysSayNo/genesis-currency-api/email-service/internal/module/mail/dto"
+	"github.com/GenesisEducationKyiv/software-engineering-school-4-0-AlwaysSayNo/pkg/broker/consumer"
 	"log"
 	"time"
 )
 
 const (
-	MailTimeout       = 10 * time.Second
-	MailerCommandType = "SendEmails"
+	Timeout                      = 10 * time.Second
+	CurrencyUpdatedEvent         = "CurrencyUpdated"
+	UserSubscribedEvent          = "UserSubscribed"
+	UserSubscriptionUpdatedEvent = "UserSubscriptionUpdated"
 )
 
 type Mailer interface {
 	SendEmail(ctx context.Context, emails []string, subject, message string) error
+}
+
+type CurrencyService interface {
+	Save(ctx context.Context, currencyAddDTO userdto.CurrencyAddDTO) error
+}
+
+type UserService interface {
+	Save(ctx context.Context, userSaveDTO userdto.UserSaveDTO) error
+	ChangeUserSubscriptionStatus(ctx context.Context, email string, isSubscribed bool) error
 }
 
 type Consumer interface {
@@ -25,72 +37,164 @@ type Consumer interface {
 	Close() error
 }
 
-type Command struct {
-	ID        string `json:"id"`
-	Type      string `json:"type"`
-	Timestamp string `json:"timestamp"`
-	Data      Data   `json:"data"`
+type Event struct {
+	ID        string          `json:"id"`
+	Type      string          `json:"type"`
+	Timestamp string          `json:"timestamp"`
+	Data      json.RawMessage `json:"data"`
 }
 
-type Data struct {
-	Emails  []string `json:"emails"`
-	Subject string   `json:"subject"`
-	Body    string   `json:"body"`
+type CurrencyUpdateData struct {
+	Number float64 `json:"number"`
+	Date   string  `json:"data"`
+}
+
+type UserSubscribedData struct {
+	Email        string `json:"email"`
+	IsSubscribed bool   `json:"isSubscribed"`
+}
+
+type UserSubscriptionUpdatedData struct {
+	Email        string `json:"email"`
+	IsSubscribed bool   `json:"isSubscribed"`
 }
 
 type Client struct {
-	stop     chan struct{}
-	consumer Consumer
+	stop          chan struct{}
+	queueConsumer Consumer
 }
 
-func NewClient(cnf config.ConsumerConfig) (*Client, error) {
-	emailConsumer, err := consumer.NewConsumer(cnf)
+func NewClient(cnf myconsumer.Config) (*Client, error) {
+	queueConsumer, err := consumer.NewConsumer(consumer.Config(cnf))
 	if err != nil {
 		return nil, fmt.Errorf("creating consumer: %w", err)
 	}
 
 	stop := make(chan struct{})
-	go emailConsumer.Listen(stop)
+	go queueConsumer.Listen(stop)
 
 	return &Client{
-		stop:     stop,
-		consumer: emailConsumer,
+		stop:          stop,
+		queueConsumer: queueConsumer,
 	}, nil
 }
 
-func (c *Client) Subscribe(ctx context.Context, mailer Mailer) error {
-	c.consumer.Subscribe(func(body []byte) error {
-		ctx, cancel := context.WithTimeout(ctx, MailTimeout)
+func (c *Client) SubscribeCurrencyUpdateEvent(ctx context.Context, service CurrencyService) error {
+	c.queueConsumer.Subscribe(func(body []byte) error {
+		ctx, cancel := context.WithTimeout(ctx, Timeout)
 		defer cancel()
 
-		cmd, err := unmarshal(body)
+		event, err := unmarshalEvent(body)
 		if err != nil {
-			return fmt.Errorf("unmarshaling: %w", err)
+			return fmt.Errorf("unmarshalling CurrencyUpdatedEvent: %w", err)
 		}
 
-		if cmd.Type != MailerCommandType {
+		if event.Type != CurrencyUpdatedEvent {
 			return nil
 		}
 
-		log.Printf("Command (id: %s, timestamp: %s)", cmd.ID, cmd.Timestamp)
+		log.Printf("CurrencyUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
 
-		return mailer.SendEmail(ctx, cmd.Data.Emails, cmd.Data.Subject, cmd.Data.Body)
+		var data CurrencyUpdateData
+		if err := json.Unmarshal(event.Data, &data); err != nil {
+			return fmt.Errorf("unmarshalling CurrencyUpdateData: %w", err)
+		}
+
+		dto := userdto.CurrencyAddDTO{
+			Number: data.Number,
+			Date:   data.Date,
+		}
+		if err := service.Save(ctx, dto); err != nil {
+			return fmt.Errorf("saving CurrencyUpdateData: %w", err)
+		}
+
+		log.Printf("Finish processing CurrencyUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+		return nil
 	})
 
 	return nil
 }
 
-func unmarshal(body []byte) (*Command, error) {
-	command := Command{}
+func (c *Client) SubscribeUserSubscribedEvent(ctx context.Context, service UserService) error {
+	c.queueConsumer.Subscribe(func(body []byte) error {
+		ctx, cancel := context.WithTimeout(ctx, Timeout)
+		defer cancel()
 
-	if err := json.Unmarshal(body, &command); err != nil {
-		return nil, fmt.Errorf("unmarshalling response body to command: %w", err)
+		event, err := unmarshalEvent(body)
+		if err != nil {
+			return fmt.Errorf("unmarshalling UserSubscribedEvent: %w", err)
+		}
+
+		if event.Type != UserSubscribedEvent {
+			return nil
+		}
+
+		log.Printf("UserSubscribedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+
+		var data UserSubscribedData
+		if err := json.Unmarshal(event.Data, &data); err != nil {
+			return fmt.Errorf("unmarshalling UserSubscribedData: %w", err)
+		}
+
+		dto := userdto.UserSaveDTO{
+			Email: data.Email,
+		}
+		if err := service.Save(ctx, dto); err != nil {
+			return fmt.Errorf("saving UserSubscribedData: %w", err)
+		}
+
+		log.Printf("Finish processing UserSubscribedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+
+		return nil
+	})
+
+	return nil
+}
+
+func (c *Client) SubscribeUserSubscriptionUpdatedEvent(ctx context.Context, service UserService) error {
+	c.queueConsumer.Subscribe(func(body []byte) error {
+		ctx, cancel := context.WithTimeout(ctx, Timeout)
+		defer cancel()
+
+		event, err := unmarshalEvent(body)
+		if err != nil {
+			return fmt.Errorf("unmarshalling UserSubscriptionUpdatedEvent: %w", err)
+		}
+
+		if event.Type != UserSubscriptionUpdatedEvent {
+			return nil
+		}
+
+		log.Printf("UserSubscriptionUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+
+		var data UserSubscriptionUpdatedData
+		if err := json.Unmarshal(event.Data, &data); err != nil {
+			return fmt.Errorf("unmarshalling UserSubscriptionUpdatedData: %w", err)
+		}
+
+		if err := service.ChangeUserSubscriptionStatus(ctx, data.Email, data.IsSubscribed); err != nil {
+			return fmt.Errorf("changing user's subscription: %w", err)
+		}
+
+		log.Printf("Finish processing UserSubscriptionUpdatedEvent (id: %s, timestamp: %s)", event.ID, event.Timestamp)
+
+		return nil
+	})
+
+	return nil
+}
+
+func unmarshalEvent(body []byte) (*Event, error) {
+	event := Event{}
+
+	if err := json.Unmarshal(body, &event); err != nil {
+		return nil, fmt.Errorf("unmarshalling response body to event: %w", err)
 	}
 
-	return &command, nil
+	return &event, nil
 }
 
 func (c *Client) Close() error {
 	close(c.stop)
-	return c.consumer.Close()
+	return c.queueConsumer.Close()
 }
