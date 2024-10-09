@@ -55,7 +55,7 @@ func (us *UserService) ChangeUserSubscriptionStatus(ctx context.Context, email s
 
 	user.IsSubscribed = isSubscribed
 
-	_, err = us.userRepository.Create(ctx, *user)
+	_, err = us.userRepository.Update(ctx, *user)
 	if err != nil {
 		return fmt.Errorf("updating user's isSubscribed status: %w", err)
 	}

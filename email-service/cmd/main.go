@@ -27,29 +27,6 @@ import (
 	"time"
 )
 
-// mailerClient
-//	- has an emailConsumer:
-//		- subscribes to RabbitMQ and listens to events
-//		- has listeners slice - functions which process messages from the queue
-// 		- Subscribe - subscribes a new consumer to the listeners slice
-// 		- Listen - function that listens either to queue or to the stop channel
-// 		- handleMessage - sends messages to the listeners
-//		- Close - closes connections to the queue
-//	- Subscribe - receives a mailer, creates a function and passes it to the consumer
-//	- Close - stops emailConsumer#Listen routine and calls emailConsumer#Close function
-//	- defines an interface for mailer command
-
-// + We save in local db next information: current currency (just db), users' emails;
-// All information we receive from currency-rate service through commands from RabbitMQ;
-// On currency-rate side we can either for each repository create a decorator, which will store in the target repository
-// data and after that publish (this service might be responsible for SAGA)
-// or this responsibility might take the service calling repositories;
-// Remove current mail publishing command and its appropriate listener;
-// Unsubscribe user
-// Instead of them create 2 new commands and 2 listeners;
-// + Each service should spin up its own db:(;
-// + For email-service its own migrations should be created;
-// + Create a repository for email-service
 func main() {
 	envs.Init("./pkg/envs/.env")
 
@@ -129,7 +106,7 @@ func startServer(r *gin.Engine) *http.Server {
 		Handler: r.Handler(),
 	}
 
-	log.Println("Starting server")
+	log.Println("Starting server on port:", cnf.ApplicationPort)
 	go func() {
 		// service connections
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
