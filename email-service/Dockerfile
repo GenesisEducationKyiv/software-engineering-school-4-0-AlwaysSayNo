@@ -48,8 +48,8 @@ COPY --from=build /app/internal/module/mail/migrations /migrations
 # Copy template files
 COPY --from=build /app/pkg/templates /pkg/templates
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 8081 to the outside world
+EXPOSE 8081
 
 # Command to run the executable
 CMD ["./main"]

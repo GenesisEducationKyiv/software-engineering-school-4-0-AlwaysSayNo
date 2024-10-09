@@ -20,6 +20,12 @@ func (r *Repository) Save(ctx context.Context, user model.User) (*model.User, er
 	return &user, result.Error
 }
 
+func (r *Repository) Update(ctx context.Context, user model.User) (*model.User, error) {
+	result := r.DB.WithContext(ctx).Save(&user)
+
+	return &user, result.Error
+}
+
 func (r *Repository) Get(ctx context.Context, id int) (*model.User, error) {
 	var user model.User
 

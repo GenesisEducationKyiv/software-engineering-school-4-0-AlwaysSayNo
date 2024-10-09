@@ -71,7 +71,7 @@ func (d *Decorator) ChangeSubscriptionStatus(ctx context.Context, id int, isSubs
 
 	data := UserSubscriptionUpdatedData{
 		Email:        responseDTO.Email,
-		IsSubscribed: true,
+		IsSubscribed: isSubscribed,
 	}
 
 	//todo SAGA

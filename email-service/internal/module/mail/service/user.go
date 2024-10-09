@@ -13,6 +13,7 @@ type UserRepository interface {
 	ExistsByEmail(email string) bool
 	GetByEmail(email string) (*model.User, error)
 	GetAllSubscribed(ctx context.Context) (*[]model.User, error)
+	Update(ctx context.Context, user model.User) (*model.User, error)
 }
 
 type UserService struct {

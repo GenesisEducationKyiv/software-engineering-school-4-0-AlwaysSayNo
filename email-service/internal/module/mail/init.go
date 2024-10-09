@@ -25,7 +25,7 @@ type Module struct {
 	EmailHandler emailhandl.Handler
 }
 
-func Init(db *gorm.DB, cnf config.EmailServiceConfig) *Module {
+func Init(db *gorm.DB, mailTransport *service.Mailer, cnf config.EmailServiceConfig) *Module {
 	userRepository := repository.NewUserRepository(db)
 	currencyRepository := repository.NewCurrencyRepository(db)
 
@@ -33,7 +33,7 @@ func Init(db *gorm.DB, cnf config.EmailServiceConfig) *Module {
 	currencyService := service.NewCurrencyService(currencyRepository)
 	emailService := emailserv.NewEmailService(userService, currencyService, cnf)
 
-	emailHandler := emailhandl.NewHandler(emailService)
+	emailHandler := emailhandl.NewHandler(emailService, mailTransport)
 
 	return &Module{
 		UserRepository:     *userRepository,

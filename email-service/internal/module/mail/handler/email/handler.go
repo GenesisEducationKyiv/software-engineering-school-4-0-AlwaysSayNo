@@ -17,9 +17,10 @@ type Handler struct {
 	mailTransport service.Mailer
 }
 
-func NewHandler(sender Sender) *Handler {
+func NewHandler(sender Sender, mailTransport *service.Mailer) *Handler {
 	return &Handler{
-		sender: sender,
+		sender:        sender,
+		mailTransport: *mailTransport,
 	}
 }
 

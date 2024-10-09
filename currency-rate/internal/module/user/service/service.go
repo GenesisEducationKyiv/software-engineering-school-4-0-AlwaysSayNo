@@ -16,6 +16,7 @@ type Repository interface {
 	Get(ctx context.Context, id int) (*model.User, error)
 	ExistsByEmail(ctx context.Context, email string) bool
 	ExistsById(ctx context.Context, id int) bool
+	Update(ctx context.Context, user model.User) (*model.User, error)
 }
 
 type Service struct {
@@ -78,7 +79,7 @@ func (s *Service) ChangeSubscriptionStatus(ctx context.Context, id int, isSubscr
 
 	user.IsSubscribed = isSubscribed
 
-	savedUser, err := s.userRepository.Save(ctx, *user)
+	savedUser, err := s.userRepository.Update(ctx, *user)
 	userDTO := dto.ToDTO(*savedUser)
 
 	return &userDTO, err

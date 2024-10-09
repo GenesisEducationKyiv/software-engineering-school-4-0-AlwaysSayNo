@@ -61,9 +61,9 @@ func main() {
 	d := db.Init(dbURL)
 
 	// MODULES
-	mailModule := mailmodule.Init(d, emailconf.LoadEmailServiceConfig())
-
 	mailTransport := getMailer(mailcnf.LoadMailerConfig())
+
+	mailModule := mailmodule.Init(d, mailTransport, emailconf.LoadEmailServiceConfig())
 
 	brokerClient, err := broker.NewClient(conscnf.LoadConsumerConfig())
 	if err != nil {

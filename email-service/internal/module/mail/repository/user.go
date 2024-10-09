@@ -20,6 +20,12 @@ func (ur *UserRepository) Create(ctx context.Context, user model.User) (*model.U
 	return &user, result.Error
 }
 
+func (ur *UserRepository) Update(ctx context.Context, user model.User) (*model.User, error) {
+	result := ur.DB.WithContext(ctx).Save(&user)
+
+	return &user, result.Error
+}
+
 func (ur *UserRepository) GetAllSubscribed(ctx context.Context) (*[]model.User, error) {
 	var users []model.User
 

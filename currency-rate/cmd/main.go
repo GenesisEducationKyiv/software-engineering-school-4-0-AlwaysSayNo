@@ -108,7 +108,7 @@ func registerRoutes(r *gin.Engine, currencyHandler currencymodule.Handler, userH
 	rootGroup := r.Group("/api/v1/")
 	rootGroup.POST("/subscribe", userHandler.Add)
 	rootGroup.GET("/users", userHandler.FindAll)
-	rootGroup.PUT("/users/subscribe", userHandler.FindAll)
+	rootGroup.PUT("/users/subscribe", userHandler.ChangeSubscriptionStatus)
 }
 
 func startServer(r *gin.Engine) *http.Server {
@@ -118,7 +118,7 @@ func startServer(r *gin.Engine) *http.Server {
 		Handler: r.Handler(),
 	}
 
-	log.Println("Starting server")
+	log.Println("Starting server on port:", cnf.ApplicationPort)
 	go func() {
 		// service connections
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
